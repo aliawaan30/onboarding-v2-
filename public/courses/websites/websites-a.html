@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="/gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 4: Why every business needs a website</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+:root{
+  --ground:#ffffff; --ground-2:#f5faf8; --surface:#ffffff; --surface-sunk:#f7fbf9;
+  --ink:#15171d; --ink-2:#3b414f; --ink-3:#6b7280; --ink-4:#9aa0ab;
+  --line:#e6eae8; --line-2:#cfd8d4;
+  --accent:#32d09f; --accent-deep:#14926c; --accent-ink:#052e21;
+  --accent-tint:#e7faf3; --accent-tint-2:#ccf3e5; --accent-line:#90e5c8;
+  --accent2:#8b5cf6; --accent2-deep:#6a3de0; --accent2-tint:#f2edff; --accent2-line:#c9b6f9;
+  --mod:var(--accent); --mod-deep:var(--accent-deep); --mod-ink:var(--accent-ink);
+  --ok:#0f8a55; --ok-tint:#e4f6ed;
+  --radius:18px; --radius-sm:12px;
+  --shadow-sm:0 1px 2px rgba(21,23,29,0.05);
+  --shadow-md:0 1px 2px rgba(21,23,29,0.05),0 8px 24px -12px rgba(21,23,29,0.16);
+  --display:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.2,0.7,0.3,1);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17.5px;line-height:1.65;-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;background-image:radial-gradient(900px 460px at 12% -180px,rgba(50,208,159,0.10),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(139,92,246,0.09),transparent 66%);background-repeat:no-repeat;background-attachment:fixed;}
+::selection{background:var(--accent-tint-2);color:var(--accent-deep);}
+.shell{max-width:730px;margin:0 auto;padding:64px 22px 96px;}
+p{margin:0 0 12px;color:var(--ink-2);max-width:62ch;}
+.muted{color:var(--ink-3);}
+section{margin-top:58px;}
+.eyebrow{margin:0 0 12px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent-deep);font-weight:700;display:flex;align-items:center;gap:9px;}
+.eyebrow::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--accent);flex:0 0 auto;}
+.hero{animation:rise 620ms var(--ease) both;}
+.hero h1{margin:0 0 12px;font-family:var(--display);font-size:clamp(31px,7.4vw,48px);line-height:1.04;letter-spacing:-0.03em;font-weight:800;color:var(--ink);}
+.hero .lede{font-size:18.5px;color:var(--ink-2);max-width:56ch;}
+h2{margin:0 0 14px;font-family:var(--display);font-size:24px;line-height:1.15;letter-spacing:-0.02em;font-weight:700;color:var(--ink);}
+@keyframes rise{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+b{color:var(--ink);}
+.big{font-family:var(--display);font-weight:700;font-size:1.2rem;color:var(--ink);max-width:40ch;}
+.hit{margin:18px 0 6px;background:var(--accent-tint);border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:var(--radius-sm);padding:18px 22px;}
+.hit p{margin:0;color:#0d4d39;}
+.hit p+p{margin-top:8px;}
+.hit .big{color:#0b3f2f;max-width:46ch;}
+.demos{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:20px 0 10px;}
+.demo{position:relative;border:1px solid var(--line);border-radius:var(--radius-sm);background:var(--surface);box-shadow:var(--shadow-sm);padding:30px 10px 10px;margin:0;}
+.demo::before{content:'';position:absolute;top:0;left:0;right:0;height:22px;background:var(--ground-2);border-bottom:1px solid var(--line);border-radius:11px 11px 0 0;}
+.demo::after{content:'';position:absolute;top:8px;left:10px;width:5px;height:5px;border-radius:50%;background:var(--line-2);box-shadow:9px 0 0 var(--line-2),18px 0 0 var(--line-2);}
+.demo-slot{display:grid;place-items:center;gap:6px;min-height:150px;border:1px dashed var(--line-2);border-radius:9px;background:var(--surface-sunk);color:var(--ink-4);font-size:.8rem;text-align:center;padding:12px;}
+.demo-slot svg{width:26px;height:26px;color:var(--accent-deep);opacity:.65;}
+.demos figcaption{margin-top:8px;text-align:center;color:var(--ink-3);font-size:.8rem;}
+.price{display:inline-block;background:var(--accent-tint);border:1px solid var(--accent-line);border-radius:var(--radius-sm);padding:14px 20px;font-family:var(--display);font-weight:700;font-size:1.05rem;color:var(--accent-deep);margin:6px 0 4px;}
+.quotecard{background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:var(--radius-sm);padding:18px 22px;margin:14px 0;color:#3a2a72;font-size:1.02rem;}
+figure.shot{margin:14px 0;padding:26px 18px;background:var(--ground-2);border:1px dashed var(--line-2);border-radius:var(--radius-sm);text-align:center;color:var(--ink-4);}
+figure.shot svg{width:28px;height:28px;display:block;margin:0 auto 8px;color:var(--ink-4);}
+figure.shot figcaption{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;font-weight:700;color:var(--ink-4);}
+/* outro finish card */
+.outro{margin-top:44px;animation:rise 520ms var(--ease) both;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt,var(--accent2,#8b5cf6))) border-box;border:2px solid transparent;border-radius:var(--radius);padding:34px 28px;text-align:center;box-shadow:var(--shadow-lg,var(--shadow-md));}
+.finish-badge{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(180deg,var(--mod),var(--mod-deep));display:grid;place-items:center;color:var(--mod-ink);box-shadow:0 10px 24px -10px var(--mod);}
+.finish-badge svg{width:28px;height:28px;}
+.finish-title{margin:0 0 6px;font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+.finish-sub{margin:0 0 6px;color:var(--ink-3);font-size:.98rem;}
+.next{display:inline-block;margin-top:16px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);font-weight:700;border-radius:12px;padding:13px 24px;text-decoration:none;font-family:var(--display);box-shadow:0 8px 20px -10px var(--mod);}
+.next:hover{transform:translateY(-1px);}
+@media(max-width:600px){.demos{grid-template-columns:1fr;}}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;}}
+/* ------- complete block ------- */
+.cblock-btn{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:16px;font-weight:700;cursor:pointer;min-height:52px;padding:14px 26px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--accent,#32d09f);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.cblock-btn:hover{transform:translateY(-1px);}
+.cblock-btn:active{transform:translateY(0);}
+.cblock-btn.is-done,.cblock-btn.is-done:hover{background:var(--surface,#ffffff);color:var(--accent-deep,#14926c);border-color:var(--accent-line,#90e5c8);box-shadow:none;cursor:default;transform:none;}
+.outro .cblock-btn{margin:18px auto 0;}
+.outro .next{display:block;width:-moz-fit-content;width:fit-content;margin:14px auto 0;}
+.outro:not(.is-done) .next{background:none;color:var(--ink-3,#6b7280);font-weight:600;font-size:.95rem;padding:9px 14px;box-shadow:none;}
+.outro:not(.is-done) .next:hover{color:var(--ink-2,#3b414f);transform:none;}
+.outro.is-done .next{background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 8px 20px -10px var(--accent,#32d09f),0 0 0 4px var(--accent-tint-2,#ccf3e5);}
+@media (max-width:420px){.cblock-btn{width:100%;}}
+@media (prefers-reduced-motion: reduce){.cblock-btn{transition:none;}}
+</style>
+</head>
+<body class="mod-web">
+<main class="shell">
+
+<header class="hero">
+<div class="eyebrow">Module 4 &middot; Page A</div>
+<h1>Why every business needs a website</h1>
+<p class="lede">Nothing to build yet. Watch the video, read this once, and get why this sells.</p>
+<p class="lede">By the end of this module you'll have picked a real local business off your board and built them a full website, with their real services, reviews and phone number on it, finished and ready to show.</p>
+<figure class="vid"><video src="/course-media/websites-intro.mp4" controls preload="metadata" playsinline></video></figure>
+</header>
+
+<section>
+<div class="eyebrow">The truth of it</div>
+<h2>You Are Not Selling Websites</h2>
+<p class="big">You're selling being findable and looking real.</p>
+<p>Here's what happens to a business with no website.</p>
+<p>A customer searches "plumber near me". Five results come up. Four have websites. One has nothing behind the name.</p>
+<p>The customer doesn't ring to ask why. They just ring someone else.</p>
+<p>That happens every week, and the business never finds out.</p>
+</section>
+
+<section>
+<div class="eyebrow">Why now</div>
+<h2>This Job Did Not Exist Two Years Ago</h2>
+<p>Building a proper website used to mean a designer, weeks of back and forth, and thousands of dollars. That is why so many small businesses still don't have one.</p>
+<p>AI changed the cost and the time.</p>
+<p>The same quality of site, the kind a designer would charge thousands for, now gets built in minutes, for a few cents of computer time.</p>
+<p><b>The businesses still think it costs thousands and takes weeks. It doesn't any more. You are the only one in their life who knows that.</b></p>
+<p>That gap is the whole business. It will not stay open forever, which is exactly why you are learning this now.</p>
+</section>
+
+<section>
+<div class="eyebrow">Why they say yes</div>
+<h2>They Already Know They Need One</h2>
+<p>You're not convincing anyone. They've been meaning to sort it for two years. You're removing the reason they haven't.</p>
+<p>Because the normal way of getting a website is painful.</p>
+<p>A web designer quotes thousands, takes six weeks, then asks them to write their own words and send photos.</p>
+<p>Most businesses stall right there, and it dies.</p>
+<p><b>You skip the whole painful bit.</b></p>
+<p>Their name, services, reviews, hours and phone number are already public on their Google listing.</p>
+<p>You build the site from that. They give you nothing.</p>
+</section>
+
+<section>
+<div class="eyebrow">Your leads</div>
+<h2>You Already Have the List</h2>
+<p>Most people starting a business have no idea who to sell to. You got past that in Module 3.</p>
+<p>Your board is already full of businesses near you with no website at all. Their name, what they do, and their phone number, all sitting there waiting.</p>
+<div class="hit">
+<p class="big">Every card on that board is someone who needs exactly what you sell, with their phone number printed next to their name.</p>
+<p>You can top it up any time, for as many areas as you want, and it costs you nothing to run.</p>
+</div>
+<p>You are not hunting for customers. You are reading a list of them.</p>
+</section>
+
+<section>
+<div class="eyebrow">Your unfair advantage</div>
+<h2>Speed Is the Whole Game</h2>
+<p>A web designer takes six weeks.</p>
+<div class="hit">
+<p class="big">Your co-founder builds the site in about five minutes.</p>
+<p>Not a template. Their real services, their real reviews, their real hours, their photos, a contact form that works, and a chat assistant that answers their customers.</p>
+</div>
+<p>On the phone you won't say five minutes, because nobody believes it and it makes the work sound cheap.</p>
+<p class="big">"I can have a preview ready for you in 24 hours."</p>
+<p class="muted">That one sentence is the strongest thing you'll say in this whole module. Nobody else in their inbox can say it, and it gives you a day of breathing room you probably won't need.</p>
+</section>
+
+<section>
+<div class="eyebrow">See it</div>
+<h2>This Is What You'll Hand Them</h2>
+<p>Three real sites, built exactly the way you are about to build yours.</p>
+<div class="demos">
+  <figure class="demo">
+    <div class="demo-slot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="M6.5 13.5l3-3 2.5 2.5 3.5-3.5 2 2"/></svg>
+      <span>Demo one</span>
+    </div>
+    <figcaption>A trades business</figcaption>
+  </figure>
+  <figure class="demo">
+    <div class="demo-slot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="M6.5 13.5l3-3 2.5 2.5 3.5-3.5 2 2"/></svg>
+      <span>Demo two</span>
+    </div>
+    <figcaption>A local service</figcaption>
+  </figure>
+  <figure class="demo">
+    <div class="demo-slot">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2.5" y="4" width="19" height="13" rx="2"/><path d="M8.5 21h7M12 17v4"/><path d="M6.5 13.5l3-3 2.5 2.5 3.5-3.5 2 2"/></svg>
+      <span>Demo three</span>
+    </div>
+    <figcaption>A professional office</figcaption>
+  </figure>
+</div>
+<p class="muted">Real reviews, real hours, real phone number. Every one of them started as a name on a list, exactly like the ones you're about to find.</p>
+</section>
+
+<section>
+<div class="eyebrow">Why the sale is easy</div>
+<h2>Nobody Pays You Until They Have Seen It</h2>
+<p>Think about how every other person who rings that business sells to them. They describe something. They send a quote for a thing that does not exist yet. They ask for money up front and a deposit for work nobody has seen.</p>
+<p>You do the opposite.</p>
+<div class="hit">
+<p class="big">The site is already built and on their screen before money is ever mentioned.</p>
+<p>There is nothing to imagine and nothing to risk. They are not deciding whether to hire you. They are deciding whether to keep something that already exists with their name on it.</p>
+</div>
+<p>That is a completely different conversation, and it is why this works for someone who has never sold anything in their life.</p>
+<p>Build first while you are learning. Later, once you are quick at it, you can turn it around and sell first. Blake explains when to make that switch.</p>
+<figure class="shot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h9a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 14 19H5a1.5 1.5 0 0 1-1.5-1.5v-11z"/><path d="M15.5 10.5 20.5 7.5v9l-5-3z"/></svg><figcaption>[BLAKE VIDEO: why you build first, then flip to selling first once you are good]</figcaption></figure>
+</section>
+
+<section>
+<div class="eyebrow">The money</div>
+<h2>What an Afternoon Is Worth</h2>
+<p>What you hand over is a real single page site with their real photos, a working enquiry form, and a chat assistant that answers their customers.</p>
+<div class="hit">
+<p class="big">The build takes minutes. The whole job is an afternoon.</p>
+<p>To the owner it is worth real money, because they are comparing you to the designer who quoted them thousands two years ago and never got started.</p>
+</div>
+<p class="price">$500 to $5,000 per client</p>
+<p>The simple sites sit at the bottom of that range. The bigger ones, more pages and video, sit at the top. <b>Landing the Client teaches you how to price it</b>, so you do not have to work that out now.</p>
+<p><b>Start on the simple ones on purpose.</b> They are cheap and fast to build, so a mistake costs you a few cents and ten minutes instead of a real loss.</p>
+<p>Three or four of those and something changes. You have real clients, real sites to show, and you have stopped guessing.</p>
+</section>
+
+<section>
+<div class="eyebrow">How you open the call</div>
+<h2>You Ring as a Customer, Not a Salesperson</h2>
+<p>Here is how a normal sales call goes. Someone rings, says they sell websites, and the owner switches off before the second sentence. They get those calls every week.</p>
+<p>You do something different, and it takes ten seconds.</p>
+<p>You ring the business the way a real customer would, trying to book them in, and you run into the exact problem you are calling about.</p>
+<div class="quotecard">"I got you guys recommended by one of my neighbours. I tried to book you online, and I realised you don't have a website. Is there a reason for that?"</div>
+<p>Now the owner is not listening to a pitch. They are listening to a customer who nearly went somewhere else.</p>
+<p>They feel the problem for themselves, in their own words, before you have offered them anything.</p>
+<p class="muted">The whole call is written out for you in Module 7, and you practise it with your co-founder before a real person ever hears you.</p>
+</section>
+
+<section>
+<div class="eyebrow">One niche</div>
+<h2>This Matters More Than It Sounds</h2>
+<p>A knee surgeon charges ten times what a GP does for the same hour.</p>
+<p>Same years of training. One difference: they do one thing, so everyone trusts them with that thing.</p>
+<p>Niching down works exactly the same here.</p>
+<p>When you only serve plumbers, your fifth plumber call sounds like someone who has seen their exact mess before.</p>
+<p>Generalists never get there.</p>
+<p><b>And plumbers refer plumbers.</b> One happy plumber talks to five others every week on job sites, and they all have the same problem.</p>
+<p><b>So everything you build from here gets built around YOUR niche.</b></p>
+<p>You picked it with your co-founder in Module 1. Every search, brief and site in this module assumes it.</p>
+</section>
+
+<section>
+<div class="eyebrow">Compounding</div>
+<h2>Every Site Sells the Next One</h2>
+<p>Every site you finish becomes a card on your own website: a screenshot, two sentences, a link.</p>
+<p>After three sites, your calls change shape: "I built the sites for [two local businesses they know]. Want me to send you a link?"</p>
+<p><b>From then on, the portfolio does the selling. You just dial.</b></p>
+</section>
+
+<div class="outro" id="outro">
+<div class="finish-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></div>
+<h2 class="finish-title">Let's Build One</h2>
+<p class="finish-sub">Open your board and pick one business off it.</p>
+<p class="finish-sub">Next page you build one. Landing the Client teaches you how to sell it. Module 8 teaches you to hand it over.</p>
+<button type="button" class="cblock-btn">Complete This Page</button>
+<a class="next" href="websites-b.html">Next: Build the website &rarr;</a>
+</div>
+
+
+</main>
+<script>
+/* ---- complete card ---- */
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---- audio + confetti (copied from business/business-a.html) ---- */
+  var ac=null;
+  function ctx(){try{if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();}if(ac.state==='suspended')ac.resume();return ac;}catch(e){return null;}}
+  function ding(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.13;out.connect(a.destination);[[880,0,0.34],[1318.5,0.075,0.32]].forEach(function(n){var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(n[0],now+n[1]);g.gain.setValueAtTime(0.0001,now+n[1]);g.gain.exponentialRampToValueAtTime(1,now+n[1]+0.012);g.gain.exponentialRampToValueAtTime(0.0001,now+n[1]+n[2]);o.connect(g);g.connect(out);o.start(now+n[1]);o.stop(now+n[1]+n[2]+0.05);});}
+  function confetti(){if(reduce)return;var cv=document.createElement('canvas');cv.setAttribute('aria-hidden','true');cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';document.body.appendChild(cv);var c=cv.getContext('2d');if(!c){cv.remove();return;}var dpr=Math.min(window.devicePixelRatio||1,2);var w=window.innerWidth,h=window.innerHeight;cv.width=w*dpr;cv.height=h*dpr;c.scale(dpr,dpr);var cols=['#32d09f','#14926c','#8b5cf6','#c9b6f9','#8b5cf6','#15171d'];var n=w<600?90:160;var ps=[];for(var i=0;i<n;i++){ps.push({x:w*(0.5+(Math.random()-0.5)*0.5),y:h*0.35+Math.random()*40,vx:(Math.random()-0.5)*9,vy:-6-Math.random()*9,s:5+Math.random()*7,r:Math.random()*Math.PI,vr:(Math.random()-0.5)*0.35,col:cols[Math.floor(Math.random()*cols.length)]});}var st=performance.now(),raf=0,dur=2000;function fr(now){var el=now-st,life=Math.min(el/dur,1);c.clearRect(0,0,w,h);ps.forEach(function(p){p.vy+=0.32;p.vx*=0.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.globalAlpha=1-life*life;c.fillStyle=p.col;c.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);c.restore();});if(el<dur){raf=requestAnimationFrame(fr);}else{cancelAnimationFrame(raf);cv.remove();}}raf=requestAnimationFrame(fr);}
+  window.__ding=ding;window.__confetti=confetti;
+  var wrap=document.getElementById('outro');
+  if(!wrap)return;
+  var btn=wrap.querySelector('.cblock-btn');
+  if(!btn)return;
+  var key='done:'+location.pathname;
+  function markDone(){
+    btn.textContent='Completed';
+    btn.classList.add('is-done');
+    btn.disabled=true;
+    wrap.classList.add('is-done');
+  }
+  try{if(localStorage.getItem(key)==='1')markDone();}catch(e){}
+  btn.addEventListener('click',function(){
+    try{localStorage.setItem(key,'1');}catch(e){}
+    markDone();
+    try{if(!reduce&&window.__confetti)window.__confetti();if(window.__ding)window.__ding();}catch(e){}
+  });
+})();
+</script>
+<script src="/nav.js" defer></script>
+</body>
+</html>

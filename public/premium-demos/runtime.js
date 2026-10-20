@@ -1,0 +1,30 @@
+/* Shared behaviour only. Layout and content belong to each business page. */
+(() => {
+ const menu=document.querySelector('.menu-toggle'),nav=document.querySelector('nav');
+ function closeMenu(restore=false){nav.classList.remove('open');menu.setAttribute('aria-expanded','false');if(restore)menu.focus();}
+ menu?.addEventListener('click',()=>{const open=menu.getAttribute('aria-expanded')!=='true';menu.setAttribute('aria-expanded',String(open));nav.classList.toggle('open',open);if(open)nav.querySelector('a').focus();});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&nav?.classList.contains('open'))closeMenu(true);});
+ nav?.querySelectorAll('a').forEach(a=>a.addEventListener('click',()=>closeMenu(true)));
+ document.querySelectorAll('.option').forEach(button=>button.addEventListener('click',()=>{document.querySelectorAll('.option').forEach(b=>b.setAttribute('aria-pressed',String(b===button)));document.querySelectorAll('[data-panel]').forEach(p=>p.hidden=p.dataset.panel!==button.dataset.choice);document.querySelector('.save-status').textContent='';}));
+ document.querySelectorAll('.save').forEach(button=>button.addEventListener('click',()=>{const panel=button.closest('.choice-panel');const text=[document.body.dataset.brand,button.dataset.save,...Array.from(panel.querySelectorAll('h3,p')).map(x=>x.textContent)].join('\n\n');try{localStorage.setItem('premium-direction-'+document.body.dataset.brand,text);}catch{}const url=URL.createObjectURL(new Blob([text],{type:'text/plain'}));const a=document.createElement('a');a.href=url;a.download=document.body.dataset.brand.toLowerCase().replace(/[^a-z0-9]+/g,'-')+'-direction.txt';a.click();setTimeout(()=>URL.revokeObjectURL(url),2000);document.querySelector('.save-status').textContent='Your direction is ready to download. Keep it with your plans.';}));
+ const small=matchMedia('(max-width:700px)'),reduced=matchMedia('(prefers-reduced-motion:reduce)');
+ let controllers=[];
+ class Film {
+  constructor(section){this.section=section;this.video=section.querySelector('video');this.sticky=section.querySelector('.film-sticky');this.active=false;this.loaded=false;this.loading=false;this.failed=false;this.seeking=false;this.raf=0;this.url=null;this.target=0;this.destroyed=false;this.seeks=0;this.stalls=0;
+   this.onSeek=()=>{this.stalls=0;this.seeking=false;clearTimeout(this.seekTimeout);this.schedule();};this.video.addEventListener('seeked',this.onSeek);
+   this.onError=()=>this.fallback();this.video.addEventListener('error',this.onError);
+   section.classList.add('scrub');section.dataset.mode='scroll';
+   this.observer=new IntersectionObserver(entries=>{for(const e of entries){this.active=e.isIntersecting;if(this.active&&!document.hidden){this.load();this.schedule();}}},{rootMargin:'200px 0px'});this.observer.observe(section);
+  }
+  async load(){if(this.loading||this.loaded||this.failed||this.destroyed)return;this.loading=true;this.abort=new AbortController();const timer=setTimeout(()=>this.abort.abort(),25000);
+   try{const response=await fetch(this.video.dataset.src,{signal:this.abort.signal});if(!response.ok)throw Error('media '+response.status);const blob=await response.blob();if(this.destroyed)return;this.url=URL.createObjectURL(blob);this.video.src=this.url;await new Promise((resolve,reject)=>{const done=()=>{clearTimeout(t);this.video.removeEventListener('loadedmetadata',done);resolve();};const t=setTimeout(()=>reject(Error('metadata timeout')),5000);this.video.addEventListener('loadedmetadata',done,{once:true});this.video.load();});if(this.destroyed)return;this.loaded=true;this.section.classList.add('ready');this.schedule();}
+   catch(error){if(!this.destroyed)this.fallback();}finally{clearTimeout(timer);this.loading=false;}
+  }
+  schedule(){if(this.raf||this.destroyed||this.failed||document.hidden||!this.active)return;this.raf=requestAnimationFrame(()=>{this.raf=0;this.update();});}
+  update(){const rect=this.section.getBoundingClientRect(),travel=this.section.offsetHeight-this.sticky.offsetHeight;const p=Math.max(0,Math.min(1,-rect.top/Math.max(1,travel)));this.section.style.setProperty('--progress',p);this.section.dataset.progress=p.toFixed(3);if(!this.loaded)return;this.target=p*Math.max(0,this.video.duration-.05);if(!this.seeking&&Math.abs(this.video.currentTime-this.target)>.035){this.seeking=true;this.seeks++;this.video.currentTime=this.target;this.seekTimeout=setTimeout(()=>{if(this.seeking){this.seeking=false;if(++this.stalls>=2)this.fallback();else this.schedule();}},1500);}}
+  fallback(){if(this.destroyed||this.failed)return;this.failed=true;this.section.classList.remove('scrub','ready');this.section.dataset.mode='still-failure';this.abort?.abort();cancelAnimationFrame(this.raf);clearTimeout(this.seekTimeout);this.video.removeAttribute('src');this.video.load();if(this.url){URL.revokeObjectURL(this.url);this.url=null;}}
+  destroy(){this.destroyed=true;this.observer.disconnect();this.abort?.abort();cancelAnimationFrame(this.raf);clearTimeout(this.seekTimeout);this.video.removeEventListener('seeked',this.onSeek);this.video.removeEventListener('error',this.onError);this.video.removeAttribute('src');this.video.load();if(this.url)URL.revokeObjectURL(this.url);this.section.classList.remove('scrub','ready');}
+ }
+ function configure(){controllers.forEach(c=>c.destroy());controllers=[];const still=small.matches||reduced.matches||navigator.connection?.saveData;document.querySelectorAll('.film').forEach(section=>{section.dataset.mode=still?'still-preference':'scroll';if(!still)controllers.push(new Film(section));});}
+ const schedule=()=>controllers.forEach(c=>c.schedule());window.addEventListener('scroll',schedule,{passive:true});window.addEventListener('resize',schedule,{passive:true});document.addEventListener('visibilitychange',()=>{if(!document.hidden){controllers.forEach(c=>{if(c.active)c.load();});schedule();}});small.addEventListener('change',configure);reduced.addEventListener('change',configure);window.addEventListener('pagehide',()=>controllers.forEach(c=>c.destroy()));window.addEventListener('pageshow',e=>{if(e.persisted)configure();});configure();
+})();

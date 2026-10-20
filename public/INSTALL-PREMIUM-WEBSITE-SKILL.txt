@@ -1,0 +1,11 @@
+Install the attached premium-website-builder.zip as my Premium Website Builder skill.
+
+Inspect the archive paths before extracting. Install or update only its premium-website-builder folder at /app/.agents/skills/premium-website-builder/. Preserve my other skills and projects. Read SKILL.md and verify the files against MANIFEST.json.
+
+This is the canonical premium website skill, version 3.0.0. It supersedes earlier premium-scroller-v2 and 10k instructions for new premium website tasks. Keep the standard local-business website and four-brand onboarding workflows separate.
+
+Blake approved the five reference designs. The package contains the whole-page design method, media prompts, tested scroll runtime, five HTML/CSS source references, visual screenshots, research and QA instructions. Use these when building; do not reduce this to a hero video followed by generic cards.
+
+Use this skill whenever I explicitly ask for a premium or cinematic website. The source-only HTML examples use media from the separate reference-site archive; they are composition references, not missing assets to invent. Generate new business-specific assets only when a build is requested and within my approved media provider and spending scope.
+
+Confirm the installed version and validation result, and save its path in memory. Do not generate media, create an app or modify an existing website during installation.

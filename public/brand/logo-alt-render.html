@@ -1,0 +1,19 @@
+<meta charset="utf-8">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:"Helvetica Neue",-apple-system,Arial,sans-serif; }
+  .board { width:1600px; height:400px; background:#0a0f0d; display:flex; align-items:center; justify-content:center; }
+  /* v2: lowercase + green full stop */
+  .v2 { color:#fff; font-size:104px; font-weight:700; letter-spacing:-3px; }
+  .v2 .dot { color:#00d67a; }
+  /* v3: cursor block, terminal vibe */
+  .v3 { color:#fff; font-size:96px; font-weight:800; letter-spacing:1px; display:flex; align-items:center; gap:18px; }
+  .v3 .cur { display:inline-block; width:52px; height:96px; background:#00d67a; border-radius:8px; }
+  /* v4: stacked, agency big */
+  .v4 { text-align:left; line-height:.95; }
+  .v4 .top { color:#00d67a; font-size:64px; font-weight:800; letter-spacing:14px; }
+  .v4 .big { color:#fff; font-size:150px; font-weight:900; letter-spacing:2px; }
+</style>
+<div class="board"><span class="v2">the ai agency<span class="dot">.</span></span></div>
+<div class="board"><span class="v3">THE AI AGENCY<span class="cur"></span></span></div>
+<div class="board"><div class="v4"><div class="top">THE AI</div><div class="big">AGENCY</div></div></div>

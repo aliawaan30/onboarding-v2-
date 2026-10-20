@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex,nofollow">
+<title>Sign in — Start Your AI Agency</title>
+<style>
+  :root{--bg:#0a0a0a;--card:#161616;--line:#2c2c2c;--white:#fff;--dim:#b9b9b9;--green:#32d09f}
+  *{margin:0;padding:0;box-sizing:border-box}
+  body{background:var(--bg);color:var(--white);font-family:'Archivo',system-ui,Arial,sans-serif;
+    min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+  .card{width:100%;max-width:420px;background:var(--card);border:1px solid var(--line);
+    border-radius:18px;padding:34px 30px}
+  h1{font-size:1.5rem;font-weight:900;margin-bottom:8px}
+  p{color:var(--dim);font-size:.98rem;line-height:1.55;margin-bottom:20px}
+  label{display:block;font-size:.8rem;color:var(--dim);margin-bottom:8px;font-weight:700}
+  input{width:100%;background:#0d0d0d;border:2px solid #333;border-radius:12px;color:#fff;
+    font-size:1rem;padding:15px;outline:none;margin-bottom:14px}
+  input:focus{border-color:var(--green)}
+  button{width:100%;background:var(--green);color:#04140f;border:0;border-radius:12px;
+    font-weight:900;font-size:1.05rem;padding:16px;cursor:pointer}
+  button:disabled{opacity:.6;cursor:default}
+  .note{margin-top:16px;font-size:.85rem;color:#8a8a8a}
+  .ok{color:var(--green)}
+  .err{color:#ff6b6b}
+  [hidden]{display:none!important}
+</style>
+</head>
+<body>
+  <div class="card">
+    <h1>Sign in to your course</h1>
+    <p>Pop your email in and we will send you a one-tap sign in link. No password to remember.</p>
+    <form id="f">
+      <label for="email">Your email</label>
+      <input id="email" type="email" placeholder="you@example.com" autocomplete="email" required>
+      <button id="go" type="submit">Send my link</button>
+    </form>
+    <div id="msg" class="note" hidden></div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+<script>
+(function(){
+  var SUPA_URL='https://klyiqncsgxcrbdgonaaj.supabase.co';
+  var ANON='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtseWlxbmNzZ3hjcmJkZ29uYWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MjkxMTQsImV4cCI6MjA5MTAwNTExNH0.WuM-vY6LBoNF2XiQJG2YX5CDOa-AWVGlhobfeuBOLl8';
+  // only ever redirect to a same-site path, never an external URL (no open redirect)
+  function safeNext(){
+    try{
+      var n=new URLSearchParams(location.search).get('next')||'/hub/index.html';
+      if(n.charAt(0)==='/' && n.charAt(1)!=='/') return n;
+    }catch(e){}
+    return '/hub/index.html';
+  }
+  var msg=document.getElementById('msg');
+  function show(t,cls){ msg.hidden=false; msg.className='note '+(cls||''); msg.textContent=t; }
+  if(!window.supabase){ show('Could not load sign in. Refresh the page.','err'); return; }
+  var sb=window.supabase.createClient(SUPA_URL,ANON,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
+  // already signed in (or just returned from the magic link) -> go where they wanted
+  sb.auth.getSession().then(function(r){
+    if(r.data && r.data.session){ location.replace(safeNext()); }
+  });
+  document.getElementById('f').addEventListener('submit', function(e){
+    e.preventDefault();
+    var email=document.getElementById('email').value.trim();
+    var go=document.getElementById('go');
+    if(!email){ return; }
+    go.disabled=true; go.textContent='Sending...';
+    var redirect=location.origin+'/login.html?next='+encodeURIComponent(safeNext());
+    sb.auth.signInWithOtp({ email:email, options:{ emailRedirectTo:redirect } }).then(function(res){
+      if(res.error){ go.disabled=false; go.textContent='Send my link'; show(res.error.message||'That did not send. Try again.','err'); }
+      else { document.getElementById('f').hidden=true; show('Check your email for your one-tap sign in link. It signs you straight in.','ok'); }
+    });
+  });
+})();
+</script>
+</body>
+</html>

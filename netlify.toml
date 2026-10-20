@@ -1,0 +1,22 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+# old link keeps working
+[[redirects]]
+  from = "/waitlist"
+  to = "/jarvis-aiagency"
+  status = 301
+
+[[redirects]]
+  from = "/waitlist/*"
+  to = "/jarvis-aiagency"
+  status = 301
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

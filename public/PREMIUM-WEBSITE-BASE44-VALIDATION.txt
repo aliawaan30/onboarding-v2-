@@ -1,0 +1,13 @@
+Use the installed Premium Website Builder skill. I have attached premium-websites-reference-sites.zip. This is a controlled port of a locally tested, Blake-approved website before we test new generation with a fresh agent.
+
+Use the restaurant reference, EMBER & SALT. Keep its actual composition, typography, copy and approved media. Do not generate anything or spend on new media. Inspect the archive before extracting it. The reference-sites folder is a complete working local website; restaurant.html, style.css, runtime.js and the assets folder contain what you need. The other four websites are comparisons and must not be built during this first port.
+
+Use the dedicated test app already identified in this conversation. If none has been identified, discover the available apps and choose only a clearly dedicated premium test app. If no suitable app exists and your tools cannot create one, ask me for that one setup action. Preserve other projects.
+
+Implement the restaurant as the test app's default native frontend page. Use the actual framework and normal frontend pipeline. Adapt the shared vanilla runtime into lifecycle-managed components and framework event handlers. Do not serve interactive HTML from a backend function. Preserve the two scroll film sections, the food-and-menu composition between them, the dining selector and the real direction download. Do not replace the tested visual design with a generic template.
+
+Upload or copy the needed assets to durable app storage. Use the approved web files, not the large originals or temporary provider URLs. Check access and CORS on the final URLs. Follow the installed skill's browser QA. Verify both films move forward and reverse, actual controls work, the phone version is composed, and reduced motion/data saving avoid video downloads. Report unavailable checks as unverified.
+
+Keep build and publish state separate. Inspect the actual builder response, changed files and preview route. An unchanged public bundle does not prove source code was unchanged. If the preview is built but owner publication is necessary, ask once for that publish action after the work is ready. Do not resend builds to solve a publish gap.
+
+Return the actual app URL, changed files, completed checks, unverified checks and visible Base44 credit use. Record that local design approval exists but this is the first Base44 port test. Do not claim fresh-agent generation is repeatable until we run that separate test.
