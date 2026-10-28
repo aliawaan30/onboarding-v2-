@@ -119,9 +119,15 @@ export const StepCard = forwardRef<HTMLElement, Props>(function StepCard(
                       ))}
                     </div>
                   </fieldset>
-                  <a className="btn btn-ghost" href="/brand-showcase-v8.zip" download="brand-showcase-v8.zip">
-                    Download the brand pack
-                  </a>
+                  <div className="download">
+                    <a className="btn btn-download" href="/brand-showcase-v8.zip" download="brand-showcase-v8.zip">
+                      <svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true">
+                        <path d="M10 3v9m0 0 3.5-3.5M10 12 6.5 8.5M4 15.5h12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      Download the brand pack
+                    </a>
+                    <span className="download-note">The Nike, Apple, IKEA and McDonald's designs. Attach it below.</span>
+                  </div>
                   <p className="step-para">Attach this file in {ctx.agentPossessive} chat with the message below.</p>
                   <CopyBox label={p.label} text={text} />
                   {p.phoneText && (

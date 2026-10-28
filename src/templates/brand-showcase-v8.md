@@ -36,7 +36,7 @@ Run these operations yourself in the sandbox. Never send the student to a termin
 
 ```text
 node /app/.agents/skills/brand-showcase-builder/scripts/render.mjs --verify
-node /app/.agents/skills/brand-showcase-builder/scripts/render.mjs --brand nike --student Blake --out /app/showcases/nike
+node /app/.agents/skills/brand-showcase-builder/scripts/render.mjs --brand nike --student "<their first name>" --out /app/showcases/nike
 ```
 
 Replace `nike` with `apple`, `ikea` or `mcd` and use the known first name. Run once for the chosen brand. The renderer verifies bundled checksums, embeds every image/font into standalone `index.html`, and produces a small native React `Showcase.jsx`, the corresponding static assets, and a build report. It needs Node 20 and no package install, browser binary, paid generator or external account.

@@ -24,7 +24,7 @@ const FILM_MODE = new URLSearchParams(window.location.search).has('film')
 const FILM_STUDENT: Student = {
   id: 'film',
   email: 'film@local',
-  first_name: 'Blake',
+  first_name: 'Alex',
   agent_name: null,
   setup_code: 'GREEN-LIGHT-90',
   current_step: 0,
@@ -44,6 +44,20 @@ export default function App() {
   const [announce, setAnnounce] = useState('')
   const [showWatch, setShowWatch] = useState(false)
   const [choosingPath, setChoosingPath] = useState(false)
+  const [finishOpen, setFinishOpen] = useState(false)
+
+  const closeFinish = useCallback(() => {
+    setFinishOpen(false)
+    window.setTimeout(() => document.getElementById('finish-card')?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 50)
+  }, [])
+
+  useEffect(() => {
+    if (!finishOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeFinish() }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [finishOpen, closeFinish])
+
 
   const stepRefs = useRef<Record<number, HTMLElement | null>>({})
   const pendingRef = useRef<StudentPatch | null>(null)
@@ -212,8 +226,7 @@ export default function App() {
           fireConfetti(2000)
         }
         setAnnounce(`All ${TOTAL_STEPS} steps done. Skool is open.`)
-        const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches
-        window.setTimeout(() => window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' }), 320)
+        window.setTimeout(() => setFinishOpen(true), 600)
       } else {
         setAnnounce(`Step ${n} done. Step ${n + 1} is open.`)
         scrollToStep(n + 1)
@@ -332,7 +345,7 @@ export default function App() {
         </div>
 
         {finished && (
-          <div className="finish card" role="status">
+          <div className="finish card" role="status" id="finish-card">
             <span className="finish-badge">Day 1</span>
             <h2 className="finish-title">
               You&apos;re in. The course just opened.
@@ -345,6 +358,26 @@ export default function App() {
                 Open the community
               </a>
             )}
+          </div>
+        )}
+
+        {finished && finishOpen && (
+          <div className="finish-overlay" role="dialog" aria-modal="true" aria-labelledby="finish-modal-title" onClick={(e) => { if (e.target === e.currentTarget) closeFinish() }}>
+            <div className="finish-modal">
+              <span className="finish-badge">Day 1</span>
+              <h2 id="finish-modal-title" className="finish-title">You&apos;re in. The community just opened.</h2>
+              <p className="finish-body">
+                You built {ctx.agent}, {ctx.biz ? 'a chief of staff that knows your business' : 'a co-founder that knows you'}, checks in on you and lives in your phone. That was the hard part. Your next step is inside the community.
+              </p>
+              {SKOOL_URL && (
+                <a className="btn btn-primary finish-cta" href={SKOOL_URL} target="_blank" rel="noreferrer" autoFocus>
+                  Join the community
+                </a>
+              )}
+              <button type="button" className="btn btn-ghost finish-close" onClick={closeFinish}>
+                Close
+              </button>
+            </div>
           </div>
         )}
 

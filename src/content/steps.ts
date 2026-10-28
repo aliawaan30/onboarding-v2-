@@ -135,16 +135,10 @@ export const STEPS: StepDef[] = [
     videoLabel: 'Blake, 1 min, screen',
     body: () => [
       'Right now your agent forgets you the second you close the chat. One quick setting fixes that for good. Watch it, then follow these three taps.',
-      '1. In your agent, click Agent settings at the top.',
-      '2. Click Sharing and access.',
-      '3. Find Memory and switch it to Shared. Done.',
-      'Now send the message below and your agent will confirm the setting worked.',
-    ],
-    footnote: () => [
-      'No Sharing and access on that screen? Some accounts do not have it there. The same setting lives somewhere else:',
       '1. In the left sidebar, under Agent Settings, click More.',
       '2. Click Memory.',
-      '3. On the Memory page, click Change access in the top right, then switch it to Shared.',
+      '3. Click Change access in the top right and switch it to Shared. Done.',
+      'Now send the message below and your agent will confirm the setting worked.',
     ],
     prompts: [
       {
@@ -311,9 +305,9 @@ export const STEPS: StepDef[] = [
     title: 'Put it in your phone',
     time: '~4 min',
     videoLabel: 'Blake, 2 min, screen and phone',
-    body: (c) => [
+    body: () => [
       `From here on it is not an app you visit. It is a co-founder in your pocket.`,
-      `In ${c.agentPossessive} settings, open Channels and connect Telegram. Follow the steps on screen. If you would rather use WhatsApp, that works the same way.`,
+      `In the left sidebar, click Channels and connect Telegram. Follow the steps on screen. If you would rather use WhatsApp, that works the same way.`,
       'Then message it from your phone.',
     ],
     callout: () => 'Telegram is the one I use every day. Pick that one if you are not sure.',
@@ -389,9 +383,9 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
     ],
   },
   9: {
-    body: (c) => [
+    body: () => [
       `From here on it is not an app you visit. It is a chief of staff in your pocket.`,
-      `In ${c.agentPossessive} settings, open Channels and connect Telegram. Follow the steps on screen. If you would rather use WhatsApp, that works the same way.`,
+      `In the left sidebar, click Channels and connect Telegram. Follow the steps on screen. If you would rather use WhatsApp, that works the same way.`,
       'Then message it from your phone.',
     ],
   },
