@@ -1,0 +1,1480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="/gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 6: Give It A Real Number</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+:root{
+  --ground:#ffffff; --ground-2:#f5faf8; --surface:#ffffff; --surface-sunk:#f7fbf9;
+  --ink:#15171d; --ink-2:#3b414f; --ink-3:#6b7280; --ink-4:#9aa0ab;
+  --line:#e6eae8; --line-2:#cfd8d4;
+  --accent:#32d09f; --accent-deep:#14926c; --accent-ink:#052e21;
+  --accent-tint:#e7faf3; --accent-tint-2:#ccf3e5; --accent-line:#90e5c8;
+  --accent2:#8b5cf6; --accent2-deep:#6a3de0; --accent2-tint:#f2edff; --accent2-tint-2:#e2d8fd; --accent2-line:#c9b6f9;
+  --ok:#0f8a55; --ok-tint:#e4f6ed; --warn:#a2560d; --warn-tint:#fdf0e2;
+  --term:#0d1a15; --term-2:#12241c; --term-ink:#8fe9c8; --term-dim:#4d8f76;
+  --radius:18px; --radius-sm:12px;
+  --shadow-sm:0 1px 2px rgba(21,23,29,0.05);
+  --shadow-md:0 1px 2px rgba(21,23,29,0.05),0 8px 24px -12px rgba(21,23,29,0.16);
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(50,208,159,0.4);
+  --display:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.2,0.7,0.3,1);
+  --mod:var(--accent); --mod-deep:var(--accent-deep); --mod-ink:var(--accent-ink);
+  --mod-tint:var(--accent-tint); --mod-tint-2:var(--accent-tint-2); --mod-line:var(--accent-line);
+  --alt:var(--accent2); --alt-deep:var(--accent2-deep); --alt-tint:var(--accent2-tint); --alt-line:var(--accent2-line);
+}
+body.mod-walk{
+  --mod:#8b5cf6; --mod-deep:#6a3de0; --mod-ink:#f4f0ff;
+  --mod-tint:#f2edff; --mod-tint-2:#e2d8fd; --mod-line:#c9b6f9;
+  --alt:#32d09f; --alt-deep:#14926c; --alt-tint:#e7faf3; --alt-line:#90e5c8;
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(139,92,246,0.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;background-image:radial-gradient(900px 460px at 12% -180px,rgba(50,208,159,0.10),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(139,92,246,0.09),transparent 66%);background-repeat:no-repeat;background-attachment:fixed;}
+body.mod-walk{background-image:radial-gradient(900px 460px at 12% -180px,rgba(139,92,246,0.11),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(50,208,159,0.09),transparent 66%);}
+::selection{background:var(--mod-tint-2);color:var(--mod-deep);}
+.shell{max-width:768px;margin:0 auto;padding:122px 20px 96px;}
+p{margin:0 0 13px;color:var(--ink-2);}
+ul{padding-left:20px;margin:8px 0 13px;color:var(--ink-2);}
+li{margin-bottom:4px;}
+.muted{color:var(--ink-3);}
+.flag{display:inline-block;background:var(--warn-tint);color:var(--warn);border-radius:6px;padding:1px 8px;font-size:.76rem;font-weight:600;font-family:var(--mono);}
+/* ------- progress rail ------- */
+.progress{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,0.84);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+.progress-inner{max-width:768px;margin:0 auto;padding:13px 20px 14px;}
+.progress-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px;}
+.progress-lead{display:flex;align-items:baseline;gap:10px;min-width:0;}
+.progress-count{font-family:var(--mono);font-weight:700;white-space:nowrap;color:var(--mod-deep);font-size:18px;line-height:1;}
+.progress-of{color:var(--ink-4);font-size:13px;}
+.progress-title{font-size:14px;font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.segments{display:flex;gap:5px;}
+.segment{flex:1;height:7px;border-radius:99px;background:var(--ground-2);box-shadow:inset 0 0 0 1px rgba(21,23,29,0.05);position:relative;overflow:hidden;transition:background 480ms var(--ease);}
+.segment::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,var(--mod-deep),var(--mod) 65%,var(--alt));transform:scaleX(0);transform-origin:left;transition:transform 520ms var(--ease);}
+.segment.is-filled::after{transform:scaleX(1);}
+.segment.is-current{background:var(--mod-tint-2);}
+.segment.is-current::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.85),transparent);transform:translateX(-100%);animation:sweep 2.2s var(--ease) infinite;}
+@keyframes sweep{to{transform:translateX(100%);}}
+/* ------- hero ------- */
+.hero{margin-bottom:42px;animation:rise 620ms var(--ease) both;}
+.eyebrow{margin:0 0 14px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mod-deep);font-weight:700;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.eyebrow::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--mod);flex:0 0 auto;}
+.hero h1{margin:0 0 12px;font-family:var(--display);font-size:clamp(30px,7.4vw,47px);line-height:1.04;letter-spacing:-0.03em;font-weight:800;color:var(--ink);}
+.hero .lede{font-size:18.5px;color:var(--ink-2);max-width:56ch;}
+.hero-fig{margin:26px 0 4px;padding:20px 18px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);}
+.hero-fig svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);}
+.hero-fig figcaption{margin-top:10px;text-align:center;color:var(--ink-3);font-size:.88rem;}
+/* ------- steps + spine ------- */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;}
+.steps>li{position:relative;}
+.steps>li+li::before{content:'';position:absolute;left:41px;top:-19px;width:2px;height:20px;border-radius:2px;background:var(--line-2);transition:background 420ms var(--ease);}
+.steps>li.spine-on+li::before{background:linear-gradient(180deg,var(--mod),var(--mod-line));box-shadow:0 0 8px rgba(50,208,159,0.35);}
+body.mod-walk .steps>li.spine-on+li::before{box-shadow:0 0 8px rgba(139,92,246,0.35);}
+.step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;scroll-margin-top:108px;box-shadow:var(--shadow-sm);transition:border-color 260ms var(--ease),box-shadow 260ms var(--ease),background 260ms var(--ease),transform 200ms var(--ease);}
+.step:hover{transform:translateY(-1px);}
+.step.is-locked:hover{transform:none;}
+.step.is-locked{background:rgba(255,255,255,0.5);border-style:dashed;box-shadow:none;}
+.step.is-open{border-color:var(--mod-line);box-shadow:var(--shadow-lg);}
+.step.is-done{background:var(--surface-sunk);}
+.step.just-passed{animation:pass-pop 700ms var(--ease);}
+@keyframes pass-pop{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(15,138,85,0.4);}35%{transform:scale(1.012);box-shadow:0 0 0 8px rgba(15,138,85,0.12);}100%{transform:scale(1);box-shadow:0 0 0 16px rgba(15,138,85,0);}}
+/* type edge strips */
+.step.t-build.is-open{border-left:4px solid var(--accent);}
+.step.t-chat.is-open{border-left:4px solid var(--accent2);}
+.step.t-phone.is-open{border-left:4px solid #14926c;}
+.step-head{display:flex;align-items:center;gap:14px;}
+.step-badge{flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--ground-2);border:1px solid var(--line);font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-3);transition:all 220ms var(--ease);}
+.step.is-locked .step-badge{background:transparent;color:var(--ink-4);border-style:dashed;}
+.step.is-open .step-badge{background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);border-color:transparent;box-shadow:0 4px 12px -4px var(--mod);}
+.step.is-done .step-badge{background:var(--ok-tint);color:var(--ok);border-color:rgba(15,138,85,0.28);}
+.step.is-done .step-badge svg path{stroke-dasharray:22;stroke-dashoffset:22;animation:tickdraw 420ms var(--ease) 120ms forwards;}
+@keyframes tickdraw{to{stroke-dashoffset:0;}}
+.step-heading{flex:1 1 auto;min-width:0;}
+.step-title{margin:0;font-family:var(--display);font-size:20px;line-height:1.22;font-weight:700;letter-spacing:-0.02em;color:var(--ink);}
+.step.is-locked .step-title{color:var(--ink-2);}
+.step-n{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-4);display:block;margin-bottom:3px;}
+.step.is-open .step-n{color:var(--mod-deep);}
+.step-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;border-radius:99px;padding:5px 12px;}
+.step-chip.is-open{background:var(--mod-tint);color:var(--mod-deep);border:1px solid var(--mod-line);}
+.step-chip.is-done{background:var(--ok-tint);color:var(--ok);border:1px solid rgba(15,138,85,0.28);}
+.step-chip.is-locked{background:transparent;color:var(--ink-4);border:1px dashed var(--line-2);}
+.step-locked-note{margin:12px 0 0 48px;font-size:14px;color:var(--ink-4);}
+.step-body{margin-top:20px;animation:rise 420ms var(--ease) both;}
+@keyframes rise{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+/* real-world action ribbon */
+.act{display:inline-flex;align-items:center;gap:8px;background:var(--ground-2);border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 6px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);margin:0 0 12px;}
+.act svg{width:20px;height:20px;display:block;color:var(--mod-deep);}
+/* ------- BUILD terminal panels ------- */
+.prompt{position:relative;background:var(--term);border:1px solid #1d3a2e;border-radius:14px;padding:52px 18px 18px;margin:12px 0 14px;font-family:var(--mono);font-size:.85rem;color:var(--term-ink);white-space:pre-wrap;overflow-wrap:break-word;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 10px 26px -14px rgba(13,26,21,0.55);}
+.prompt::before{content:"PASTE INTO BASE44";position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;padding-left:64px;font-size:.64rem;letter-spacing:.16em;color:var(--term-dim);font-weight:700;font-family:var(--body);background:var(--term-2);border-bottom:1px solid #1d3a2e;border-radius:13px 13px 0 0;}
+.prompt::after{content:'';position:absolute;top:14px;left:18px;width:8px;height:8px;border-radius:50%;background:#2fbf8f;box-shadow:14px 0 0 #f2b84b,28px 0 0 #ef7b6a;}
+/* CHAT bubbles */
+.prompt.chat{background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;color:#3a2a72;box-shadow:var(--shadow-sm);padding:48px 18px 16px;}
+.prompt.chat::before{content:"TO YOUR CO-FOUNDER";background:transparent;border-bottom:1px dashed var(--accent2-line);color:var(--accent2-deep);padding-left:40px;border-radius:15px 15px 0 0;}
+.prompt.chat::after{top:11px;left:16px;width:14px;height:14px;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));box-shadow:none;}
+/* pwrap variants (labelled panels with pre) */
+.pwrap{position:relative;background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;padding:48px 18px 16px;margin:12px 0 14px;box-shadow:var(--shadow-sm);}
+.pwrap .plabel{position:absolute;top:0;left:0;right:0;height:34px;display:flex;align-items:center;padding-left:40px;font-size:.64rem;letter-spacing:.16em;color:var(--accent2-deep);font-weight:700;font-family:var(--body);border-bottom:1px dashed var(--accent2-line);margin:0;}
+.pwrap::after{content:'';position:absolute;top:10px;left:16px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));}
+.pwrap pre{margin:0;white-space:pre-wrap;word-wrap:break-word;font-family:var(--mono);font-size:.85rem;color:#3a2a72;max-height:340px;overflow-y:auto;}
+/* PHONE frame */
+.pwrap.is-phone{background:#101418;border:1px solid #2a3340;border-radius:26px;padding:64px 22px 22px;box-shadow:0 18px 40px -18px rgba(16,20,24,0.55);}
+.pwrap.is-phone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:86px;height:18px;border-radius:99px;background:#000;}
+.pwrap.is-phone::after{display:none;}
+.pwrap.is-phone .plabel{position:absolute;top:34px;left:22px;right:22px;height:26px;display:flex;align-items:center;gap:8px;padding-left:16px;font-size:.62rem;letter-spacing:.14em;color:#7ce7c0;border-bottom:1px solid #223229;background:rgba(50,208,159,0.08);border-radius:8px;}
+.pwrap.is-phone .plabel::before{content:'';width:7px;height:7px;border-radius:50%;background:#32d09f;animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.pwrap.is-phone pre{color:#e8eef2;font-family:var(--body);font-size:.94rem;line-height:1.65;}
+/* copy buttons */
+.copybtn,.copy{position:absolute;top:5px;right:8px;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:5px 13px;font-family:var(--body);font-size:.78rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);z-index:2;}
+.prompt:not(.chat) .copybtn{background:#173026;border-color:#26543f;color:#8fe9c8;}
+.pwrap.is-phone .copy{top:36px;background:#1b2530;border-color:#31404f;color:#cfe0ea;}
+.copybtn:hover,.copy:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.copybtn.did,.copy.did{background:var(--ok-tint) !important;border-color:rgba(15,138,85,0.35) !important;color:var(--ok) !important;}
+.copybtn:focus-visible,.copy:focus-visible{outline:2px solid var(--alt);outline-offset:2px;}
+/* what-you-should-see mini window */
+.see{position:relative;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:12px;padding:40px 16px 12px;margin:14px 0;color:var(--ink-3);font-size:.95rem;background:var(--surface);box-shadow:var(--shadow-sm);}
+.see::before{content:"WHAT YOU SHOULD SEE";position:absolute;top:0;left:0;right:0;height:30px;display:flex;align-items:center;padding-left:56px;font-size:.62rem;letter-spacing:.15em;font-weight:700;color:var(--ink-4);font-family:var(--body);background:var(--ground-2);border-bottom:1px solid var(--line);border-radius:11px 11px 0 0;}
+.see::after{content:'';position:absolute;top:12px;left:14px;width:6px;height:6px;border-radius:50%;background:var(--line-2);box-shadow:11px 0 0 var(--line-2),22px 0 0 var(--line-2);}
+.see b{color:var(--accent-deep);}
+.callout{background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:var(--radius-sm);padding:16px 20px;margin:14px 0;}
+/* milestone checkpoint cards */
+.step.t-mile{border-width:2px;}
+.step.t-mile.is-open{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;box-shadow:var(--shadow-lg);}
+.step.t-mile .step-chip.is-open{background:linear-gradient(120deg,var(--mod-tint),var(--alt-tint));}
+.mile-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.15em;color:var(--mod-deep);background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:99px;padding:4px 12px;margin:0 0 12px;}
+.mile-tag svg{width:12px;height:12px;}
+/* file download chips */
+.filechip{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:10px 16px;margin:4px 10px 10px 0;font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);}
+.filechip:hover{transform:translateY(-1px);border-color:var(--mod-line);color:var(--mod-deep);box-shadow:var(--shadow-md);}
+.filechip svg{width:17px;height:17px;color:var(--mod-deep);}
+.filechip small{font-family:var(--body);font-weight:500;color:var(--ink-4);}
+/* done button */
+.btn-done{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:15.5px;font-weight:700;cursor:pointer;min-height:48px;padding:12px 18px;width:100%;margin-top:20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--mod);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.btn-done:hover{transform:translateY(-1px);}
+.btn-done:active{transform:translateY(1px) scale(0.995);}
+.btn-done:focus-visible{outline:2px solid var(--alt);outline-offset:3px;}
+/* outro finish card */
+.outro{margin-top:44px;animation:rise 520ms var(--ease) both;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;border:2px solid transparent;border-radius:var(--radius);padding:34px 28px;text-align:center;box-shadow:var(--shadow-lg);}
+.finish-badge{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(180deg,var(--mod),var(--mod-deep));display:grid;place-items:center;color:var(--mod-ink);box-shadow:0 10px 24px -10px var(--mod);}
+.finish-badge svg{width:28px;height:28px;}
+.finish-title{margin:0 0 6px;font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+.finish-sub{margin:0 0 6px;color:var(--ink-3);font-size:.98rem;}
+.next{display:inline-block;margin-top:16px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);font-weight:700;border-radius:12px;padding:13px 24px;text-decoration:none;font-family:var(--display);box-shadow:0 8px 20px -10px var(--mod);}
+.next:hover{transform:translateY(-1px);}
+.nextpage{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-3);font-size:.95rem;}
+.startover{display:block;margin:46px auto 0;background:none;border:none;color:var(--ink-4);font-size:12.5px;font-family:var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.startover:hover{color:var(--ink-2);}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}.segment.is-current::before{display:none;}}
+@media(max-width:600px){.step{padding:18px;}.steps>li+li::before{left:35px;}.shell{padding-top:112px;}}
+
+
+.pwrap.is-skill{padding-bottom:36px;}
+.pwrap.is-skill pre{max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px;}
+.pwrap.is-skill .sfade{position:absolute;left:1px;right:1px;bottom:1px;height:60px;pointer-events:none;border-radius:0 0 16px 5px;background:linear-gradient(to bottom,rgba(242,237,255,0) 0%,rgba(242,237,255,0.9) 60%,#f2edff 100%);}
+.pwrap.is-skill .shint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.6rem;letter-spacing:.14em;font-weight:700;font-family:var(--body);color:var(--accent2-deep);opacity:.7;z-index:3;pointer-events:none;}
+.pwrap.is-skill .copy{background:var(--accent2);border-color:var(--accent2-deep);color:#fff;font-weight:700;padding:6px 17px;}
+.pwrap.is-skill .copy:hover{background:var(--accent2-deep);border-color:var(--accent2-deep);}
+@media(max-width:600px){.pwrap.is-skill pre{max-height:190px;font-size:.8rem;}}
+</style>
+<style>
+body.mod-call{
+  --mod:#32d09f; --mod-deep:#14926c; --mod-ink:#052e21;
+  --mod-tint:#e7faf3; --mod-tint-2:#ccf3e5; --mod-line:#90e5c8;
+  --alt:#32d09f; --alt-deep:#14926c; --alt-tint:#e7faf3; --alt-line:#90e5c8;
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(239,143,46,0.38);
+}
+body.mod-call{background-image:radial-gradient(900px 460px at 12% -180px,rgba(239,143,46,0.11),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(50,208,159,0.09),transparent 66%);}
+body.mod-call .steps>li.spine-on+li::before{box-shadow:0 0 8px rgba(239,143,46,0.35);}
+/* screenshot placeholder frame, styled properly */
+figure.shot{margin:14px 0 4px;padding:26px 18px 16px;background:var(--ground-2);border:1px dashed var(--line-2);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;gap:9px;}
+figure.shot svg{width:26px;height:26px;color:var(--ink-4);}
+figure.shot figcaption{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--ink-4);text-align:center;}
+.clientblock{margin:34px 0 8px;padding:26px 22px;background:var(--ground-2);border:1px solid var(--line-2);border-radius:var(--radius);}.cb-h{margin:0 0 12px;font-size:1.15rem;}
+figure.vid{margin:16px 0 10px;}
+figure.vid video{width:100%;display:block;border-radius:var(--radius-sm);background:#000;border:1px solid var(--line-2);}
+figure.vid figcaption{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--ink-4);margin-top:8px;}
+.helpline{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-3);font-size:.95rem;}
+/* ------- complete block ------- */
+.cblock-btn{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:16px;font-weight:700;cursor:pointer;min-height:52px;padding:14px 26px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--accent,#32d09f);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.cblock-btn:hover{transform:translateY(-1px);}
+.cblock-btn:active{transform:translateY(0);}
+.cblock-btn.is-done,.cblock-btn.is-done:hover{background:var(--surface,#ffffff);color:var(--accent-deep,#14926c);border-color:var(--accent-line,#90e5c8);box-shadow:none;cursor:default;transform:none;}
+.outro .cblock-btn{margin:18px auto 0;}
+.outro .next{display:block;width:-moz-fit-content;width:fit-content;margin:14px auto 0;}
+.outro:not(.is-done) .next{background:none;color:var(--ink-3,#6b7280);font-weight:600;font-size:.95rem;padding:9px 14px;box-shadow:none;}
+.outro:not(.is-done) .next:hover{color:var(--ink-2,#3b414f);transform:none;}
+.outro.is-done .next{background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 8px 20px -10px var(--accent,#32d09f),0 0 0 4px var(--accent-tint-2,#ccf3e5);}
+@media (max-width:420px){.cblock-btn{width:100%;}}
+@media (prefers-reduced-motion: reduce){.cblock-btn{transition:none;}}
+</style>
+</head>
+<body class="mod-call">
+<div class="progress"><div class="progress-inner">
+<div class="progress-row">
+<div class="progress-lead"><span class="progress-count"><span id="done-count">0</span><span class="progress-of"> of 12</span></span>
+<span class="progress-title">Module 6 &middot; Page D: Give It A Real Number</span></div>
+</div>
+<div class="segments"><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span></div>
+</div></div>
+<main class="shell">
+<header class="hero">
+<div class="eyebrow">Module 6 &middot; Page D</div>
+<h1>Give It A Real Number</h1>
+<p class="lede">Right now your receptionist only exists in a browser tab. By the end of this page you can ring it from your own phone, and it can put you through to a human.</p>
+</header>
+<ol class="steps">
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">1</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 01</span><span class="step-title-text">Open a Twilio Account.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Retell sells phone numbers in the United States and Canada only. Everywhere else the number comes from a company called Twilio, and the two get joined together. That is the whole reason this page exists.</p><ul><li>Go to twilio.com and sign up</li><li>Verify your email</li><li>Verify your own mobile when it asks</li><li>Answer the few questions about what you are building, any sensible answer is fine</li></ul><p>Do not skip the mobile verification. That verified phone is the one your AI is allowed to ring later, and it is the phone you are going to test the transfer on.</p><p><b>A new Twilio account is a free trial account, and that is enough to build all of this.</b> It gives you one trunk, which is exactly one more than you need. It will only ring numbers you have verified, which is your own phone, which is exactly the phone you want it ringing while you learn. You upgrade when you get a client, and their money pays for it.</p><p>Buying a local number in most countries needs your address and your ID checked first, and that takes a few days. Start it now so it is approved while you work through the rest.</p><figure class="vid"><video src="/course-media/twilio-1-your-two-keys.mp4" controls preload="metadata" playsinline></video><figcaption>BLAKE, 1:30, OPENING TWILIO AND GETTING YOUR TWO KEYS</figcaption></figure><div class="see"><b>You should see:</b> a Twilio console with a trial balance on it, and your own mobile listed as a verified number.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">2</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 02</span><span class="step-title-text">Get the Two Credentials In.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><ul><li>Open the Twilio console home page</li><li>Find Account SID</li><li>Copy it</li><li>Find Auth Token and click to reveal it</li><li>Copy it</li></ul><p>Use the Auth Token. Not an API key. API keys hit permission walls all the way through this build, and every wall looks like a completely different problem.</p><figure class="shot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3.5 6.5A1.5 1.5 0 0 1 5 5h9a1.5 1.5 0 0 1 1.5 1.5v11A1.5 1.5 0 0 1 14 19H5a1.5 1.5 0 0 1-1.5-1.5v-11z"/><path d="M15.5 10.5 20.5 7.5v9l-5-3z"/></svg><figcaption>[SCREENSHOT: the two credentials saved in your app secrets]</figcaption></figure><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Here are my Twilio credentials.
+
+Account SID: [PASTE IT]
+Auth Token: [PASTE IT]
+
+Save both in this app&#x27;s secrets. Before you use them, count them. An Account SID starts with AC and is 34 characters. An Auth Token is 32 characters and does not start with AC. If both of mine start with AC then I have pasted the same thing twice, so tell me and stop.
+
+Then make one harmless read call and confirm my account answers.</pre></div><div class="see"><b>You should see:</b> both lengths confirmed, and your account answering. If it says 20003 Authenticate, the token is wrong. Go back and copy it again.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">3</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 03</span><span class="step-title-text">Give Your Co-Founder the Phone Skill.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Everything about buying the number and building the pipe, in one box.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called twilio-number-setup. Save the following content as the SKILL.md file in the .agents/skills/twilio-number-setup/ directory:
+
+---
+name: twilio-number-setup
+description: Sets up the phone side of an AI receptionist in Twilio. Saves the account credentials correctly, buys the local number, builds the elastic SIP trunk with the settings that make transfers work, turns on the right dialling permissions, and reads every value back before handing over to Retell.
+---
+
+# Twilio Number Setup
+
+## What this skill is for
+
+Retell sells phone numbers in the United States and Canada only. Everywhere else,
+the number comes from Twilio and gets connected to Retell over SIP. This skill
+builds the Twilio side and hands one exact value to the next skill: the trunk
+domain.
+
+Get one character of that domain wrong and every transfer fails with an error
+message about permissions that has nothing to do with permissions. That happened on
+the live build and it cost a full day. This skill exists so it does not happen
+again.
+
+## Parameters
+
+- `{COUNTRY}` and `{AREA_CODE}` where the client&#x27;s number should look local.
+- `{ACCOUNT_SID}` the Twilio Account SID.
+- `{AUTH_TOKEN}` the Twilio Auth Token.
+- `{TRUNK_NAME}` a name for the trunk, unique to this client.
+- `{TRUNK_DOMAIN}` the trunk&#x27;s SIP domain, which Twilio generates. You do not
+  choose the format, you read it back exactly as shown.
+- `{TWILIO_NUMBER}` the number you buy, in full international format.
+
+## The trial account, said plainly up front
+
+A brand new Twilio account is a trial account, and a trial account is enough to
+build and test the whole thing yourself. Tell the owner this before they reach for a
+credit card.
+
+What a trial account gives you:
+
+- One elastic SIP trunk. One is all this build needs.
+- Outbound calls only to **verified** numbers. The owner verifies their own mobile
+  in Twilio, and that same mobile is the transfer target while testing. It lines up
+  exactly.
+
+What it will not do:
+
+- A second trunk. Trying returns error `21244`, &quot;Only one trunk allowed for trial
+  accounts&quot;.
+- Outbound to a number that is not verified.
+
+The upgrade happens at the first paying client, and the client&#x27;s money pays for it.
+Do not tell someone to upgrade before they have one.
+
+Buying a local number in some countries also needs identity paperwork approved
+first, which is a separate wait. `[VERIFY: confirm the paperwork requirement for
+{COUNTRY} on Twilio&#x27;s own regulatory guidelines page before promising a go-live
+date.]`
+
+## Step 1: credentials, and the five second check that saves an hour
+
+The owner needs the **Account SID** and the **Auth Token** from the Twilio console
+home page. Save both into the app&#x27;s secrets.
+
+**Use the Auth Token. Never use a scoped API key.** Scoped keys hit permission walls
+on trunking and on messaging, and every wall looks like a different bug. The Auth
+Token has full account access and skips all of it.
+
+Then run this check before you make a single API call:
+
+- An Account SID starts with `AC` and is **34 characters** long.
+- An Auth Token is **32 characters** long and does not start with `AC`.
+
+If both values start with `AC`, the same value got pasted twice, or an automatic
+secret detector grabbed the wrong line. That is exactly what happened on the live
+build, and every Twilio call came back with error `20003 Authenticate` while both
+values looked correct on screen. Count the characters. Then make one harmless read
+call and confirm it returns the account.
+
+## Step 2: buy the number
+
+- Search Twilio&#x27;s available local numbers for `{COUNTRY}` with `{AREA_CODE}`.
+- Buy one that has **Voice** capability.
+- Record `{TWILIO_NUMBER}` in full international format, starting with the plus
+  sign.
+
+The number costs a few dollars a month. On a real client the Twilio account sits in
+the client&#x27;s business name and the client pays Twilio directly, so this line never
+comes out of the owner&#x27;s pocket.
+
+## Step 3: create the elastic SIP trunk
+
+Create an elastic SIP trunk named `{TRUNK_NAME}` and set exactly these:
+
+- **Transfer mode: `enable-all`.** Without this, a transfer on a real call fails.
+  This is not optional and it is not a default.
+- **Authentication: IP access control list.** Create an IP access control list
+  containing the Retell SBC block `18.98.16.120/30` and attach it to the trunk.
+- **No SIP credentials.** The IP list is the whole auth story. Credentials are one
+  more secret to manage, leak and rotate. Do not create any.
+- **Origination URL: `sip:sip.retellai.com`**, priority 1, weight 10, enabled.
+  This is the address Twilio sends incoming calls to, and it is the same for
+  everyone.
+- **Secure: off.**
+- Caller name lookup: off.
+- Recording: do not record at the trunk. Retell handles recording.
+
+Then attach `{TWILIO_NUMBER}` to the trunk.
+
+One consequence to know before you attach it: a number attached to a trunk ignores
+every other voice setting on that number. That is fine for the overflow and
+always-AI routing modes, which is what this build uses. Time-of-day routing needs a
+different setup that does not go through the trunk.
+
+## Step 4: note the trunk domain, exactly as shown
+
+Twilio generates a SIP domain for the trunk. It looks like
+`something.pstn.twilio.com`.
+
+**Copy it exactly. Do not type it from memory. Do not shorten it. Do not tidy it
+up.** On the live build the real domain ended in `-001` and the version typed into
+Retell did not, and every transfer failed for a day with an error about permissions.
+
+Read it back to the owner character by character, including any digits or hyphens,
+and save it as `{TRUNK_DOMAIN}`.
+
+## Step 5: dialling permissions
+
+Turn on outbound voice dialling to `{COUNTRY}` in Twilio&#x27;s voice geographic
+permissions. Without it, the agent cannot dial out to transfer a caller, and the
+failure looks like a Retell problem when it is a Twilio setting.
+
+On a trial account, also verify the owner&#x27;s own mobile as a caller ID, because
+that is the only number the account is allowed to dial while testing.
+
+## Step 6: read every value back
+
+Print these, one per line, and compare each against the console with the owner
+watching:
+
+1. `{ACCOUNT_SID}` first four and last four characters, and its length. Should be
+   34, starting `AC`.
+2. Auth token length. Should be 32.
+3. `{TWILIO_NUMBER}` in full international format, digit by digit.
+4. The trunk name and trunk SID.
+5. **`{TRUNK_DOMAIN}`, read character by character.** Then have the owner read the
+   domain off the Twilio screen out loud while you compare. This one value is the
+   whole reason this section exists.
+6. Trunk transfer mode. Must read `enable-all`.
+7. The IP access control list, and the block inside it. Must read
+   `18.98.16.120/30`.
+8. The origination URL. Must read `sip:sip.retellai.com`.
+9. That the number is attached to the trunk.
+10. That outbound dialling to `{COUNTRY}` is enabled.
+11. On a trial account, that the owner&#x27;s mobile shows as a verified number.
+
+Only when all eleven read back correctly do you hand `{TRUNK_DOMAIN}` and
+`{TWILIO_NUMBER}` to `retell-number-connect`.
+
+## Things you never do
+
+- Never create a scoped API key for this build.
+- Never create SIP credentials when an IP access control list will do.
+- Never retype the trunk domain from memory.
+- Never tell someone to upgrade Twilio before they have a paying client.
+- Never promise a go-live date before the country&#x27;s identity paperwork is approved.
+
+Once it is saved: read it, and reply &quot;ready to set up the number&quot; when you understand it. Do not build anything yet.</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it saves the skill and confirms.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">4</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 04</span><span class="step-title-text">Buy the Number.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your twilio-number-setup skill, do step 2: buy one local number in [MY COUNTRY], with the area code [AN AREA CODE NEAR ME]. It has to have voice.
+
+Then read the number back to me digit by digit, in full international format.</pre></div><div class="callout"><b>Which kind of number?</b> Ask where the client's work actually happens. One area, buy a local number in their area code, about $1.15 a month, and it matches the landline they already advertise. Their van, buy a mobile number, about $8.25 a month, so confirmations look like the tradie and not a call centre. The whole country, a 1800 number, about $20 a month. And if they already have a number their customers know, do not sell them a new one. Forward that number to the AI and nothing changes for their customers. Price follows the type, not the area code.</div><div class="see"><b>You should see:</b> a phone number that is now yours. It costs a few dollars a month, and on a real client the client pays that, not you.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">5</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 05</span><span class="step-title-text">Build the Trunk.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>A trunk is just the pipe between the phone network and the AI. You build it once and then forget it exists.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your twilio-number-setup skill, do step 3: create the elastic SIP trunk.
+
+Transfer mode enable-all.
+Authentication by IP access control list containing 18.98.16.120/30, and no SIP credentials at all.
+Origination URL sip:sip.retellai.com at priority 1, weight 10, enabled.
+Secure off.
+
+Then attach my new number to the trunk.</pre></div><div class="see"><b>You should see:</b> a trunk with your number attached to it. Nothing rings yet.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">6</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 06</span><span class="step-title-text">Read Every Value Back.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>This is the most important thirty seconds on the page.</p><p>Your trunk has an address that ends in .pstn.twilio.com, and there is usually a number stuck on the end of it. Copy it exactly as it is written. On the build this course is based on, one missing 001 broke every transfer for a full day, and the error message blamed permissions, which had nothing to do with it.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your twilio-number-setup skill, do step 6: read every value back to me.
+
+Read the trunk domain out character by character, slowly, including any numbers and hyphens on the end of it.
+
+Then turn on outbound calling to my country in Twilio, and confirm my own mobile is showing as verified.</pre></div><div class="see"><b>You should see:</b> the trunk address read out one character at a time. Write it into your note exactly as it is read to you.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">7</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 07</span><span class="step-title-text">Give Your Co-Founder the Connect Skill.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>The one that joins the number to the receptionist. It also carries the fix for the one bug that catches everybody, so it is worth having saved before you need it.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called retell-number-connect. Save the following content as the SKILL.md file in the .agents/skills/retell-number-connect/ directory:
+
+---
+name: retell-number-connect
+description: Connects a Twilio number to a Retell agent. Imports the number as custom telephony with the exact termination URI, binds the inbound agent, sets the inbound webhook, reads the whole config back, and carries the troubleshooting tree for transfers that fail with a permissions error.
+---
+
+# Retell Number Connect
+
+## What this skill is for
+
+The Twilio side is built. This skill joins it to the voice agent, and it is the
+place where one wrong character silently breaks transfers.
+
+Read the gotcha below before you do anything else, because it changes the order you
+work in.
+
+## Parameters
+
+- `{TWILIO_NUMBER}` in full international format, from `twilio-number-setup`.
+- `{TRUNK_DOMAIN}` the trunk&#x27;s SIP domain, exactly as Twilio shows it.
+- `{ACCOUNT_SID}` and `{AUTH_TOKEN}` the Twilio credentials.
+- `{AGENT_ID}` the published Retell agent from `receptionist-agent-builder`.
+- `{INBOUND_ROUTER_URL}` the live `inbound_call_router` function URL.
+- `{NICKNAME}` a name for this number in Retell, for example
+  `{BUSINESS_NAME} main line`.
+- `{RETELL_API_KEY}` the owner&#x27;s Retell key.
+
+## THE GOTCHA, read this first
+
+**The Retell update-phone-number call silently ignores changes to the outbound
+trunk config.** It returns success. It updates the modification timestamp. It
+changes nothing.
+
+The termination URI can only be set at import. So:
+
+- If the termination URI is wrong, you **delete the number in Retell and import it
+  again** with the correct value.
+- You **never** try to fix a termination URI with an update or a patch. It will
+  look like it worked and it will not have worked, and you will spend the next hour
+  debugging the wrong thing.
+
+Deleting the number in Retell does not give up the number. Twilio still owns it.
+You are only removing Retell&#x27;s record of it, and you rebuild that record in one
+call. What you must restore after re-importing: the inbound agent, the inbound
+webhook and the nickname.
+
+## Step 1: import the number
+
+Import `{TWILIO_NUMBER}` into Retell as **custom telephony** with:
+
+- `termination_uri` set to **exactly `{TRUNK_DOMAIN}`**. Not a shortened version.
+  Not one with a hyphen or a digit dropped. Character for character.
+- Transport: **TCP**.
+- The Twilio account SID and auth token, so Retell can place outbound legs.
+- `nickname`: `{NICKNAME}`.
+
+Before you send the import, print the termination URI you are about to use on its
+own line and compare it to `{TRUNK_DOMAIN}` character by character. This is a ten
+second check that prevents the worst bug in this whole build.
+
+## Step 2: bind the inbound agent
+
+Set the inbound agent on the number to `{AGENT_ID}`.
+
+If the owner is running more than one agent version, bind the **published** one,
+and check the version number, not just the name.
+
+## Step 3: set the inbound webhook
+
+Set the number&#x27;s inbound webhook to `{INBOUND_ROUTER_URL}`.
+
+This is what Retell calls when a call arrives, before the agent speaks, and it is
+what lets the router hand the agent per-call variables.
+
+## Step 4: read the whole config back and compare it to intent
+
+Fetch the phone number record from Retell and print every field. Then go through
+this list line by line:
+
+1. The phone number, digit by digit against `{TWILIO_NUMBER}`.
+2. **The termination URI, character by character against `{TRUNK_DOMAIN}`.** Say
+   each character out loud. Do not skim it. Do not trust that it looks right.
+3. Transport reads TCP.
+4. The inbound agent id matches `{AGENT_ID}`, and it is the published version.
+5. The inbound webhook matches `{INBOUND_ROUTER_URL}`.
+6. The nickname is set.
+
+If any of lines 1 to 3 is wrong, go to the triage tree. Do not patch it.
+
+## The troubleshooting tree: transfer fails with a permissions error
+
+The exact error is: `Transfer call cannot be completed, probably don&#x27;t have the
+permission to perform the transfer.`
+
+Ignore the word &quot;permission&quot;. It is almost never about permissions. Work through
+these four checks **in this order** and stop at the first one that is wrong.
+
+### Check 1: the termination URI, character by character
+
+Fetch the number record from Retell. Fetch the trunk from Twilio. Put the
+termination URI and the trunk domain next to each other and compare them one
+character at a time.
+
+This is the cause most of the time. On the live build the trunk domain ended in
+`-001` and the imported termination URI did not, so every transfer was dialling a
+trunk that does not exist. Nothing in the error message hinted at that.
+
+If they do not match, go to Check 4.
+
+### Check 2: the trunk transfer mode
+
+Read the trunk&#x27;s transfer mode from Twilio. It must be `enable-all`. If it is
+anything else, set it to `enable-all` and test again. Transfers over SIP need it
+and it is not on by default.
+
+### Check 3: the IP access control list
+
+Read the trunk&#x27;s authentication. There must be an IP access control list attached
+containing `18.98.16.120/30`, which is the Retell SBC block. If the trunk has no
+credentials and no IP list, Twilio rejects Retell&#x27;s SIP and the call goes nowhere.
+Attach the list and test again.
+
+Also confirm outbound dialling to the country is switched on in Twilio&#x27;s voice
+geographic permissions, and on a trial account, that the transfer target is a
+verified number.
+
+### Check 4: the termination URI is wrong, so re-import
+
+Not a patch. A delete and re-import.
+
+1. Read the current config and write down the inbound agent id, the inbound webhook
+   URL and the nickname. You are about to lose all three.
+2. Delete the number in Retell.
+3. Import it again with `termination_uri` set to the **correct** `{TRUNK_DOMAIN}`,
+   transport TCP.
+4. Restore the inbound agent.
+5. Restore the inbound webhook.
+6. Restore the nickname.
+7. Read the whole config back again, character by character.
+8. Test the transfer on a real call, not a web call.
+
+## Two limits that will waste your afternoon if you forget them
+
+- **A web call can never test a transfer.** Retell&#x27;s transfer only works on phone
+  calls. The dashboard Test button is a web call, so it will never prove a transfer
+  works no matter how many times you press it.
+- **A green dashboard test is not a working phone line.** The only proof is a real
+  call to the real number. See `receptionist-test-protocol`.
+
+## Read-back verification before you say the number is connected
+
+Print all six lines from Step 4 again, plus:
+
+7. The trunk transfer mode, read from Twilio, showing `enable-all`.
+8. The IP access control list contents, showing `18.98.16.120/30`.
+9. The origination URL on the trunk, showing `sip:sip.retellai.com`.
+
+Then hand over to `receptionist-test-protocol` and run steps 2 and 3, the real
+inbound call and the transfer test.
+
+Once it is saved: read it, and reply &quot;ready to connect the number&quot; when you understand it. Do not build anything yet.</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it saves the skill and confirms.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">8</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 08</span><span class="step-title-text">Join the Number to the Receptionist.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your retell-number-connect skill, import my Twilio number into Retell as custom telephony.
+
+The termination URI has to be exactly the trunk domain, character for character. Transport TCP.
+
+Then bind my published agent to it as the inbound agent, set the inbound webhook to my inbound_call_router address, and give it a nickname.
+
+Before you send the import, print the termination URI on its own line so I can check it against my note myself. Then read the whole number back and compare every value to what I asked for.</pre></div><div class="see"><b>You should see:</b> the termination URI printed on its own line. Check it against your note yourself, character by character, before you let it carry on.</div><p>If it ever comes out wrong, it does not get patched. The number gets deleted in Retell and imported again from scratch. Your co-founder knows that, and it is in the skill.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">9</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 09</span><span class="step-title-text">Ring Your Own Number.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>From your own phone. Right now.</p><ul><li>Ring the number you bought</li><li>Let it answer</li><li>Talk to it like a customer</li><li>Book something in for tomorrow</li><li>Hang up</li></ul><div class="see"><b>You should hear:</b> your receptionist pick up a real phone call, greet you as that business, and take a booking. Then open your app and find the row it saved.</div><p>You built that. It has a phone number and it answers.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">10</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 10</span><span class="step-title-text">Ring It Again and Ask for a Human.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><ul><li>Ring the number again</li><li>Part way through, say you would like to speak to a person</li><li>Listen for it to say it is putting you through</li><li>Then watch your own mobile</li></ul><div class="see"><b>You should see:</b> the call you are on ends, and <b>your mobile rings</b>. Both halves have to happen. A call that ends without your phone ringing is not a working transfer, no matter what any screen says.</div><p>If it comes back with something about not having permission to transfer, that is almost never about permission. Your co-founder knows the fix. Paste this and let it work through it.</p><div class="pwrap"><div class="plabel">ONLY IF THE TRANSFER FAILED</div><button class="copy" onclick="cp(this)">Copy</button><pre>The transfer failed and said something about not having the permission to perform the transfer.
+
+Use the troubleshooting tree in your retell-number-connect skill and work the four checks in order, starting with the trunk address character by character against the termination URI.
+
+Tell me which one was wrong before you change anything.</pre></div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">11</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 11</span><span class="step-title-text">Save the Test Skill for Every Build After This.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>You just ran three of the four tests by hand. From now on your co-founder runs them for you, in the right order, with the right thing to look for at each step.</p><p>This is what stops you telling a client something works when it does not.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called receptionist-test-protocol. Save the following content as the SKILL.md file in the .agents/skills/receptionist-test-protocol/ directory:
+
+---
+name: receptionist-test-protocol
+description: The four-step test that decides whether an AI receptionist is actually working. Run it in this order on every build, before the owner tells a client anything is live, and again after any change to the agent, the number or the backend.
+---
+
+# Receptionist Test Protocol
+
+## What this skill is for
+
+&quot;It sounded great in the test&quot; is not working. A build is working when all four
+steps below pass, in this order, with the exact success signals written next to
+them. Anything less and the owner is about to tell a client something that is not
+true.
+
+Run the whole protocol on every new build. Run it again after any change to the
+agent, the phone number, the trunk or the booking backend.
+
+## Parameters
+
+- `{TWILIO_NUMBER}` the business line, full international format.
+- `{OWN_MOBILE}` the mobile the transfer goes to, full international format. On a
+  Twilio trial account this must be a verified number.
+- `{AGENT_ID}` the published agent.
+- `{APP_URL}` the Base44 app, for checking the Booking entity.
+
+## Step 1: the dashboard web call
+
+Open the Retell dashboard and press the Test button to talk to the agent in the
+browser.
+
+What you are testing: does it hold a conversation, does the booking flow work, do
+the tools actually fire.
+
+Run a full booking out loud. Give a name, a phone number, an address, say what you
+need, and ask for tomorrow. Listen for:
+
+- It asks one question at a time. If it interrogates you with three at once, the
+  role prompt is too long or the facts are in the prompt instead of the knowledge
+  base.
+- It quotes prices that match the client&#x27;s website. If it invents one, the
+  knowledge base is wrong or missing.
+- It offers real times, and the date it reads back is genuinely tomorrow. If it
+  says a date from a different year, the date rule is not in the tool descriptions.
+
+**Success signal:** the conversation feels normal, and both tool calls show as
+executed in the call detail, not failed.
+
+**What this step can NEVER test:** the transfer. Retell&#x27;s transfer works on phone
+calls only. The dashboard Test button is a web call. Pressing it a hundred times
+proves nothing about transfers.
+
+Two practical notes:
+
+- **Use a decent microphone**, especially for a client demo. On a noisy laptop mic
+  the speech recognition mangles words. On the live build &quot;callout fee&quot; came
+  through as &quot;full outfit&quot;.
+- **Never host a custom web-call test page on a Base44 function.** Base44 functions
+  serve HTML with a content security policy that blocks all scripts, so the page is
+  dead in the browser, and Retell refuses web calls from a local file. Use the
+  dashboard, or host the page on a real site outside Base44 functions.
+
+## Step 2: the real inbound call
+
+Ring `{TWILIO_NUMBER}` from your own phone.
+
+Run a full booking again, properly, as if you were a customer.
+
+**Success signals, all three:**
+
+1. The agent picks up with the right business greeting.
+2. A new row appears in the Booking entity in the app, with the right name, phone,
+   address, date and time. Check the date is real, not two years ago.
+3. The call events show up from the webhook: call started, call ended, and the
+   post-call analysis.
+
+If the conversation was fine but no row appeared, the tool URLs are wrong. Read
+them back off the LLM object character by character against the live function URL.
+
+## Step 3: the transfer test
+
+This is the step that gets skipped and it is the one that fails on real clients.
+
+Two ways to run it. Either works.
+
+**Option A, the simple one.** Ring `{TWILIO_NUMBER}`, and part way through say
+&quot;can you put me through to a human&quot;.
+
+**Option B, placed by API.** Create a phone call through Retell with the business
+number as the from number, `{OWN_MOBILE}` as the to number, and `{AGENT_ID}` as the
+agent override. Then ask for a human on that call.
+
+**Success signal, and it has two halves. Both must happen:**
+
+1. The call ends with a disconnection reason of `call_transfer`.
+2. **Your own mobile rings.**
+
+If the call ends with `call_transfer` but nothing rings, it is not working. If you
+hear the error &quot;Transfer call cannot be completed, probably don&#x27;t have the
+permission to perform the transfer&quot;, that is almost never about permissions. Go to
+the troubleshooting tree in `retell-number-connect` and work the four checks in
+order, starting with the termination URI character by character.
+
+## Step 4: check the records after every call
+
+After each test call, open the app and Retell and confirm:
+
+- The Booking row exists and every field is right, especially the date.
+- The post-call analysis fields are populated: caller name, what they wanted,
+  whether a booking was made.
+- The call transcript reads like a conversation a customer would be happy with.
+
+Then delete the test bookings so the client&#x27;s data starts clean.
+
+## What &quot;working&quot; means, in one line
+
+The agent answered a real call on the real number, a real booking row exists with
+the right date, and asking for a human made a real mobile ring. Until all three of
+those have happened, the build is not finished, whatever the dashboard says.
+
+## Read-back verification
+
+Print a short pass or fail line for each of the four steps, with the actual
+evidence next to it: the greeting you heard, the booking row id, the disconnection
+reason, and whether the mobile rang. If any line is a fail, say so plainly and name
+which skill fixes it. Do not report a build as ready with a fail on the sheet.
+
+Once it is saved: read it, and reply &quot;ready to test&quot; when you understand it. Do not build anything yet.</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it saves the skill and confirms.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">12</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 12</span><span class="step-title-text">Save the Client Skill for the Day Someone Says Yes.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>The last one. You do not need it today. You need it the day a business says yes.</p><p>It is the interview to run before you build for a real client: what sort of phone they have, when the AI should pick up, which mobile it passes people to, and the one question that stops you accidentally taking their phones down.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called receptionist-client-intake. Save the following content as the SKILL.md file in the .agents/skills/receptionist-client-intake/ directory:
+
+---
+name: receptionist-client-intake
+description: The interview to run before building an AI receptionist for a real client, and the plan it produces. Works out the country and phone type, the routing mode, the transfer mobile, the forwarding code, the booking situation and the never-say list. Catches the loop trap before it takes a client&#x27;s phones down. Run it every time a client says yes, and again whenever a client wants to change when the AI picks up.
+---
+
+# Receptionist Client Intake
+
+## What this skill is for
+
+Every client already has a phone number. That number stays theirs. Your job is to
+get their unanswered calls to reach the AI without breaking anything they rely on.
+
+There are several ways that can work depending on what kind of phone they have and
+when they want the AI to pick up. Guessing wastes days and can take a business
+offline. This skill asks the right questions first, then writes a plan the owner
+can follow without thinking.
+
+## The rules you follow
+
+1. **Never guess.** If you do not know something, write &quot;check this with the owner&quot;
+   or &quot;test this before go-live&quot;. Never state as fact something you were not told
+   and that is not in this skill.
+2. **Plain language.** Write so a twelve year old could follow it. Say &quot;the phone
+   company&quot;, not &quot;the carrier&quot;, wherever you can.
+3. **One job per step.** Every step has one action and one person doing it.
+4. **Say who does it.** Tag every step YOU (the owner running the agency), CLIENT
+   (the business owner), or ME (this agent).
+5. **Never ring the client&#x27;s business number back.** See the loop trap. This is the
+   fastest way to break a client&#x27;s phones.
+6. **No em-dashes in anything you write.**
+
+---
+
+## Part 1: the interview
+
+Ask these in order, one or two at a time, in normal conversation. Do not move on
+without an answer. If the owner does not know, that becomes a question for the
+client and you say so.
+
+### Q1. Which country is the client in?
+
+Why it matters: it decides where the number comes from, whether identity paperwork
+is needed, and what the forwarding code is.
+
+- United States or Canada: Retell sells the number directly. No Twilio needed.
+- Australia, New Zealand, United Kingdom and much of Europe: the number comes from
+  Twilio and gets imported into Retell. Identity paperwork usually has to be
+  approved first, which takes days, not hours.
+- Anywhere else: say plainly &quot;I have not been given the rules for that country. Do
+  not promise the client a date until we check what Twilio needs there.&quot;
+
+### Q2. What is the business number, and what kind of phone is it?
+
+Read the four options out and let them pick:
+
+- **A. A mobile.** The business number is a phone in someone&#x27;s pocket.
+- **B. A landline or internet phone.** A fixed line at a shop or office, usually a
+  handset on a desk, often bundled with the internet.
+- **C. A phone system.** More than one handset, or extensions, or someone who
+  transfers calls. Names to listen for: 3CX, RingCentral, Aircall, Zoom Phone,
+  Microsoft Teams Phone, &quot;our VoIP system&quot;, &quot;our PBX&quot;.
+- **D. They do not know.**
+
+If the answer is D, give the owner these exact words to send the client:
+
+&gt; Quick one so I can set your AI up properly.
+&gt; 1. Is your business number a mobile you carry, or a phone sitting at the shop?
+&gt; 2. Who do you pay for it each month?
+&gt; 3. Does anyone else&#x27;s phone ring when that number is called?
+&gt; 4. When you miss a call now, what happens? Voicemail, or does it ring someone
+&gt;    else?
+
+Map the answers: mobile they carry equals A. One handset at the shop, nobody else
+rings, equals B. Anyone else rings, or extensions, or a system named, equals C.
+Still unclear means ask them to log in wherever they pay the bill and read out what
+the service is called. Do not proceed on a guess.
+
+### Q3. Which phone company?
+
+You need the company name to give them the right forwarding code and to know
+whether forwarding is even available on their plan.
+
+### Q4. When should the AI pick up? The five modes.
+
+Read these out in plain words and let them choose one.
+
+- **Overflow.** Their phone rings first, like normal. If nobody answers after about
+  twenty seconds, the AI takes it. Outside hours it goes straight to the AI. This
+  is what most people want and it is the simplest to build.
+- **After hours only.** In business hours they answer everything and the AI never
+  touches a call. Outside those hours the AI takes everything.
+- **Always AI first.** Every call goes to the AI, every time. It handles bookings
+  and questions and passes real humans through.
+- **AI as backup, with transfer.** Overflow, but the AI also offers to put urgent
+  callers through to their mobile.
+- **Split by intent.** The AI answers everything, handles the simple calls, and
+  passes anything complicated to a human.
+
+These are routing settings, not different agents. The same agent works for all
+five. What changes is where the calls come from before they reach the AI.
+
+Recommend Overflow unless they have a reason. It needs one code tapped into one
+phone and there is nothing else to break. After hours and Split need a piece of
+routing that decides call by call, which is more to build and more to test.
+
+If they choose anything other than Overflow, ask their exact business hours and
+which days.
+
+### Q5. What mobile should the AI ring when a caller needs a human?
+
+This must be a **different number from the business number**. Get it in full
+international format and read it back digit by digit.
+
+If the owner is still on a Twilio trial account, that mobile has to be verified in
+Twilio before the AI can dial it. Do that now, not on the day you go live.
+
+If the client only has one phone, say it plainly:
+
+&gt; Because your business number sends missed calls to the AI, the AI cannot ring
+&gt; that same number back or the call goes in a circle. Two options. Either we keep
+&gt; it simple and the AI takes a message every time, or you give me a second number
+&gt; to reach you on.
+
+### Q6. THE LOOP TRAP CHECK. Ask this directly, every single time.
+
+Ask the client, in these words:
+
+&gt; On the mobile you want the AI to transfer calls to, is there any call forwarding
+&gt; switched on right now? Anything that sends calls somewhere else, always or when
+&gt; you miss them?
+
+Why this question exists: if the transfer mobile has **unconditional forwarding**
+pointing back at the AI number, the AI transfers a caller, the caller lands on the
+mobile, the mobile immediately forwards them back to the AI, and round it goes. The
+client&#x27;s phones effectively stop working.
+
+The rule: the transfer mobile must have **no forwarding, or conditional forwarding
+only** (forward when not answered, or when busy). Never unconditional.
+
+**Never infer forwarding from call data.** On the live build a diversion marker in
+the call information led to a wrong conclusion that the owner had forwarding set up
+when he had never touched it. Ask the person. Believe the person. If they are not
+sure, have them check with the code in the table below and read the result back to
+you.
+
+### Q7. What happens when the AI takes a booking? The booking situation.
+
+Three tiers. Find out which one this client is.
+
+- **Tier 1, the default that always works.** The AI takes all the details and they
+  land in the app as a booking record. The owner sees them in the app, or asks
+  their co-founder agent for the day&#x27;s bookings. This works for every business on
+  earth, needs nothing from the client, and is what you sell. Most trades are here,
+  running on a diary or a whiteboard.
+- **Tier 2, Google Calendar.** The client already lives in Google Calendar and
+  wants real-time availability and real bookings in it. Possible, needs a bridge
+  built and a Google login connected. Only offer it if they already use Google
+  Calendar as their actual calendar.
+- **Tier 3, their booking platform.** Some platforms let other software book into
+  them directly. More work, higher price, and only worth it for a client whose
+  whole business runs through one.
+
+The honest script when a client has an unusual system:
+
+&gt; We work with all sorts of systems. Either we connect straight to yours, or the AI
+&gt; qualifies the caller and takes the full booking, which lands in one place you
+&gt; check. During setup we test your exact workflow. If we cannot make it seamless,
+&gt; you do not pay.
+
+Do not promise a text message to the caller or to staff. That needs paperwork on
+the phone number that is not in place yet. `[VERIFY: SMS is blocked pending the
+Twilio regulatory bundle and messaging permission. It is the first upgrade, not
+part of the first build.]`
+
+### Q8. Who is the emergency contact, and what counts as an emergency?
+
+For a trade, a burst pipe at 11pm is not the same call as a quote request. Get the
+number, and get the client&#x27;s own words for what counts.
+
+### Q9. What should the AI never say?
+
+Prices they do not want quoted. Timeframes they cannot hold to. Anything about
+warranties, insurance or someone else&#x27;s work. Write it down word for word. It goes
+straight into the agent&#x27;s guardrails.
+
+### Q10. Whose name is the phone account in?
+
+The normal answer is that the Twilio account sits in the client&#x27;s business name and
+the client pays Twilio directly, and the owner has the login and manages it. That
+keeps the number portable and keeps the owner out of the billing.
+
+---
+
+## Part 2: the decision tree
+
+Work through this in order. Do not skip ahead and do not invent a branch.
+
+### Branch 1: the country
+
+```
+United States or Canada?
+  YES -&gt; Retell sells the number directly. No Twilio, no paperwork.
+         Buy the number in Retell, bind the agent, then go to Branch 2.
+  NO  -&gt; You need a Twilio number. Continue.
+
+Australia, New Zealand, United Kingdom or Europe?
+  YES -&gt; Twilio sells numbers there, and each one needs identity paperwork
+         approved before you can buy it. Once one bundle is approved it covers
+         every future number of the same type in the same country.
+         If the paperwork is already approved: the number can be live today.
+         If it is not: tell the client &quot;later this week&quot;, never &quot;this afternoon&quot;.
+  NO  -&gt; Stop. Tell the owner you have not been given the rules for that country.
+```
+
+### Branch 2: where the client&#x27;s number lives
+
+```
+A. A MOBILE on a normal mobile company
+   -&gt; Nothing to build. The CLIENT taps one code into their own phone, once.
+      Twenty seconds. Go to the forwarding codes below.
+
+B. A LANDLINE or INTERNET PHONE
+   -&gt; Codes usually do not work. Forwarding is a setting on the phone company&#x27;s
+      website. The CLIENT logs in, or adds YOU as a user.
+      Ask: &quot;Can you log in to your phone service online? Who do you pay?&quot;
+      Then say honestly: &quot;I do not know that provider&#x27;s exact menu. Get on a
+      screen share and look for Call Forward, Divert or Follow Me. The setting
+      you want is forward when not answered, pointing at the new number.&quot;
+      The usual hold-up is that nobody knows the login. Ask for it a day early.
+
+C. A PHONE SYSTEM (3CX, RingCentral, Aircall, Teams Phone and similar)
+   -&gt; Someone already looks after it. YOU do not touch it. Tell their phone
+      person what you need. Give the owner this to send:
+        &quot;Hi, we are adding an AI receptionist. Can you add a forward rule so that
+        when a call is not answered after about twenty seconds it goes to
+        {TWILIO_NUMBER}? Please leave everything else as it is.&quot;
+      Ask what happens today first. These systems often already overflow to
+      somebody&#x27;s mobile, and you do not want two hops.
+
+D. THEY ASK TO MOVE THE NUMBER TO TWILIO
+   -&gt; Say no, and say why: &quot;We do not need to move your number. We just point
+      missed calls at the new one. Moving it takes weeks, needs signed forms,
+      and if anything goes wrong your phone stops working.&quot;
+
+E. SOMEONE SUGGESTS HOSTED NUMBERS
+   -&gt; They do not do voice calls. Do not offer it for a receptionist.
+```
+
+### Branch 3: how the AI gets the call once it reaches Twilio
+
+```
+Overflow or Always AI?
+  -&gt; Simplest setup. The Twilio number sits on the SIP trunk pointing at Retell,
+     and the number is imported into Retell. Nothing else. Recommend this.
+
+After hours or Split by intent?
+  -&gt; The simple setup cannot do this. A number attached to a trunk ignores every
+     other setting on that number, so there is nowhere to put a clock.
+     For these two the number does NOT go on the trunk. It points at a small piece
+     of routing that decides, call by call, whether to ring a human or hand the
+     call to the AI. Build that routing, then test it with real calls before you
+     tell the client it is live.
+     [VERIFY: the routing function path has not been proven end to end on a real
+     call in this build.]
+```
+
+---
+
+## The forwarding codes
+
+These are the codes the CLIENT taps into their own mobile. They are a phone network
+standard rather than a Twilio feature, and the same codes are used across
+Australian, New Zealand and UK mobile networks.
+
+| What you want | Code to tap | Undo it | Check it |
+|---|---|---|---|
+| Forward only when they do not answer | `**61*NUMBER#` | `##61#` | `*#61#` |
+| Same, choosing how long it rings first | `**61*NUMBER**SECONDS#` | `##61#` | `*#61#` |
+| Forward every call, always | `**21*NUMBER#` | `##21#` | `*#21#` |
+| Forward when the line is busy | `**67*NUMBER#` | `##67#` | `*#67#` |
+| Forward when the phone is off | `**62*NUMBER#` | `##62#` | `*#62#` |
+| Undo everything, the panic button | `##002#` | | |
+
+**Confirm the exact code on the client&#x27;s own phone company support page before you
+send it.** Companies change these and some plans do not allow forwarding at all.
+United States carriers use different codes again, so look theirs up rather than
+using this table. `[VERIFY: these codes have not been live-tested on every
+network.]`
+
+Ring time: five to thirty seconds, in steps of five. Roughly five seconds is one
+ring. About twenty-five seconds, which is five rings, is the good default.
+
+Always write the number in full international format starting with the plus sign.
+
+### The two 61s that confuse everyone
+
+An Australian code looks like this:
+
+```
+**61*+61XXXXXXXXX**25#
+```
+
+Two 61s, and they mean completely different things.
+
+- The **first 61**, right after the two stars, is the phone network&#x27;s code for
+  &quot;when I do not answer&quot;. It is the same in Australia, New Zealand and the UK and
+  has nothing to do with Australia.
+- The **second 61**, after the plus sign, is Australia&#x27;s country code. It is part
+  of the phone number.
+
+Say this out loud to the client so they do not think they typed it twice. It looks
+like a typo and it is not.
+
+### If the code does not work
+
+- Some phone companies want you to use the phone&#x27;s own menu instead: Phone app,
+  then Settings, then Call forwarding, then &quot;when unanswered&quot;, then the number.
+- Some prepaid plans cannot forward at all. Check whether they are on prepaid.
+- If nothing works, have them tap `##002#` to clear everything and start again.
+
+### The cost question, answered honestly
+
+The client&#x27;s phone company may charge them for the forwarded leg, as if they had
+made that call themselves. On some plans it is free. Say this word for word:
+
+&gt; Your phone company might charge you for the diverted leg like a call you made
+&gt; yourself. On a lot of plans it is included. Have a quick look at whether your
+&gt; plan has unlimited standard calls. If it does, you will not notice it.
+
+Never promise it is free.
+
+---
+
+## The voicemail trap
+
+This one comes free with every setup that rings a human.
+
+You ring the owner&#x27;s mobile to pass a caller through. The owner does not pick up.
+Voicemail does. Voicemail counts as someone answering, so the caller gets connected
+to a beep and a greeting instead of getting help, everyone hangs up, and from the
+outside it looks like it worked.
+
+The fix, built into the routing: before connecting the caller, the system whispers
+privately to the owner, &quot;New call for your business, press 1 to take it.&quot;
+Voicemail cannot press 1. If nothing is pressed within a few seconds, that leg is
+dropped and the caller goes to the AI instead. The caller hears normal ringing the
+whole time and never knows.
+
+Include this in the plan every time the setup rings a human.
+
+---
+
+## Part 3: write the plan
+
+Output exactly these seven sections, in this order, with these headings. Nothing
+else. Plain language throughout.
+
+### 1. What we are doing, in one paragraph
+
+Two or three sentences. Name the client, say their number stays where it is, say
+what happens when they miss a call, and say when the AI picks up.
+
+### 2. The steps
+
+A numbered list. Every step tagged YOU, CLIENT or ME, one action each. The shape:
+
+```
+1. YOU: Get the identity paperwork approved on the Twilio account. One time job,
+   covers every client after this.
+2. ME: Buy the number and build the trunk.
+3. ME: Connect the number to Retell and put this client&#x27;s agent on it.
+4. YOU: Ring the new number yourself. Confirm the AI answers.
+5. CLIENT: On the business phone, tap the forwarding code and press call.
+6. YOU: Ring the business number from a different phone, let it ring out, confirm
+   the AI answers.
+```
+
+### 3. The exact code or setting
+
+The literal string to tap, or the literal path through the menu, written so it can
+be pasted into a text message to the client. Add the two 61s explanation if it is
+one of those codes. Add the line telling them to confirm it on their phone
+company&#x27;s own support page.
+
+### 4. What it costs to run
+
+The number is a few dollars a month. The voice is charged per minute of call time.
+Give the owner the real current figures from Retell and Twilio, say plainly which
+currency they are in, and never quote what the client&#x27;s own phone company charges
+for a diverted call.
+
+### 5. Who does what, at a glance
+
+Three short lists: YOU, CLIENT, ME. Headlines only. This is what the owner forwards
+to the client.
+
+### 6. Test before you tell the client it is live
+
+Always include these, in this order:
+
+```
+1. Ring the new number from your own phone. The AI answers.
+2. Ring the client&#x27;s business number from a phone that is not theirs. Let it ring
+   right out. The AI picks up.
+3. Ring in and book something. Check the booking appears in the app with the right
+   date.
+4. Ring the business number and have the CLIENT answer it. Confirm the AI stays out
+   of the way and nothing sounds different.
+5. Ring in and ask for a human. The call must end as a transfer AND the owner&#x27;s
+   mobile must actually ring.
+6. If a human is in the routing: let their voicemail pick up. The caller must end
+   up with the AI, not with voicemail.
+7. Have the client tap the check code on their phone. It should read back the new
+   number.
+```
+
+The full detail of steps 1, 3 and 5 lives in `receptionist-test-protocol`. Run that
+skill, do not rewrite it here.
+
+### 7. If it goes wrong
+
+Always include these four:
+
+```
+- Client wants everything back to normal right now: they tap ##002# and press
+  call. Every divert clears in one second and their phone works exactly as before.
+  Tell them this line at the start. It takes all the fear out of it.
+- The AI never picks up: check the divert is actually on with the check code, then
+  ring the new number directly to find out whether the problem is the divert or
+  the AI.
+- Callers hear an error message: the routing did not answer in time. There should
+  be a backup on the number that takes a message instead.
+- The AI cannot ring the owner out: outbound dialling to that country is switched
+  off in Twilio. Turn it on in voice geographic permissions.
+```
+
+---
+
+## Read-back verification
+
+Before you hand the plan over, print and confirm with the owner:
+
+1. Country, phone company, and phone type.
+2. The chosen routing mode, in the client&#x27;s own words.
+3. The business hours, if the mode needs them.
+4. The transfer mobile, digit by digit, and confirmation that it is NOT the
+   business number.
+5. The loop trap answer, in the client&#x27;s own words, and confirmation that any
+   forwarding on the transfer mobile is conditional or absent.
+6. The booking tier.
+7. The emergency contact.
+8. The never-say list, word for word.
+
+## Things you never do
+
+- Never tell a client to move their number in order to get started.
+- Never ring the client&#x27;s business number from the routing.
+- Never promise the client their phone company will not charge them.
+- Never promise a same-day go-live before the identity paperwork is approved.
+- Never promise a text message to the caller or to staff in the first build.
+- Never put a number on a SIP trunk and then promise time-of-day routing on it.
+- Never assume what forwarding a client has. Ask them.
+- Never use an em-dash.
+
+Once it is saved: read it, and reply &quot;ready for the first client&quot; when you understand it. Do not build anything yet.</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it saves the skill and confirms. Six skills now, and between them they build a receptionist for anybody.</div>
+<button type="button" class="btn-done" hidden>Finish this page</button>
+</div>
+</section></li>
+</ol>
+
+<section class="clientblock"><h2 class="cb-h">For the day you land a client</h2><div class="callout"><b>When you land your first client, these two are waiting for you.</b> Neither one is part of your own build, so skip them today and come back the day someone says yes.</div><figure class="vid"><video src="/course-media/twilio-2-client-account-access.mp4" controls preload="metadata" playsinline></video><figcaption>BLAKE, 1:48, GETTING ACCESS TO A CLIENT&#x27;S TWILIO ACCOUNT</figcaption></figure><div class="callout"><b>One role. Administrator. That is the whole answer.</b><br>In the video Blake lists a few extra roles and second-guesses himself on camera. Ignore that part. The client creates the account so they stay the Owner, they invite you as a user, and they give you Administrator. That lets you buy numbers, build the trunk, create API keys, submit regulatory bundles and read the logs. It does not let you close the account or remove them, which is exactly what they should keep. Skip Messaging Insights and Voice Intelligence, they are analytics roles and this build does not touch them. If a client would rather keep you out of billing, Developer works instead.</div><p><b>US and Canadian clients need no paperwork at all.</b> Numbers there are instant. Almost everywhere else, and that means every Australian client, needs what Twilio calls a regulatory bundle.</p><p><b>Here is the part that saves your launch.</b> In Australia you can buy a local number and take calls straight away with just an Australian address on file. The bundle is what unlocks text messages, not calls. So your receptionist can be answering the phone the same day, while the bundle approves in the background. Start it the day they say yes anyway, because approval takes 24 to 48 hours.</p><p><b>What Australia asks for.</b> A registered business needs four things: an ASIC company extract, proof of the business address, photo ID for the person you list as the representative, and, only if that person is not a director on the extract, a letter of authorisation signed by one who is. A sole trader needs two: photo ID and one document showing their address. It has to be a street address, Twilio rejects PO boxes.</p><figure class="vid"><video src="/course-media/twilio-3-regulatory-bundle-au.mp4" controls preload="metadata" playsinline></video><figcaption>BLAKE, 2:34, ADDRESSES AND THE AUSTRALIAN REGULATORY BUNDLE</figcaption></figure></section>
+<div class="outro" id="outro">
+<div class="finish-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></div>
+<h2 class="finish-title">It Answers a Real Phone</h2>
+<p class="finish-sub">You built a receptionist, gave it a number, and made it pass a call to a human. Connecting a real business to it is one forwarding code tapped into their phone. Module 8 finishes the handover.</p>
+<button type="button" class="cblock-btn">Complete This Page</button>
+<a class="next" href="../calls/calls-a.html">Next: Sell It &rarr;</a>
+</div>
+<p class="helpline">Something not working the way this page says it should? Post it in the group with a screenshot. Someone will get you moving.</p>
+<button type="button" class="startover">Start this page over</button>
+</main>
+<script>
+window.PAGECFG={"miles": [], "downloads": []};
+(function(){
+  var KEY='course.m6.d';
+  var CFG=window.PAGECFG||{miles:[],downloads:[]};
+  var lis=[].slice.call(document.querySelectorAll('.steps > li'));
+  var total=lis.length;
+  var segs=[].slice.call(document.querySelectorAll('.segment'));
+  var countEl=document.getElementById('done-count');
+  var outro=document.getElementById('outro');
+  function getDone(){try{var v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?0:Math.min(v,total);}catch(e){return 0;}}
+  function setDone(n){try{localStorage.setItem(KEY,String(n));}catch(e){}}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---- audio ---- */
+  var ac=null;
+  function ctx(){try{if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();}if(ac.state==='suspended')ac.resume();return ac;}catch(e){return null;}}
+  function ding(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.13;out.connect(a.destination);[[880,0,0.34],[1318.5,0.075,0.32]].forEach(function(n){var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(n[0],now+n[1]);g.gain.setValueAtTime(0.0001,now+n[1]);g.gain.exponentialRampToValueAtTime(1,now+n[1]+0.012);g.gain.exponentialRampToValueAtTime(0.0001,now+n[1]+n[2]);o.connect(g);g.connect(out);o.start(now+n[1]);o.stop(now+n[1]+n[2]+0.05);});}
+  function fanfare(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.12;out.connect(a.destination);[523.25,659.25,783.99,1046.5].forEach(function(f,i){var at=i*0.11;var o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.setValueAtTime(f,now+at);g.gain.setValueAtTime(0.0001,now+at);g.gain.exponentialRampToValueAtTime(1,now+at+0.015);g.gain.exponentialRampToValueAtTime(0.0001,now+at+0.7);o.connect(g);g.connect(out);o.start(now+at);o.stop(now+at+0.75);});}
+  function tickSnd(){var a=ctx();if(!a)return;var now=a.currentTime;var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(1650,now);o.frequency.exponentialRampToValueAtTime(950,now+0.05);g.gain.setValueAtTime(0.0001,now);g.gain.exponentialRampToValueAtTime(0.06,now+0.006);g.gain.exponentialRampToValueAtTime(0.0001,now+0.06);o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+0.08);}
+  /* ---- confetti ---- */
+  function confetti(){if(reduce)return;var cv=document.createElement('canvas');cv.setAttribute('aria-hidden','true');cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';document.body.appendChild(cv);var c=cv.getContext('2d');if(!c){cv.remove();return;}var dpr=Math.min(window.devicePixelRatio||1,2);var w=window.innerWidth,h=window.innerHeight;cv.width=w*dpr;cv.height=h*dpr;c.scale(dpr,dpr);var cols=['#32d09f','#14926c','#8b5cf6','#c9b6f9','#8b5cf6','#15171d'];var n=w<600?90:160;var ps=[];for(var i=0;i<n;i++){ps.push({x:w*(0.5+(Math.random()-0.5)*0.5),y:h*0.35+Math.random()*40,vx:(Math.random()-0.5)*9,vy:-6-Math.random()*9,s:5+Math.random()*7,r:Math.random()*Math.PI,vr:(Math.random()-0.5)*0.35,col:cols[Math.floor(Math.random()*cols.length)]});}var st=performance.now(),raf=0,dur=2000;function fr(now){var el=now-st,life=Math.min(el/dur,1);c.clearRect(0,0,w,h);ps.forEach(function(p){p.vy+=0.32;p.vx*=0.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.globalAlpha=1-life*life;c.fillStyle=p.col;c.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);c.restore();});if(el<dur){raf=requestAnimationFrame(fr);}else{cancelAnimationFrame(raf);cv.remove();}}raf=requestAnimationFrame(fr);}
+  /* ---- icons ---- */
+  var LOCK='<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="4.5" y="8.5" width="11" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.2 8.5V6.6a2.8 2.8 0 0 1 5.6 0v1.9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  var TICK='<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5 8.3 14.3 15.5 6.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var FLAGI='<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17V3.5"/><path d="M5 4h9.5l-2.2 3 2.2 3H5" fill="currentColor" stroke="none"/></svg>';
+  var BOLT='<svg viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M11 2 4 11.5h4.4L8.6 18l7-9.5h-4.4L11 2z"/></svg>';
+  var FILE='<svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5H5.8A1.3 1.3 0 0 0 4.5 3.8v12.4a1.3 1.3 0 0 0 1.3 1.3h8.4a1.3 1.3 0 0 0 1.3-1.3V6.5l-4-4z"/><path d="M11.5 2.5v4h4"/><path d="M10 9v5m0 0-2.2-2.2M10 14l2.2-2.2"/></svg>';
+  /* ---- classify step types ---- */
+  var ACT=/^(go |open |ring|make the call|watch|download|upload|get |send |text |scroll|look for|note the|swap in|click around)/i;
+  lis.forEach(function(li,i){
+    var card=li.querySelector('.step');if(!card)return;
+    var t='';
+    if(card.querySelector('.prompt:not(.chat)'))t='t-build';
+    else if(card.querySelector('.prompt.chat'))t='t-chat';
+    var pl=card.querySelector('.pwrap .plabel');
+    if(pl){var lt=pl.textContent.toUpperCase();
+      if(lt.indexOf('PHONE')>-1){t='t-phone';pl.parentNode.classList.add('is-phone');pl.textContent='On the call';}
+      else t='t-chat';}
+    var titleEl=card.querySelector('.step-title-text');
+    var title=titleEl?titleEl.textContent:'';
+    if(!t&&ACT.test(title.trim()))t='t-act';
+    if(CFG.miles.some(function(m){return title.indexOf(m)>-1;}))t=(t?t+' ':'')+'t-mile';
+    if(t)card.setAttribute('data-t',t);
+    var body=card.querySelector('.step-body');
+    if(body&&/(^|\s)t-mile(\s|$)/.test(t)){var mt=document.createElement('span');mt.className='mile-tag';mt.innerHTML=FLAGI+' CHECKPOINT';body.insertBefore(mt,body.firstChild);}
+    else if(body&&t==='t-act'){var ar=document.createElement('span');ar.className='act';ar.innerHTML=BOLT+' REAL WORLD MOVE';body.insertBefore(ar,body.firstChild);}
+  });
+  /* ---- file download chips ---- */
+  CFG.downloads.forEach(function(d){
+    var li=lis[d.step];if(!li)return;
+    var pre=li.querySelector('.pwrap pre');if(!pre)return;
+    var chip=document.createElement('button');chip.type='button';chip.className='filechip';
+    chip.innerHTML=FILE+d.name+' <small>download</small>';
+    chip.addEventListener('click',function(){
+      try{var blob=new Blob([pre.innerText],{type:'text/markdown'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=d.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);tickSnd();}
+      catch(e){var btn=li.querySelector('.copy');if(btn)btn.click();}
+    });
+    var wrap=li.querySelector('.pwrap');wrap.parentNode.insertBefore(chip,wrap);
+  });
+  /* ---- render ---- */
+  function render(done,animateIdx){
+    lis.forEach(function(li,i){
+      var st=i<done?'done':(i===done?'open':'locked');
+      var card=li.querySelector('.step');
+      var t=card.getAttribute('data-t')||'';
+      card.className='step is-'+st+(t?' '+t.split(' ').join(' '):'')+(i===animateIdx?' just-passed':'');
+      li.className=i<done?'spine-on':'';
+      var badge=card.querySelector('.step-badge');
+      var isMile=t.indexOf('t-mile')>-1;
+      badge.innerHTML=st==='done'?TICK:(st==='locked'?LOCK:(isMile?FLAGI:String(i+1)));
+      var chip=card.querySelector('.step-chip');
+      chip.className='step-chip is-'+st;
+      chip.innerHTML=st==='done'?'Done':(st==='locked'?LOCK:(isMile?'Checkpoint':'Start'));
+      var body=card.querySelector('.step-body');
+      if(body)body.hidden=(st==='locked');
+      var note=card.querySelector('.step-locked-note');
+      if(note)note.hidden=(st!=='locked');
+      var btn=card.querySelector('.btn-done');
+      if(btn)btn.hidden=(st!=='open');
+    });
+    segs.forEach(function(s,i){s.className='segment'+(i<done?' is-filled':(i===done?' is-current':''));});
+    if(countEl)countEl.textContent=String(done);
+  }
+  lis.forEach(function(li,i){
+    var btn=li.querySelector('.btn-done');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      var done=getDone();
+      if(i!==done)return;
+      var card=li.querySelector('.step');
+      var mile=(card.getAttribute('data-t')||'').indexOf('t-mile')>-1;
+      done+=1;setDone(done);
+      if(done>=total){fanfare();}else if(mile){fanfare();}else{ding();}
+      render(done,i);
+      var target=done<total?lis[done]:outro;
+      if(target)setTimeout(function(){var hdr=document.querySelector('.progress');var off=(hdr&&hdr.offsetHeight?hdr.offsetHeight:0)+16;var y=target.getBoundingClientRect().top+window.pageYOffset-off;window.scrollTo({top:y<0?0:y,behavior:reduce?'auto':'smooth'});},320);
+    });
+  });
+  var so=document.querySelector('.startover');
+  if(so)so.addEventListener('click',function(){try{localStorage.removeItem('done:'+location.pathname);}catch(e){}setDone(0);render(0,-1);location.reload();});
+  /* ---- copy ---- */
+  function doCopy(text,btn){function ok(){tickSnd();btn.textContent='Copied';btn.classList.add('did');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('did');},2000);}function fb(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){}ta.remove();}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fb);}else{fb();}}
+  window.cp=function(b){var pre=b.parentNode.querySelector('pre');doCopy(pre?pre.innerText:'',b);};
+  [].slice.call(document.querySelectorAll('.prompt')).forEach(function(box){
+    var text=box.innerText;
+    var btn=document.createElement('button');btn.className='copybtn';btn.type='button';btn.textContent='Copy';
+    btn.addEventListener('click',function(){doCopy(text,btn);});
+    box.appendChild(btn);
+  });
+  render(getDone(),-1);
+  window.__confetti=confetti;window.__ding=ding;
+})();
+
+</script>
+<script>
+/* ---- complete card ---- */
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var wrap=document.getElementById('outro');
+  if(!wrap)return;
+  var btn=wrap.querySelector('.cblock-btn');
+  if(!btn)return;
+  var key='done:'+location.pathname;
+  function markDone(){
+    btn.textContent='Completed';
+    btn.classList.add('is-done');
+    btn.disabled=true;
+    wrap.classList.add('is-done');
+  }
+  try{if(localStorage.getItem(key)==='1')markDone();}catch(e){}
+  btn.addEventListener('click',function(){
+    try{localStorage.setItem(key,'1');}catch(e){}
+    markDone();
+    try{if(!reduce&&window.__confetti)window.__confetti();if(window.__ding)window.__ding();}catch(e){}
+  });
+})();
+</script>
+<script src="/nav.js" defer></script>
+</body>
+</html>

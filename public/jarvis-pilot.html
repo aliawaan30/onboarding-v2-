@@ -1,0 +1,1547 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><title>Your Jarvis · Guided pilot</title><style>/* =========================================================================
+   Build Your AI Agency, onboarding portal.
+   Light, warm-paper ground. Ultramarine accent. One spine down the page
+   that fills in as the build completes.
+   ========================================================================= */
+
+:root {
+  /* ground + surfaces */
+  --ground: #ffffff;
+  --ground-2: #f5faf8;
+  --surface: #ffffff;
+  --surface-sunk: #f7fbf9;
+
+  /* ink */
+  --ink: #15171d;
+  --ink-2: #3b414f;
+  --ink-3: #6b7280;
+  --ink-4: #9aa0ab;
+
+  /* lines */
+  --line: #e6eae8;
+  --line-2: #cfd8d4;
+
+  /* accent, green */
+  --accent: #32d09f;
+  --accent-deep: #14926c;
+  --accent-ink: #052e21;
+  --accent-tint: #e7faf3;
+  --accent-tint-2: #ccf3e5;
+  --accent-line: #90e5c8;
+
+  /* secondary accent, violet */
+  --accent2: #8b5cf6;
+  --accent2-deep: #6a3de0;
+  --accent2-tint: #f2edff;
+  --accent2-tint-2: #e2d8fd;
+  --accent2-line: #c9b6f9;
+
+  /* semantics */
+  --ok: #0f8a55;
+  --ok-tint: #e4f6ed;
+  --warn: #a2560d;
+  --warn-tint: #fdf0e2;
+
+  --radius: 18px;
+  --radius-sm: 12px;
+
+  --shadow-sm: 0 1px 2px rgba(21, 23, 29, 0.05);
+  --shadow-md: 0 1px 2px rgba(21, 23, 29, 0.05), 0 8px 24px -12px rgba(21, 23, 29, 0.16);
+  --shadow-lg:
+    0 1px 2px rgba(21, 23, 29, 0.05),
+    0 12px 28px -14px rgba(21, 23, 29, 0.18),
+    0 40px 64px -48px rgba(50, 208, 159, 0.4);
+
+  --display: 'Bricolage Grotesque', 'Instrument Sans', system-ui, -apple-system, sans-serif;
+  --body: 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
+
+  --spine-x: 41px;
+  --ease: cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 17px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100dvh;
+  background-image:
+    radial-gradient(900px 460px at 12% -180px, rgba(44, 61, 245, 0.09), transparent 68%),
+    radial-gradient(760px 420px at 92% -60px, rgba(255, 186, 92, 0.13), transparent 66%);
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+::selection {
+  background: var(--accent-tint-2);
+  color: var(--accent-deep);
+}
+
+/* ------------------------------------------------------------- layout */
+
+.shell {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 124px 20px 96px;
+}
+
+.shell-centre {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 32px;
+  box-shadow: var(--shadow-md);
+}
+
+.card-auth {
+  max-width: 460px;
+  width: 100%;
+  padding: 36px 32px 30px;
+  box-shadow: var(--shadow-lg);
+}
+
+.eyebrow {
+  /* violet identity label */
+  margin: 0 0 14px;
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--accent2-deep);
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.eyebrow::before {
+  content: '';
+  width: 18px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--accent2);
+  flex: 0 0 auto;
+}
+
+/* ----------------------------------------------------------- progress */
+
+.progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(246, 245, 242, 0.82);
+  backdrop-filter: saturate(180%) blur(18px);
+  -webkit-backdrop-filter: saturate(180%) blur(18px);
+  border-bottom: 1px solid var(--line);
+  padding-top: env(safe-area-inset-top);
+}
+
+.progress-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 14px 20px 15px;
+}
+
+.progress-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-bottom: 11px;
+}
+
+.progress-lead {
+  display: flex;
+  align-items: baseline;
+  gap: 11px;
+  min-width: 0;
+}
+
+.progress-count {
+  font-family: var(--mono);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  color: var(--accent-deep);
+  font-size: 19px;
+  line-height: 1;
+}
+
+.progress-of {
+  color: var(--ink-4);
+  font-size: 13px;
+}
+
+.progress-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+.save-dot {
+  flex: 0 0 auto;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.save-dot::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--ok);
+  opacity: 0.75;
+}
+
+.save-dot.is-saving::before {
+  background: var(--accent);
+  animation: pulse-dot 1.1s ease-in-out infinite;
+}
+
+.save-dot.is-failed {
+  color: var(--warn);
+}
+
+.save-dot.is-failed::before {
+  background: var(--warn);
+}
+
+@keyframes pulse-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+.segments {
+  display: flex;
+  gap: 5px;
+}
+
+.segment {
+  flex: 1;
+  height: 7px;
+  border-radius: 99px;
+  background: var(--ground-2);
+  box-shadow: inset 0 0 0 1px rgba(21, 23, 29, 0.05);
+  position: relative;
+  overflow: hidden;
+  transition: background 480ms var(--ease);
+}
+
+.segment::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent) 65%, var(--accent2));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 520ms var(--ease);
+}
+
+.segment.is-filled::after {
+  transform: scaleX(1);
+}
+
+.segment.is-current {
+  background: var(--accent2-tint-2);
+}
+
+.segment.is-current::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(90deg, transparent, rgba(44, 61, 245, 0.55), transparent);
+  transform: translateX(-100%);
+  animation: sweep 2.1s var(--ease) infinite;
+}
+
+@keyframes sweep {
+  0% {
+    transform: translateX(-100%);
+  }
+  60%,
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+/* -------------------------------------------------------------- intro */
+
+.intro {
+  margin-bottom: 44px;
+  animation: rise 620ms var(--ease) both;
+}
+
+.intro-title {
+  margin: 0 0 14px;
+  font-family: var(--display);
+  font-size: clamp(31px, 8.2vw, 54px);
+  line-height: 1.03;
+  overflow-wrap: break-word;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+  color: var(--ink);
+}
+
+.welcome-back {
+  margin: 0 0 20px;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--accent2-deep);
+  background: var(--accent2-tint);
+  border: 1px solid var(--accent2-line);
+  border-radius: 99px;
+  padding: 6px 14px;
+  display: inline-block;
+}
+
+.intro-para {
+  margin: 0 0 15px;
+  color: var(--ink-2);
+  font-size: 17px;
+}
+
+.intro .video {
+  margin: 22px 0 24px;
+}
+
+.intro-time {
+  margin: 22px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--line);
+  font-size: 14px;
+  color: var(--ink-3);
+}
+
+/* -------------------------------------------------------------- steps */
+
+.steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.steps > li {
+  position: relative;
+}
+
+/* the spine: a connector in the gap above each card, filled once the
+   step above is done. The page literally builds itself downward. */
+.steps > li + li::before {
+  content: '';
+  position: absolute;
+  left: var(--spine-x);
+  top: -19px;
+  width: 2px;
+  height: 20px;
+  border-radius: 2px;
+  background: var(--line-2);
+  transition: background 420ms var(--ease);
+}
+
+.steps > li.spine-on + li::before {
+  background: linear-gradient(180deg, var(--accent), var(--accent-line));
+}
+
+.step {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 24px;
+  scroll-margin-top: 108px;
+  box-shadow: var(--shadow-sm);
+  transition:
+    border-color 260ms var(--ease),
+    box-shadow 260ms var(--ease),
+    background 260ms var(--ease),
+    transform 260ms var(--ease);
+}
+
+.step.is-locked {
+  background: rgba(255, 255, 255, 0.5);
+  border-color: var(--line);
+  border-style: dashed;
+  box-shadow: none;
+}
+
+.step.is-locked .step-title-text {
+  color: var(--ink-2);
+}
+
+.step.is-locked .step-badge {
+  background: transparent;
+  color: var(--ink-4);
+  border-style: dashed;
+}
+
+.step.is-open {
+  border-color: var(--accent-line);
+  box-shadow: var(--shadow-lg);
+}
+
+.step.is-open::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  border: 1px solid rgba(44, 61, 245, 0.18);
+  pointer-events: none;
+}
+
+.step.is-done {
+  background: var(--surface-sunk);
+}
+
+.step.just-passed {
+  animation: pass-pop 700ms var(--ease);
+}
+
+@keyframes pass-pop {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(15, 138, 85, 0.4);
+  }
+  35% {
+    transform: scale(1.012);
+    box-shadow: 0 0 0 8px rgba(15, 138, 85, 0.12);
+  }
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 16px rgba(15, 138, 85, 0);
+  }
+}
+
+.step-head {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.step-badge {
+  flex: 0 0 auto;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border-radius: 11px;
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+  font-family: var(--mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ink-3);
+  transition:
+    background 240ms var(--ease),
+    color 240ms var(--ease),
+    border-color 240ms var(--ease);
+}
+
+.step.is-open .step-badge {
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  color: var(--accent-ink);
+  border-color: transparent;
+  box-shadow: 0 4px 12px -4px rgba(44, 61, 245, 0.6);
+}
+
+.step.is-done .step-badge {
+  background: var(--ok-tint);
+  color: var(--ok);
+  border-color: rgba(15, 138, 85, 0.28);
+}
+
+.step-heading {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.step-title {
+  margin: 0;
+  font-family: var(--display);
+  font-size: 21px;
+  line-height: 1.22;
+  font-weight: 700;
+  letter-spacing: -0.022em;
+  color: var(--ink);
+}
+
+.step-n {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ink-4);
+  display: block;
+  margin-bottom: 3px;
+}
+
+.step.is-open .step-n {
+  color: var(--accent-deep);
+}
+
+.step-meta {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--ink-3);
+  background: var(--ground-2);
+  border-radius: 99px;
+  padding: 3px 9px;
+}
+
+.step.is-done .step-meta {
+  color: var(--ok);
+  background: var(--ok-tint);
+}
+
+.step.is-open .step-meta {
+  color: var(--accent-deep);
+  background: var(--accent-tint);
+}
+
+.step-locked-note {
+  margin: 12px 0 0 48px;
+  font-size: 14px;
+  color: var(--ink-4);
+}
+
+.step-body {
+  margin-top: 22px;
+  animation: rise 420ms var(--ease) both;
+}
+
+.step-para {
+  margin: 0 0 15px;
+  color: var(--ink-2);
+}
+
+.step-expect {
+  margin: 24px 0 0;
+  padding: 16px 18px;
+  background: var(--accent-tint);
+  border: 1px solid var(--accent-line);
+  border-radius: var(--radius-sm);
+  font-size: 15.5px;
+  color: var(--ink-2);
+}
+
+.step-expect-label {
+  display: block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-deep);
+  margin-bottom: 5px;
+}
+
+/* -------------------------------------------------------------- video */
+
+.video {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-bottom: 22px;
+  background: var(--ground-2);
+  border: 1px solid var(--line);
+}
+
+.video iframe,
+.video video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+
+.video video {
+  background: #000;
+  object-fit: contain;
+}
+
+.video-empty {
+  aspect-ratio: 16 / 8;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  border-style: dashed;
+  border-color: var(--line-2);
+  text-align: center;
+  padding: 18px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.7), rgba(255, 255, 255, 0)),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(21, 23, 29, 0.018) 0 10px,
+      transparent 10px 20px
+    ),
+    var(--ground-2);
+}
+
+.video-badge {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--accent-deep);
+  font-weight: 700;
+}
+
+.video-label {
+  font-size: 14.5px;
+  font-weight: 500;
+  color: var(--ink-2);
+  max-width: 36ch;
+}
+
+.video-soon {
+  font-size: 12px;
+  color: var(--ink-4);
+}
+
+/* ------------------------------------------------------------ buttons */
+
+.btn {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: 12px;
+  font-family: var(--body);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.005em;
+  text-decoration: none;
+  cursor: pointer;
+  min-height: 46px;
+  padding: 12px 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  transition:
+    transform 140ms var(--ease),
+    background 160ms var(--ease),
+    border-color 160ms var(--ease),
+    box-shadow 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.995);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--accent2);
+  outline-offset: 3px;
+}
+
+.btn-primary,
+.btn-gate {
+  background: linear-gradient(180deg, var(--accent), var(--accent-deep));
+  color: var(--accent-ink);
+  box-shadow: 0 1px 2px rgba(21, 23, 29, 0.12), 0 8px 20px -10px rgba(44, 61, 245, 0.8);
+}
+
+.btn-primary:hover:not(:disabled),
+.btn-gate:hover:not(:disabled) {
+  box-shadow: 0 2px 4px rgba(21, 23, 29, 0.14), 0 14px 26px -10px rgba(44, 61, 245, 0.85);
+  transform: translateY(-1px);
+}
+
+.btn-primary {
+  width: 100%;
+  min-height: 50px;
+  font-size: 16px;
+}
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--line-2);
+  color: var(--ink-3);
+  font-size: 13.5px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 99px;
+}
+
+.btn-ghost:hover:not(:disabled) {
+  color: var(--ink);
+  border-color: var(--ink-3);
+  background: rgba(255, 255, 255, 0.7);
+}
+
+.btn-copy {
+  background: var(--surface);
+  border-color: var(--line-2);
+  color: var(--ink);
+  font-size: 13.5px;
+  min-height: 38px;
+  padding: 8px 14px;
+  border-radius: 10px;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-copy:hover:not(:disabled) {
+  transform: translateY(-1px);
+  border-color: var(--accent-line);
+  color: var(--accent-deep);
+  box-shadow: var(--shadow-md);
+}
+
+.btn-copy.is-copied {
+  background: var(--ok-tint);
+  border-color: rgba(15, 138, 85, 0.35);
+  color: var(--ok);
+}
+
+.tick-icon {
+  animation: draw 340ms var(--ease) both;
+}
+
+.btn-download {
+  background: var(--accent);
+  border-color: var(--accent-deep);
+  color: #04140f;
+  font-weight: 700;
+  box-shadow: var(--shadow-md);
+}
+
+.btn-download:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: var(--accent-deep);
+  color: #fff;
+  box-shadow: var(--shadow-lg, var(--shadow-md));
+}
+
+.download {
+  padding: 14px 16px;
+  border-radius: var(--radius-sm);
+  background: var(--accent-tint, var(--ground-2));
+  border: 1px dashed var(--accent-deep);
+}
+
+.gate-tick {
+  width: 17px;
+  height: 17px;
+  border-radius: 6px;
+  border: 2px solid currentColor;
+  display: inline-block;
+  opacity: 0.85;
+}
+
+/* ------------------------------------------------------------- copybox */
+
+.copybox {
+  background: var(--surface-sunk);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px 16px;
+  margin: 0 0 16px;
+}
+
+.copybox-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.copybox-label {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--ink-3);
+  font-weight: 700;
+}
+
+.copybox-text {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--ink-2);
+  white-space: pre-wrap;
+}
+
+/* ------------------------------------------------------------ download */
+
+.download {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 18px;
+}
+
+.download-note {
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* ---------------------------------------------------------------- gate */
+
+.gate {
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+}
+
+.gate-label,
+.field-label {
+  display: block;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  margin-bottom: 6px;
+}
+
+.gate-help {
+  margin: 0 0 12px;
+  font-size: 13.5px;
+  color: var(--ink-3);
+}
+
+.gate-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.gate-input,
+.field {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: var(--surface);
+  border: 1px solid var(--line-2);
+  border-radius: 12px;
+  color: var(--ink);
+  font-family: var(--body);
+  font-size: 16px;
+  min-height: 48px;
+  padding: 12px 15px;
+  box-shadow: inset 0 1px 2px rgba(21, 23, 29, 0.04);
+  transition:
+    border-color 160ms var(--ease),
+    box-shadow 160ms var(--ease),
+    background 160ms var(--ease);
+}
+
+.gate-input::placeholder,
+.field::placeholder {
+  color: var(--ink-4);
+}
+
+.gate-input:hover:not(:focus),
+.field:hover:not(:focus) {
+  border-color: var(--ink-4);
+}
+
+.gate-input:focus,
+.field:focus {
+  outline: none;
+  border-color: var(--accent-deep);
+  box-shadow: 0 0 0 4px rgba(44, 61, 245, 0.14);
+}
+
+.gate-msg {
+  margin: 10px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--ok);
+  min-height: 20px;
+}
+
+.gate-msg.is-wrong {
+  color: var(--warn);
+}
+
+/* The corrected address inside a typo warning, tappable to accept it. */
+.link-inline {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.gate-typed.state-wrong {
+  animation: shake 420ms var(--ease);
+}
+
+.gate-typed.state-wrong .gate-input {
+  border-color: var(--warn);
+  background: var(--warn-tint);
+}
+
+@keyframes shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  20% {
+    transform: translateX(-6px);
+  }
+  40% {
+    transform: translateX(5px);
+  }
+  60% {
+    transform: translateX(-3px);
+  }
+  80% {
+    transform: translateX(2px);
+  }
+}
+
+.gate-typed.state-ok .gate-input {
+  border-color: var(--ok);
+  background: var(--ok-tint);
+}
+
+.name-form {
+  border-top: 1px solid var(--line);
+  padding-top: 22px;
+}
+
+/* --------------------------------------------------------- brand picker */
+
+.brand-block {
+  margin-bottom: 16px;
+}
+
+.brand-picker {
+  border: 0;
+  padding: 0;
+  margin: 0 0 14px;
+}
+
+.brand-options {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.brand-chip {
+  border: 1px solid var(--line-2);
+  background: var(--surface);
+  border-radius: 999px;
+  padding: 9px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink-2);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    border-color 160ms var(--ease),
+    background 160ms var(--ease),
+    color 160ms var(--ease);
+}
+
+.brand-chip:hover {
+  border-color: var(--ink-4);
+}
+
+.brand-chip input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.brand-chip.is-on {
+  border-color: var(--accent-deep);
+  color: var(--accent-ink);
+  background: var(--accent);
+}
+
+.brand-chip:focus-within {
+  outline: 2px solid var(--accent2);
+  outline-offset: 3px;
+}
+
+.brand-input {
+  width: 100%;
+}
+
+/* -------------------------------------------------------------- finish */
+
+.finish {
+  margin-bottom: 36px;
+  border-color: var(--accent-line);
+  background:
+    radial-gradient(600px 240px at 0% 0%, var(--accent-tint), transparent 70%),
+    var(--surface);
+  box-shadow: var(--shadow-lg);
+  animation: rise 620ms var(--ease) both;
+}
+
+.finish-badge {
+  display: inline-block;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--accent-ink);
+  background: var(--accent);
+  border-radius: 999px;
+  padding: 5px 12px;
+  margin-bottom: 16px;
+}
+
+.finish-title {
+  margin: 0 0 12px;
+  font-family: var(--display);
+  font-size: clamp(24px, 5vw, 30px);
+  line-height: 1.14;
+  letter-spacing: -0.028em;
+  font-weight: 700;
+}
+
+.finish-body {
+  margin: 0 0 22px;
+  color: var(--ink-2);
+}
+
+/* ---------------------------------------------------------------- auth */
+
+/* eight dashes: the build ahead, and the same rail that pins to the top
+   of the flow once they are inside */
+.auth-rail {
+  display: flex;
+  gap: 5px;
+  margin: 0 0 24px;
+}
+
+.auth-rail span {
+  flex: 1;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--ground-2);
+  box-shadow: inset 0 0 0 1px rgba(21, 23, 29, 0.05);
+}
+
+.auth-rail span:first-child {
+  background: linear-gradient(90deg, var(--accent-deep), var(--accent) 65%, var(--accent2));
+  box-shadow: none;
+}
+
+.auth-title {
+  margin: 0 0 12px;
+  font-family: var(--display);
+  font-size: clamp(28px, 6vw, 34px);
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+}
+
+.auth-body {
+  margin: 0 0 22px;
+  color: var(--ink-2);
+  font-size: 15.5px;
+}
+
+/* Said once after a resend, so the newest email is the one they reach for. */
+.auth-note {
+  margin: 10px 0 0;
+  color: var(--ink-2);
+  font-size: 13.5px;
+}
+
+.auth-contact {
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.auth-error {
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--warn);
+}
+
+.card-auth .btn-ghost {
+  margin-top: 18px;
+  align-self: flex-start;
+}
+
+/* page-load stagger on the sign in card */
+.card-auth > * {
+  animation: rise 560ms var(--ease) both;
+}
+.card-auth > *:nth-child(1) { animation-delay: 40ms; }
+.card-auth > *:nth-child(2) { animation-delay: 100ms; }
+.card-auth > *:nth-child(3) { animation-delay: 160ms; }
+.card-auth > *:nth-child(4) { animation-delay: 220ms; }
+.card-auth > *:nth-child(5) { animation-delay: 280ms; }
+
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes draw {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* the done tick draws itself in */
+.tick-draw {
+  stroke-dasharray: 22;
+  stroke-dashoffset: 22;
+  animation: draw-stroke 460ms var(--ease) forwards;
+}
+
+@keyframes draw-stroke {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- foot */
+
+.foot {
+  margin-top: 56px;
+  padding-top: 22px;
+  border-top: 1px solid var(--line);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--ink-3);
+}
+
+/* --------------------------------------------------------------- small */
+
+@media (max-width: 600px) {
+  html,
+  body {
+    font-size: 16px;
+  }
+
+  :root {
+    --spine-x: 33px;
+    --radius: 16px;
+  }
+
+  .shell {
+    padding: 116px 15px 72px;
+  }
+
+  .card {
+    padding: 24px 20px;
+  }
+
+  .card-auth {
+    padding: 28px 22px 24px;
+  }
+
+  .step {
+    padding: 19px 17px;
+  }
+
+  .step-badge {
+    width: 30px;
+    height: 30px;
+    border-radius: 10px;
+  }
+
+  .step-head {
+    gap: 12px;
+  }
+
+  .step-title {
+    font-size: 19px;
+  }
+
+  .step-locked-note {
+    margin-left: 42px;
+  }
+
+  .progress-title {
+    display: none;
+  }
+
+  .gate-row {
+    flex-direction: column;
+  }
+
+  .btn-gate {
+    width: 100%;
+  }
+
+  .copybox-head {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ---------------- hero progress, watch card, chips, option B ------------- */
+
+.hero-progress {
+  max-width: 460px;
+  margin: 18px 0 6px;
+  padding: 14px 16px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-sm);
+}
+
+.hero-progress-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 9px;
+}
+
+.hero-progress-label {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--accent2-deep);
+}
+
+.hero-progress-pct {
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--accent-deep);
+  font-variant-numeric: tabular-nums;
+}
+
+.step-chip {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--mono);
+  font-size: 0.66rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 5px 11px;
+  border-radius: 99px;
+  white-space: nowrap;
+}
+
+.step-chip.is-open {
+  background: var(--accent2-tint);
+  color: var(--accent2-deep);
+  border: 1px solid var(--accent2-line);
+}
+
+.step-chip.is-done {
+  background: var(--ok-tint);
+  color: var(--ok);
+  border: 1px solid transparent;
+}
+
+.step-chip.is-locked {
+  background: var(--surface-sunk);
+  color: var(--ink-4);
+  border: 1px solid var(--line);
+}
+
+.step-chip svg {
+  width: 11px;
+  height: 11px;
+}
+
+.step-head .btn-ghost {
+  margin-left: 10px;
+}
+
+.watch-card.is-done {
+  opacity: 0.82;
+}
+
+.step-callout {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 4px 0 12px;
+  padding: 12px 14px;
+  background: var(--accent2-tint);
+  border: 1px solid var(--accent2-line);
+  border-radius: var(--radius-sm);
+  font-size: 0.93rem;
+  font-weight: 500;
+  color: var(--ink);
+}
+
+.callout-mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent2);
+  color: #fff;
+  font-size: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+/* Sits under the steps: only read when the screen does not match the words. */
+.step-footnote {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  margin: 14px 0 12px;
+  padding: 12px 14px;
+  background: var(--warn-tint, rgba(255, 184, 107, 0.1));
+  border: 1px solid var(--warn-line, rgba(255, 184, 107, 0.34));
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  color: var(--ink);
+}
+
+.step-footnote p {
+  margin: 0 0 4px;
+  line-height: 1.5;
+}
+
+.step-footnote p:last-child {
+  margin-bottom: 0;
+}
+
+.footnote-mark {
+  flex: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--warn, #e0973f);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 1px;
+}
+
+.paste-alt {
+  margin: 10px 0 4px;
+  border: 1px dashed var(--line-2);
+  border-radius: var(--radius-sm);
+  padding: 0 14px;
+  background: var(--surface-sunk);
+}
+
+.paste-alt[open] {
+  padding-bottom: 12px;
+}
+
+.paste-alt summary {
+  cursor: pointer;
+  padding: 11px 0;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--ink-2);
+  list-style-position: inside;
+}
+
+.paste-alt summary:hover {
+  color: var(--accent-deep);
+}
+
+.paste-alt-note {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  color: var(--ink-3);
+}
+
+.paste-alt .copybox-text {
+  max-height: 130px;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(180deg, #000 55%, transparent);
+  mask-image: linear-gradient(180deg, #000 55%, transparent);
+}
+
+.video-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+  gap: 4px;
+  min-height: 150px;
+  padding: 16px 18px;
+  border-radius: var(--radius-sm);
+  background:
+    radial-gradient(120% 160% at 85% -20%, var(--accent2-tint) 0%, transparent 55%),
+    linear-gradient(135deg, var(--accent-tint) 0%, var(--surface-sunk) 60%);
+  border: 1px solid var(--line);
+  position: relative;
+}
+
+.video-empty::after {
+  content: '\25B6';
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  transform: translateY(-50%);
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-md);
+  color: var(--accent-deep);
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gate-stuck {
+  margin-top: 10px;
+  padding: 13px 15px;
+  border-radius: var(--radius-sm);
+  background: var(--ground-2);
+  border: 1px dashed var(--line);
+}
+
+.gate-stuck p {
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.gate-stuck p + p {
+  margin-top: 7px;
+}
+
+
+.shell{max-width:820px;padding-top:105px}.pilot-title{font-size:clamp(36px,7vw,58px);line-height:1.03;letter-spacing:-.045em;margin:12px 0 20px}.pilot-sub{font-size:19px;color:var(--ink-2)}.pilot-actions{display:flex;gap:10px;flex-wrap:wrap;margin:22px 0}.btn{cursor:pointer}.prompt{border:1px solid var(--line);border-radius:12px;margin:18px 0;overflow:hidden;background:var(--surface-sunk)}.prompt-top{display:flex;justify-content:space-between;align-items:center;padding:10px 15px;gap:12px}.prompt pre{font-family:var(--mono);font-size:12px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;padding:15px;margin:0;max-height:260px;overflow:auto;border-top:1px solid var(--line)}.pilot-note{padding:18px;border:1px solid var(--accent-line);border-radius:14px;background:var(--accent-tint);margin:24px 0}.pilot-warning{padding:15px;border-left:3px solid var(--warn);background:var(--warn-tint);font-size:14px}.pilot-check{display:flex;align-items:flex-start;gap:10px;margin:15px 0}.pilot-check input{width:19px;height:19px;flex:none;margin-top:4px;accent-color:var(--accent-deep)}.pilot-check span{flex:1}a{color:var(--accent-deep)}.step{margin:24px 0}.step-meta{display:block}.progress-inner{max-width:820px;display:flex;justify-content:space-between;gap:12px}.small{font-size:13px;color:var(--ink-3)}#notice{min-height:26px;color:var(--accent-deep);font-weight:600}.pilot-bottom{border-top:1px solid var(--line);margin-top:35px;padding-top:20px}.step-body{overflow-wrap:anywhere}.step-head{padding-right:18px}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid var(--accent2);outline-offset:3px}@media(max-width:480px){.shell{padding-left:16px;padding-right:16px}.step-body{padding:18px}.step-title-text{font-size:23px}.step-head{gap:12px}.pilot-title{font-size:39px}}@media print{.progress,.pilot-actions,button,#notice{display:none}.shell{padding:0}.prompt pre{max-height:none}.step{break-inside:avoid}}
+</style></head><body><header class="progress"><div class="progress-inner"><strong>JARVIS / GUIDED PILOT</strong><span id="progress" aria-live="polite">0 / 3 checked</span></div></header><main class="shell"><p class="eyebrow">The AI Agency · Build with Blake</p><h1 class="pilot-title">Your agent.<br>Your command centre.</h1><p class="pilot-sub">You already built its brain. Now give it a dashboard, connect its work, and test a real call together.</p><div class="pilot-actions"><a class="btn btn-primary" href="/jarvis-exact-dashboard-sep24.zip" download>Download the dashboard source (ZIP)</a><button class="btn btn-ghost" id="download-all">Text prompts only</button><button class="btn btn-ghost" onclick="window.print()">Print / save PDF</button></div><p class="small">The ZIP is the dashboard. The text prompts are the messages you send, they are not the source and your agent will reject them.</p><p id="notice" role="status" aria-live="polite"></p><div class="pilot-note"><strong>Three steps. Two setup messages. We do the connection together.</strong><p>This is the small, hands-on Base44 pilot—not a self-service installer. Keep your existing Superagent, brain, skills and Telegram. No Retell account needed today.</p><p class="small">Before starting: be signed into your own Base44 account, have your phone nearby, and show Blake your Superagent settings. Calling depends on the features available in your account. The current facilitator calling package is tested for Australia/Brisbane only; another timezone needs review before calls are enabled.</p></div>
+<section class="step is-open" aria-labelledby="title-1"><div class="step-head"><span class="step-badge">1</span><div class="step-heading"><h2 class="step-title" id="title-1"><span class="step-n">Step 01</span><span class="step-title-text">Install your dashboard</span></h2><span class="step-meta">Attach the source in Base44</span></div></div><div class="step-body"><p class="step-para">This is the real dashboard, supplied as code. You are not asking it to design one. Download the source below, attach it in your <strong>Base44 app</strong>, and send the message underneath.</p><p><a class="btn btn-download" href="/jarvis-exact-dashboard-sep24.zip" download>Download the dashboard source (254 KB)</a></p><div class="prompt"><div class="prompt-top"><strong>Message 1 · Attach the source</strong><button class="btn btn-ghost" data-copy="install">Copy</button></div><pre tabindex="0" id="install-text">Read INSTALL.md and install the supplied source files exactly. Do not redesign, simplify or recreate the dashboard. Preserve my account configuration and existing data. Configure only my own account bindings. If you cannot read the archive, stop and tell me—do not invent replacement code.</pre></div><details><summary>Attachment will not upload? Use the complete source as text</summary><p class="step-para">Same 127 files, written out in one file. Download it and attach that instead.</p><p><a class="btn btn-ghost" href="/jarvis-dashboard-source.txt" download>Download DASHBOARD-SOURCE.txt (405 KB)</a></p></details><div class="pilot-warning"><strong>It must not redesign anything.</strong> If it starts inventing screens or simplifying the layout, stop it and say so. The design is supplied; only your own account bindings get configured.</div><p class="step-expect"><strong>You should see:</strong> a private, login-required command centre with the reactor, your objective, tasks, leads and activity. Empty numbers stay honest. CALL ME stays disabled until we connect it.</p><label class="pilot-check"><input type="checkbox" data-step="1"><span>We opened my dashboard and checked that a signed-out visitor cannot access it.</span></label></div></section>
+<section class="step is-open" aria-labelledby="title-2"><div class="step-head"><span class="step-badge">2</span><div class="step-heading"><h2 class="step-title" id="title-2"><span class="step-n">Step 02</span><span class="step-title-text">Connect your Jarvis</span></h2><span class="step-meta">One file + one message in your existing Superagent</span></div></div><div class="step-body"><p class="step-para">Download the operating pack and attach it to your <strong>existing Superagent chat</strong>. Send the message below. Do not repeat your original onboarding or create another agent.</p><button class="btn btn-download" data-download="pack">Download jarvis-operating-pack.md</button><div class="prompt"><div class="prompt-top"><strong>Message 2 · Existing Superagent</strong><button class="btn btn-ghost" data-copy="attach">Copy</button></div><pre tabindex="0" id="attach-text">Read the attached jarvis-operating-pack.md. Add its dashboard and after-call rules alongside my existing brain and skills; do not replace them or change existing workflows. Use only the HUD connection Blake has verified with me. Tell us which required tools are actually available, and clearly identify anything still missing. Do not claim the connection works until we test it.</pre></div><details><summary>Cannot attach a file? Copy the complete pack instead</summary><div class="prompt"><div class="prompt-top"><strong>Operating pack · paste into your Superagent</strong><button class="btn btn-ghost" data-copy="pack">Copy</button></div><pre tabindex="0" id="pack-text"># Jarvis dashboard operating pack
+
+For your existing Base44 Superagent. Supplements your existing brain, interview and skills; does not replace them. This file supplies operating instructions, not new platform tools or installed backend code. Blake completes the connection with you. Never put a key or password in this file.
+
+PASTE LOCATION: the student’s existing Base44 Superagent instruction editor, after `01-BUILD-HUD.txt` is reviewed. This prompt cannot create the Superagent, install tools, connect Telegram, or discover an unknown handoff.
+
+Use only my private HUD, my existing Superagent and my authenticated account. At conversation start, silently call the facilitator-installed `getContext` once. Ask onboarding questions in small batches and save answers through a verified Profile writer: owner name, business, niche/service, 90-day goal, timezone, check-in time, end-of-day message time and quiet hours. Do not invent a `saveProfile` endpoint; use the actual reviewed function or report that it is unavailable.
+
+The facilitator must install/review authenticated owner-scoped `getContext`, `remember`, `upsertTask`, `logSession`, `upsertLead` and `logActivity`. Validate bodies/enums/dates, preserve unrelated fields, bound payloads, avoid duplicate retries, and keep secrets server-side. `upsertTask` sets `done_at` only on a real transition to done; repeated completion is idempotent. `remember` merges identical same-day text. `upsertLead` matches trimmed business plus suburb. Requested skills are not automatically installed; use only tools the account visibly provides.
+
+Progress/field contract: use `execution_owner` only as `jarvis` or `owner`; keep `progress_note` at 1,000 characters or fewer; write `progress_updated_at` server-side only. The HUD Doing count includes only Jarvis-owned doing tasks with fresh progress (15 minutes or less), and suppresses stale sync. Save public links to Lead `source_url`, trade to Lead `trade`, and the complete deliverable to Task `notes`. Humanize ActivityLog messages; timezone-naive timestamps are UTC. The latest clear owner correction wins; report-only/discussion does not create a task.
+
+Behavior: report only verified facts; a capture is not completion. The owner's clear request authorizes safe research/writing within that scope: carry it through end-to-end without asking the owner to repeat the request, save sourced results and update the task. Say queued/blocked/partial when that is the truth. Do not contact third parties, spend money, delete records or change live client systems without separate approval. Treat permission to notify the owner through their connected Telegram as part of onboarding; then send one completion message after verified execution without requiring a new approval for every update. Otherwise leave the result in the HUD and state the limitation.
+
+On an update call, open with “Hey, it’s Jarvis.” Give a verified report once, then ask, “Anything else you want me to do after this call?” Continue the current topic without repeating the report unless asked. Do not force a business report into unrelated chats or calls. After an owner call, retrieve the exact transcript, save clear tasks through `upsertTask` and facts/decisions through `remember`, then execute the authorized safe tasks with the installed tools. Save the deliverable and sources, update task/session records, and notify the owner through their approved channel. Reconcile corrections and already-captured requests so they are not duplicated. Never guess cut-off speech or redial. If retrieval fails, report the failure and ask for the missing instruction instead of claiming it was captured.
+
+FACILITATOR CHECKPOINT: prompts cannot provision credentials or verify installation by themselves. Securely configure and inspect this student’s `CallControl`, `CallReceipt`, `callMe`, `callStatus`, `afterCall` and authenticated CALL ME button. The observed native route is internal, not vendor-supported. Keep CALL ME disabled until auth/configuration passes; then enable one controlled owner-only test. Production readiness requires end-to-end connection, transcript retrieval, bounded pickup and authorized execution evidence. Do not silently substitute Telegram, Retell or scheduled calls. Preserve existing reminder workflows.
+</pre></div></details><div class="pilot-warning"><strong>Blake completes the connection here.</strong> This pack teaches behavior; it does not install the backend or grant tools. Blake installs the student-specific source, configures the server-side credentials and after-call pickup, and checks access. Never paste passwords or keys into this page, a prompt or a shared file.</div><p class="step-expect"><strong>You should see:</strong> your agent reads your board and saves one harmless test task. Missing tools must be reported—not described as connected. Existing reminders stay unchanged.</p><label class="pilot-check"><input type="checkbox" data-step="2"><span>Blake verified the connection and a task appeared on my own dashboard.</span></label></div></section>
+<section class="step is-open" aria-labelledby="title-3"><div class="step-head"><span class="step-badge">3</span><div class="step-heading"><h2 class="step-title" id="title-3"><span class="step-n">Step 03</span><span class="step-title-text">Make the call. Watch the work.</span></h2><span class="step-meta">One controlled call, then allow up to 15 minutes</span></div></div><div class="step-body"><p class="step-para">Only once Blake confirms the connection is ready: click <strong>CALL ME</strong> once on your dashboard and answer your phone. Choose a suburb together, then say:</p><blockquote>Create a task for me to review my pilot notes tomorrow. After this call, research two plumbers in my chosen suburb. Save their business names, public phone numbers and official source links on my dashboard. Do not contact them.</blockquote><p class="step-para">Hang up and do not send a follow-up. We are testing whether it picks up your instructions and does the research by itself. After-call pickup normally checks every five minutes; allow up to 15 minutes for this test.</p><ul><li>Your own review task stays open for you.</li><li>The research task appears in Doing while the agent works.</li><li>Two real businesses and their sources appear on your board.</li><li>The finished research is saved on the task before it is marked done.</li></ul><div class="pilot-warning">A ringing phone or a new task card alone is not a pass. If it fails, stop and let Blake inspect it—do not repeatedly click or resend. Native calls can have pauses. Scheduled EOD calls and Retell are not part of today’s sign-off.</div><label class="pilot-check"><input type="checkbox" data-step="3"><span>We verified the call, task capture and completed sourced research without a follow-up.</span></label><p id="outcome" class="step-expect">Not signed off yet. Check each step only after you and Blake verify it.</p></div></section>
+<footer class="pilot-bottom"><strong>Your existing skills still belong to your agent.</strong><p class="small">This pack adds shared-board and call follow-through rules. It does not reinstall the full course or promise access to unavailable tools. Checkboxes are your notes, not automated proof. No student details or secrets are collected by this page. Keep the original onboarding unchanged.</p><button class="btn btn-ghost" data-download="checks">Download detailed test checklist</button></footer></main><script id="pilot-data" type="application/json">{"build":"PASTE LOCATION: the private Jarvis HUD app’s App Builder, after the facilitator preflight. This is a guided build draft. Do not add demo records, copy reference data, or overwrite existing business logic.\n\nCreate/update a login-required private Base44 app for my account. Owner/admin access must be enforced server-side; reject unauthenticated access and never trust client owner IDs, roles, emails or secrets. Use Base44-generated IDs and exactly one owner Profile row.\n\nCreate/preserve these six entities:\n\n- Task: `title` text; `status` todo|doing|done default todo; `priority` low|normal|high default normal; `due_date` optional date; `done_at` optional date; `notes` long text; `source` text; `execution_owner` jarvis|owner; `progress_note` text max 1,000 characters; `progress_updated_at` date written server-side only.\n- ActivityLog: `message` text; `type` task_started|task_done|note|update default note; `task_title` optional text; `created_at` date.\n- Profile: `business_name`, `owner_name`, `niche`, `service`, `suburbs`, `tools`, `call_hours`, `timezone`, `checkin_time`, `end_of_day_time`, `quiet_hours`, `goal_90_day` text; `price_low`, `price_high` optional numbers; `updated_at` date. Store the owner's IANA timezone and chosen local message times; do not hardcode the teacher's preferences.\n- Memory: `text`, `subject`, `source` text; `kind` fact|decision|event|question|outcome default event; `created_at` date.\n- SessionLog: `title`, `job`, `conversation_ref` text; `status` open|done default open; `outcome` long text; `started_at`, `ended_at` dates.\n- Lead: `business_name`, `trade`, `suburb`, `phone`, `website`, `source_url`, `demo_url`, `pitch`, `notes` text; `google_rating`, `review_count`, `deal_value` numbers; `status` new|demo_built|contacted|replied|won|lost default new; `won_at` date. Public sources belong in `source_url` and trade in `trade`; do not create aliases.\n\nBuild Today with exactly four verified stats: Revenue this month (won `deal_value` by `won_at`), Businesses spoken to (explicit status-derived proxy, never invented), Leads generated, and Tasks done (server-recorded `done_at`). Show `$0` for zero wins and unavailable only on source failure. Show Profile `goal_90_day` as OBJECTIVE, Doing/To do/Done today lanes, leads, memories and timestamped ActivityLog. Count Doing only for Jarvis-owned doing tasks with server `progress_updated_at` no older than 15 minutes; suppress stale progress. Task writes must update actual status; a transition to done sets `done_at` server-side and duplicate completion events do not create duplicate logs/memories. Keep full deliverables in Task `notes`, humanize logs and treat timezone-naive timestamps as UTC.\n\nUse the reactor-v3 visual: dark near-black navy; ice-cyan core; crisp white and restrained amber. Centre a substantial SVG with a triangular luminous core, three turbine shields, twelve segmented outer plates, calibration ticks, concentric counter-rotating rings and a subtle scanner marker. Keep the real completed-task readout beneath the core, not a fabricated number inside it. Desktop layout: four stats left, reactor centre, existing comms/activity/charts right. At 320/390/640/768/1024/1440px, avoid horizontal overflow; on phone put reactor first and stats in two columns. Add keyboard-focusable pause/resume with `aria-pressed` and reduced motion for every animation. Decorative labels must not claim live speech, health, calls or services.\n\nUse real ActivityLog data for a 24-hour activity sparkline and `done_at` for 14-day completion bars. Subscribe only where authenticated realtime works; otherwise poll every 15 seconds while visible, stopping when hidden. Never animate fabricated results. Keep credentials out of frontend variables, prompts, logs and screenshots; authenticated dashboard writes use the owner's SDK session.\n\nPreserve working CALL ME, Telegram handlers, data functions and existing workflows. If this is a fresh app with no verified bridge, render CALL ME disabled—not a fake success—and do not add Retell or another provider. Verify manually in an incognito window, then create/remove one harmless owner test task and record exact failures.\n","pack":"# Jarvis dashboard operating pack\n\nFor your existing Base44 Superagent. Supplements your existing brain, interview and skills; does not replace them. This file supplies operating instructions, not new platform tools or installed backend code. Blake completes the connection with you. Never put a key or password in this file.\n\nPASTE LOCATION: the student’s existing Base44 Superagent instruction editor, after `01-BUILD-HUD.txt` is reviewed. This prompt cannot create the Superagent, install tools, connect Telegram, or discover an unknown handoff.\n\nUse only my private HUD, my existing Superagent and my authenticated account. At conversation start, silently call the facilitator-installed `getContext` once. Ask onboarding questions in small batches and save answers through a verified Profile writer: owner name, business, niche/service, 90-day goal, timezone, check-in time, end-of-day message time and quiet hours. Do not invent a `saveProfile` endpoint; use the actual reviewed function or report that it is unavailable.\n\nThe facilitator must install/review authenticated owner-scoped `getContext`, `remember`, `upsertTask`, `logSession`, `upsertLead` and `logActivity`. Validate bodies/enums/dates, preserve unrelated fields, bound payloads, avoid duplicate retries, and keep secrets server-side. `upsertTask` sets `done_at` only on a real transition to done; repeated completion is idempotent. `remember` merges identical same-day text. `upsertLead` matches trimmed business plus suburb. Requested skills are not automatically installed; use only tools the account visibly provides.\n\nProgress/field contract: use `execution_owner` only as `jarvis` or `owner`; keep `progress_note` at 1,000 characters or fewer; write `progress_updated_at` server-side only. The HUD Doing count includes only Jarvis-owned doing tasks with fresh progress (15 minutes or less), and suppresses stale sync. Save public links to Lead `source_url`, trade to Lead `trade`, and the complete deliverable to Task `notes`. Humanize ActivityLog messages; timezone-naive timestamps are UTC. The latest clear owner correction wins; report-only/discussion does not create a task.\n\nBehavior: report only verified facts; a capture is not completion. The owner's clear request authorizes safe research/writing within that scope: carry it through end-to-end without asking the owner to repeat the request, save sourced results and update the task. Say queued/blocked/partial when that is the truth. Do not contact third parties, spend money, delete records or change live client systems without separate approval. Treat permission to notify the owner through their connected Telegram as part of onboarding; then send one completion message after verified execution without requiring a new approval for every update. Otherwise leave the result in the HUD and state the limitation.\n\nOn an update call, open with “Hey, it’s Jarvis.” Give a verified report once, then ask, “Anything else you want me to do after this call?” Continue the current topic without repeating the report unless asked. Do not force a business report into unrelated chats or calls. After an owner call, retrieve the exact transcript, save clear tasks through `upsertTask` and facts/decisions through `remember`, then execute the authorized safe tasks with the installed tools. Save the deliverable and sources, update task/session records, and notify the owner through their approved channel. Reconcile corrections and already-captured requests so they are not duplicated. Never guess cut-off speech or redial. If retrieval fails, report the failure and ask for the missing instruction instead of claiming it was captured.\n\nFACILITATOR CHECKPOINT: prompts cannot provision credentials or verify installation by themselves. Securely configure and inspect this student’s `CallControl`, `CallReceipt`, `callMe`, `callStatus`, `afterCall` and authenticated CALL ME button. The observed native route is internal, not vendor-supported. Keep CALL ME disabled until auth/configuration passes; then enable one controlled owner-only test. Production readiness requires end-to-end connection, transcript retrieval, bounded pickup and authorized execution evidence. Do not silently substitute Telegram, Retell or scheduled calls. Preserve existing reminder workflows.\n","attach":"Read the attached jarvis-operating-pack.md. Add its dashboard and after-call rules alongside my existing brain and skills; do not replace them or change existing workflows. Use only the HUD connection Blake has verified with me. Tell us which required tools are actually available, and clearly identify anything still missing. Do not claim the connection works until we test it.","checks":"PASTE LOCATION: an ordinary chat with the student's existing Superagent, not its permanent instruction editor, after the facilitator has reviewed Prompt 2. This prompt describes checks; reading it is not proof that any external check occurred.\n\nAUTOMATIC CHECKS — do not place a call: verify owner-only HUD/function access, Profile objective, `getContext`, task capture, real status/`done_at`, duplicate-completion protection, bounded function errors, existing reminder workflows, and routine visibility. Use a manual incognito window for privacy; record exact evidence. Label each `verified`, `blocked`, `failed` or `not tested`.\n\nCONTROLLED OWNER TEST — only after the facilitator confirms the student-owned bridge and enables CALL ME for this one test. The owner must click CALL ME and answer their own phone. Run both phrases, separately:\n\n1. Capture: “Create an open task for me to review the pilot notes this afternoon.” Verify one owner task, source call reference and no duplicate completion.\n2. Research/execution: “Research three public facts about a local industry, save the sourced summary to my task, and tell me when it is actually complete.” Verify sources, task update and one completion message only if the owner’s Telegram is connected. Never contact a business or claim completion without read-back evidence.\n\nDuring execution, use `execution_owner=jarvis|owner`, keep `progress_note` ≤1,000 characters, and let the server write `progress_updated_at`. Doing is counted only while Jarvis-owned progress is fresh (≤15 minutes); stale progress must be suppressed. Humanize logs and treat timezone-naive timestamps as UTC. A clear owner correction supersedes earlier capture; report-only/discussion does not spawn a task. Outreach always requires explicit approval.\n\nAllow up to 5 minutes for pickup and a 15-minute acceptance window. Do not send a follow-up, manually repair the board, or resend. Record separately: call connected, exact transcript retrieved, task captured, authorized execution completed. A card, acknowledgement, transcript, manually prompted fetch or queued status is not completion. A failed call with valid owner speech may be inspected without guessing or redialing.\n\nOnly create routines visibly supported by this account. Preserve existing reminder workflows and avoid duplicates. If supported, configure local-time check-in and end-of-day messages using the student’s timezone, quiet hours and configured channel; report verified work/blockers and log the decision. Do not promise scheduled outbound calls or silently substitute another channel.\n\nFinish with an evidence table and exact errors. This pilot does not prove fresh-account installation, fluent voice, automatic continuation, Telegram-first delivery or production readiness without manual end-to-end checks.\n","spoken":"Create a task for me to review my pilot notes tomorrow. After this call, research two plumbers in my chosen suburb. Save their business names, public phone numbers and official source links on my dashboard. Do not contact them.","install":"Read INSTALL.md and install the supplied source files exactly. Do not redesign, simplify or recreate the dashboard. Preserve my account configuration and existing data. Configure only my own account bindings. If you cannot read the archive, stop and tell me—do not invent replacement code."}</script><script>
+const data=JSON.parse(document.getElementById('pilot-data').textContent);const names={build:'01-build-dashboard.txt',pack:'jarvis-operating-pack.md',attach:'02-connect-message.txt',checks:'facilitated-test-checklist.txt'};const notice=m=>document.getElementById('notice').textContent=m;
+async function copy(key){try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(data[key])}else{const t=document.createElement('textarea');t.value=data[key];t.style.position='fixed';t.style.top='0';document.body.append(t);t.select();const ok=document.execCommand('copy');t.remove();if(!ok)throw Error('copy')}notice('Copied. Paste it into the location shown in this step.')}catch{const e=document.getElementById(key+'-text');if(e){const r=document.createRange();r.selectNodeContents(e);const s=window.getSelection();s.removeAllRanges();s.addRange(r)}notice('Automatic copy was blocked. The text is selected: use Copy from your browser or keyboard.')}}
+function download(text,name){const u=URL.createObjectURL(new Blob([text],{type:'text/plain;charset=utf-8'}));const a=document.createElement('a');a.href=u;a.download=name;document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(u),2000);notice('Download requested. Check your Downloads folder.')}
+document.querySelectorAll('[data-copy]').forEach(b=>b.onclick=()=>copy(b.dataset.copy));document.querySelectorAll('[data-download]').forEach(b=>b.onclick=()=>download(data[b.dataset.download],names[b.dataset.download]));document.getElementById('download-all').onclick=()=>download('# JARVIS GUIDED PILOT SETUP FILES\n\nUse each section only where indicated. The page itself is the step-by-step guide. No secrets belong here.\n\n## 1. APP BUILDER\n\n'+data.build+'\n\n## 2. OPERATING PACK — EXISTING SUPERAGENT\n\n'+data.pack+'\n\n## MESSAGE WITH THE PACK\n\n'+data.attach+'\n\n## FACILITATED TEST CHECKLIST\n\n'+data.checks,'jarvis-pilot-setup.md');
+document.querySelectorAll('[data-step]').forEach(c=>c.onchange=()=>{const n=document.querySelectorAll('[data-step]:checked').length;document.getElementById('progress').textContent=n+' / 3 checked';document.getElementById('outcome').textContent=n===3?'You marked the three pilot checks complete. Keep the evidence with Blake; this is not a guarantee of future call quality.':'Not signed off yet. Check each step only after you and Blake verify it.'});
+</script></body></html>

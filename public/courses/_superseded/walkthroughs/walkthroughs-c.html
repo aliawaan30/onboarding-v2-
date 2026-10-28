@@ -1,0 +1,782 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 5: Call them</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+:root{
+  --ground:#ffffff; --ground-2:#f5faf8; --surface:#ffffff; --surface-sunk:#f7fbf9;
+  --ink:#15171d; --ink-2:#3b414f; --ink-3:#6b7280; --ink-4:#9aa0ab;
+  --line:#e6eae8; --line-2:#cfd8d4;
+  --accent:#32d09f; --accent-deep:#14926c; --accent-ink:#052e21;
+  --accent-tint:#e7faf3; --accent-tint-2:#ccf3e5; --accent-line:#90e5c8;
+  --accent2:#8b5cf6; --accent2-deep:#6a3de0; --accent2-tint:#f2edff; --accent2-tint-2:#e2d8fd; --accent2-line:#c9b6f9;
+  --ok:#0f8a55; --ok-tint:#e4f6ed; --warn:#a2560d; --warn-tint:#fdf0e2;
+  --term:#0d1a15; --term-2:#12241c; --term-ink:#8fe9c8; --term-dim:#4d8f76;
+  --radius:18px; --radius-sm:12px;
+  --shadow-sm:0 1px 2px rgba(21,23,29,0.05);
+  --shadow-md:0 1px 2px rgba(21,23,29,0.05),0 8px 24px -12px rgba(21,23,29,0.16);
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(50,208,159,0.4);
+  --display:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.2,0.7,0.3,1);
+  --mod:var(--accent); --mod-deep:var(--accent-deep); --mod-ink:var(--accent-ink);
+  --mod-tint:var(--accent-tint); --mod-tint-2:var(--accent-tint-2); --mod-line:var(--accent-line);
+  --alt:var(--accent2); --alt-deep:var(--accent2-deep); --alt-tint:var(--accent2-tint); --alt-line:var(--accent2-line);
+}
+body.mod-walk{
+  --mod:#8b5cf6; --mod-deep:#6a3de0; --mod-ink:#f4f0ff;
+  --mod-tint:#f2edff; --mod-tint-2:#e2d8fd; --mod-line:#c9b6f9;
+  --alt:#32d09f; --alt-deep:#14926c; --alt-tint:#e7faf3; --alt-line:#90e5c8;
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(139,92,246,0.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;background-image:radial-gradient(900px 460px at 12% -180px,rgba(50,208,159,0.10),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(139,92,246,0.09),transparent 66%);background-repeat:no-repeat;background-attachment:fixed;}
+body.mod-walk{background-image:radial-gradient(900px 460px at 12% -180px,rgba(139,92,246,0.11),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(50,208,159,0.09),transparent 66%);}
+::selection{background:var(--mod-tint-2);color:var(--mod-deep);}
+.shell{max-width:768px;margin:0 auto;padding:122px 20px 96px;}
+p{margin:0 0 13px;color:var(--ink-2);}
+ul{padding-left:20px;margin:8px 0 13px;color:var(--ink-2);}
+li{margin-bottom:4px;}
+.muted{color:var(--ink-3);}
+.flag{display:inline-block;background:var(--warn-tint);color:var(--warn);border-radius:6px;padding:1px 8px;font-size:.76rem;font-weight:600;font-family:var(--mono);}
+/* ------- progress rail ------- */
+.progress{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,0.84);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+.progress-inner{max-width:768px;margin:0 auto;padding:13px 20px 14px;}
+.progress-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px;}
+.progress-lead{display:flex;align-items:baseline;gap:10px;min-width:0;}
+.progress-count{font-family:var(--mono);font-weight:700;white-space:nowrap;color:var(--mod-deep);font-size:18px;line-height:1;}
+.progress-of{color:var(--ink-4);font-size:13px;}
+.progress-title{font-size:14px;font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.segments{display:flex;gap:5px;}
+.segment{flex:1;height:7px;border-radius:99px;background:var(--ground-2);box-shadow:inset 0 0 0 1px rgba(21,23,29,0.05);position:relative;overflow:hidden;transition:background 480ms var(--ease);}
+.segment::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,var(--mod-deep),var(--mod) 65%,var(--alt));transform:scaleX(0);transform-origin:left;transition:transform 520ms var(--ease);}
+.segment.is-filled::after{transform:scaleX(1);}
+.segment.is-current{background:var(--mod-tint-2);}
+.segment.is-current::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.85),transparent);transform:translateX(-100%);animation:sweep 2.2s var(--ease) infinite;}
+@keyframes sweep{to{transform:translateX(100%);}}
+/* ------- hero ------- */
+.hero{margin-bottom:42px;animation:rise 620ms var(--ease) both;}
+.eyebrow{margin:0 0 14px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mod-deep);font-weight:700;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.eyebrow::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--mod);flex:0 0 auto;}
+.hero h1{margin:0 0 12px;font-family:var(--display);font-size:clamp(30px,7.4vw,47px);line-height:1.04;letter-spacing:-0.03em;font-weight:800;color:var(--ink);}
+.hero .lede{font-size:18.5px;color:var(--ink-2);max-width:56ch;}
+.hero-fig{margin:26px 0 4px;padding:20px 18px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);}
+.hero-fig svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);}
+.hero-fig figcaption{margin-top:10px;text-align:center;color:var(--ink-3);font-size:.88rem;}
+/* ------- steps + spine ------- */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;}
+.steps>li{position:relative;}
+.steps>li+li::before{content:'';position:absolute;left:41px;top:-19px;width:2px;height:20px;border-radius:2px;background:var(--line-2);transition:background 420ms var(--ease);}
+.steps>li.spine-on+li::before{background:linear-gradient(180deg,var(--mod),var(--mod-line));box-shadow:0 0 8px rgba(50,208,159,0.35);}
+body.mod-walk .steps>li.spine-on+li::before{box-shadow:0 0 8px rgba(139,92,246,0.35);}
+.step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;scroll-margin-top:108px;box-shadow:var(--shadow-sm);transition:border-color 260ms var(--ease),box-shadow 260ms var(--ease),background 260ms var(--ease),transform 200ms var(--ease);}
+.step:hover{transform:translateY(-1px);}
+.step.is-locked:hover{transform:none;}
+.step.is-locked{background:rgba(255,255,255,0.5);border-style:dashed;box-shadow:none;}
+.step.is-open{border-color:var(--mod-line);box-shadow:var(--shadow-lg);}
+.step.is-done{background:var(--surface-sunk);}
+.step.just-passed{animation:pass-pop 700ms var(--ease);}
+@keyframes pass-pop{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(15,138,85,0.4);}35%{transform:scale(1.012);box-shadow:0 0 0 8px rgba(15,138,85,0.12);}100%{transform:scale(1);box-shadow:0 0 0 16px rgba(15,138,85,0);}}
+/* type edge strips */
+.step.t-build.is-open{border-left:4px solid var(--accent);}
+.step.t-chat.is-open{border-left:4px solid var(--accent2);}
+.step.t-phone.is-open{border-left:4px solid #14926c;}
+.step-head{display:flex;align-items:center;gap:14px;}
+.step-badge{flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--ground-2);border:1px solid var(--line);font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-3);transition:all 220ms var(--ease);}
+.step.is-locked .step-badge{background:transparent;color:var(--ink-4);border-style:dashed;}
+.step.is-open .step-badge{background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);border-color:transparent;box-shadow:0 4px 12px -4px var(--mod);}
+.step.is-done .step-badge{background:var(--ok-tint);color:var(--ok);border-color:rgba(15,138,85,0.28);}
+.step.is-done .step-badge svg path{stroke-dasharray:22;stroke-dashoffset:22;animation:tickdraw 420ms var(--ease) 120ms forwards;}
+@keyframes tickdraw{to{stroke-dashoffset:0;}}
+.step-heading{flex:1 1 auto;min-width:0;}
+.step-title{margin:0;font-family:var(--display);font-size:20px;line-height:1.22;font-weight:700;letter-spacing:-0.02em;color:var(--ink);}
+.step.is-locked .step-title{color:var(--ink-2);}
+.step-n{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-4);display:block;margin-bottom:3px;}
+.step.is-open .step-n{color:var(--mod-deep);}
+.step-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;border-radius:99px;padding:5px 12px;}
+.step-chip.is-open{background:var(--mod-tint);color:var(--mod-deep);border:1px solid var(--mod-line);}
+.step-chip.is-done{background:var(--ok-tint);color:var(--ok);border:1px solid rgba(15,138,85,0.28);}
+.step-chip.is-locked{background:transparent;color:var(--ink-4);border:1px dashed var(--line-2);}
+.step-locked-note{margin:12px 0 0 48px;font-size:14px;color:var(--ink-4);}
+.step-body{margin-top:20px;animation:rise 420ms var(--ease) both;}
+@keyframes rise{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+/* real-world action ribbon */
+.act{display:inline-flex;align-items:center;gap:8px;background:var(--ground-2);border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 6px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);margin:0 0 12px;}
+.act svg{width:20px;height:20px;display:block;color:var(--mod-deep);}
+/* ------- BUILD terminal panels ------- */
+.prompt{position:relative;background:var(--term);border:1px solid #1d3a2e;border-radius:14px;padding:52px 18px 18px;margin:12px 0 14px;font-family:var(--mono);font-size:.85rem;color:var(--term-ink);white-space:pre-wrap;overflow-wrap:break-word;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 10px 26px -14px rgba(13,26,21,0.55);}
+.prompt::before{content:"PASTE INTO BASE44";position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;padding-left:64px;font-size:.64rem;letter-spacing:.16em;color:var(--term-dim);font-weight:700;font-family:var(--body);background:var(--term-2);border-bottom:1px solid #1d3a2e;border-radius:13px 13px 0 0;}
+.prompt::after{content:'';position:absolute;top:14px;left:18px;width:8px;height:8px;border-radius:50%;background:#2fbf8f;box-shadow:14px 0 0 #f2b84b,28px 0 0 #ef7b6a;}
+/* CHAT bubbles */
+.prompt.chat{background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;color:#3a2a72;box-shadow:var(--shadow-sm);padding:48px 18px 16px;}
+.prompt.chat::before{content:"TO YOUR CO-FOUNDER";background:transparent;border-bottom:1px dashed var(--accent2-line);color:var(--accent2-deep);padding-left:40px;border-radius:15px 15px 0 0;}
+.prompt.chat::after{top:11px;left:16px;width:14px;height:14px;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));box-shadow:none;}
+/* pwrap variants (labelled panels with pre) */
+.pwrap{position:relative;background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;padding:48px 18px 16px;margin:12px 0 14px;box-shadow:var(--shadow-sm);}
+.pwrap .plabel{position:absolute;top:0;left:0;right:0;height:34px;display:flex;align-items:center;padding-left:40px;font-size:.64rem;letter-spacing:.16em;color:var(--accent2-deep);font-weight:700;font-family:var(--body);border-bottom:1px dashed var(--accent2-line);margin:0;}
+.pwrap::after{content:'';position:absolute;top:10px;left:16px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));}
+.pwrap pre{margin:0;white-space:pre-wrap;word-wrap:break-word;font-family:var(--mono);font-size:.85rem;color:#3a2a72;max-height:340px;overflow-y:auto;}
+/* PHONE frame */
+.pwrap.is-phone{background:#101418;border:1px solid #2a3340;border-radius:26px;padding:64px 22px 22px;box-shadow:0 18px 40px -18px rgba(16,20,24,0.55);}
+.pwrap.is-phone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:86px;height:18px;border-radius:99px;background:#000;}
+.pwrap.is-phone::after{display:none;}
+.pwrap.is-phone .plabel{position:absolute;top:34px;left:22px;right:22px;height:26px;display:flex;align-items:center;gap:8px;padding-left:16px;font-size:.62rem;letter-spacing:.14em;color:#7ce7c0;border-bottom:1px solid #223229;background:rgba(50,208,159,0.08);border-radius:8px;}
+.pwrap.is-phone .plabel::before{content:'';width:7px;height:7px;border-radius:50%;background:#32d09f;animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.pwrap.is-phone pre{color:#e8eef2;font-family:var(--body);font-size:.94rem;line-height:1.65;}
+/* copy buttons */
+.copybtn,.copy{position:absolute;top:5px;right:8px;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:5px 13px;font-family:var(--body);font-size:.78rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);z-index:2;}
+.prompt:not(.chat) .copybtn{background:#173026;border-color:#26543f;color:#8fe9c8;}
+.pwrap.is-phone .copy{top:36px;background:#1b2530;border-color:#31404f;color:#cfe0ea;}
+.copybtn:hover,.copy:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.copybtn.did,.copy.did{background:var(--ok-tint) !important;border-color:rgba(15,138,85,0.35) !important;color:var(--ok) !important;}
+.copybtn:focus-visible,.copy:focus-visible{outline:2px solid var(--alt);outline-offset:2px;}
+/* what-you-should-see mini window */
+.see{position:relative;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:12px;padding:40px 16px 12px;margin:14px 0;color:var(--ink-3);font-size:.95rem;background:var(--surface);box-shadow:var(--shadow-sm);}
+.see::before{content:"WHAT YOU SHOULD SEE";position:absolute;top:0;left:0;right:0;height:30px;display:flex;align-items:center;padding-left:56px;font-size:.62rem;letter-spacing:.15em;font-weight:700;color:var(--ink-4);font-family:var(--body);background:var(--ground-2);border-bottom:1px solid var(--line);border-radius:11px 11px 0 0;}
+.see::after{content:'';position:absolute;top:12px;left:14px;width:6px;height:6px;border-radius:50%;background:var(--line-2);box-shadow:11px 0 0 var(--line-2),22px 0 0 var(--line-2);}
+.see b{color:var(--accent-deep);}
+.callout{background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:var(--radius-sm);padding:16px 20px;margin:14px 0;}
+/* milestone checkpoint cards */
+.step.t-mile{border-width:2px;}
+.step.t-mile.is-open{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;box-shadow:var(--shadow-lg);}
+.step.t-mile .step-chip.is-open{background:linear-gradient(120deg,var(--mod-tint),var(--alt-tint));}
+.mile-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.15em;color:var(--mod-deep);background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:99px;padding:4px 12px;margin:0 0 12px;}
+.mile-tag svg{width:12px;height:12px;}
+/* file download chips */
+.filechip{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:10px 16px;margin:4px 10px 10px 0;font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);}
+.filechip:hover{transform:translateY(-1px);border-color:var(--mod-line);color:var(--mod-deep);box-shadow:var(--shadow-md);}
+.filechip svg{width:17px;height:17px;color:var(--mod-deep);}
+.filechip small{font-family:var(--body);font-weight:500;color:var(--ink-4);}
+/* done button */
+.btn-done{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:15.5px;font-weight:700;cursor:pointer;min-height:48px;padding:12px 18px;width:100%;margin-top:20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--mod);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.btn-done:hover{transform:translateY(-1px);}
+.btn-done:active{transform:translateY(1px) scale(0.995);}
+.btn-done:focus-visible{outline:2px solid var(--alt);outline-offset:3px;}
+/* outro finish card */
+.outro{margin-top:44px;animation:rise 520ms var(--ease) both;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;border:2px solid transparent;border-radius:var(--radius);padding:34px 28px;text-align:center;box-shadow:var(--shadow-lg);}
+.outro[hidden]{display:none;}
+.finish-badge{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(180deg,var(--mod),var(--mod-deep));display:grid;place-items:center;color:var(--mod-ink);box-shadow:0 10px 24px -10px var(--mod);}
+.finish-badge svg{width:28px;height:28px;}
+.finish-title{margin:0 0 6px;font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+.finish-sub{margin:0 0 6px;color:var(--ink-3);font-size:.98rem;}
+.next{display:inline-block;margin-top:16px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);font-weight:700;border-radius:12px;padding:13px 24px;text-decoration:none;font-family:var(--display);box-shadow:0 8px 20px -10px var(--mod);}
+.next:hover{transform:translateY(-1px);}
+.nextpage{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-3);font-size:.95rem;}
+.startover{display:block;margin:46px auto 0;background:none;border:none;color:var(--ink-4);font-size:12.5px;font-family:var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.startover:hover{color:var(--ink-2);}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}.segment.is-current::before{display:none;}}
+@media(max-width:600px){.step{padding:18px;}.steps>li+li::before{left:35px;}.shell{padding-top:112px;}}
+
+
+.pwrap.is-skill{padding-bottom:36px;}
+.pwrap.is-skill pre{max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px;}
+.pwrap.is-skill .sfade{position:absolute;left:1px;right:1px;bottom:1px;height:60px;pointer-events:none;border-radius:0 0 16px 5px;background:linear-gradient(to bottom,rgba(242,237,255,0) 0%,rgba(242,237,255,0.9) 60%,#f2edff 100%);}
+.pwrap.is-skill .shint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.6rem;letter-spacing:.14em;font-weight:700;font-family:var(--body);color:var(--accent2-deep);opacity:.7;z-index:3;pointer-events:none;}
+.pwrap.is-skill .copy{background:var(--accent2);border-color:var(--accent2-deep);color:#fff;font-weight:700;padding:6px 17px;}
+.pwrap.is-skill .copy:hover{background:var(--accent2-deep);border-color:var(--accent2-deep);}
+@media(max-width:600px){.pwrap.is-skill pre{max-height:190px;font-size:.8rem;}}
+</style>
+</head>
+<body class="mod-walk">
+<div class="progress"><div class="progress-inner">
+<div class="progress-row">
+<div class="progress-lead"><span class="progress-count"><span id="done-count">0</span><span class="progress-of"> of 12</span></span>
+<span class="progress-title">Module 5 &middot; Page C: Call them</span></div>
+</div>
+<div class="segments"><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span></div>
+</div></div>
+<main class="shell">
+<header class="hero">
+<div class="eyebrow">Module 5 &middot; Page C</div>
+<h1>Call them</h1>
+<p class="lede">One phone script, ten dials, and your first yes. Then your co-founder gets its video skills.</p>
+
+</header>
+<ol class="steps">
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">1</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 01</span><span class="step-title-text">Agents live on the phone.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>That's how they buy and sell all day.</p><p>A call beats an email every single time. This page is you making ten of them.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">2</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 02</span><span class="step-title-text">Get your call sheet.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Pull up my Walkthrough Studio listings. I&#x27;m calling the agents now. For each listing give me: the agent&#x27;s name, the address, and one natural opening line about their specific listing. Keep it tight, one block per listing.</pre></div><div class="see"><b>You should see:</b> a tidy call sheet, one block per agent, ready to work down.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">3</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 03</span><span class="step-title-text">Make the call. Here is the script.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><div class="pwrap"><div class="plabel">ON THE PHONE</div><button class="copy" onclick="cp(this)">Copy</button><pre>Hey [agent name]? It&#x27;s [your name].
+
+I was looking at your listing at [address] and noticed it doesn&#x27;t have a video walkthrough.
+
+I make AI video walkthroughs from the listing photos. I&#x27;ve actually created a couple of videos for listings just like yours.
+
+Want to see what yours would look like?
+
+If they hesitate: &quot;No cost to look. If you love it, we talk numbers.&quot;
+
+If they&#x27;re keen: &quot;Perfect. What&#x27;s your best email? Let&#x27;s jump on a quick 15 minute call tomorrow and I&#x27;ll show you the video on screen.&quot;</pre><!-- BUILDER NOTE: stand-in script, Blake's final wording to come --></div><p class="muted">Work down the sheet. Every no gets you closer to the yes.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">4</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 04</span><span class="step-title-text">Practise it in voice mode first.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Before a real agent hears you, run the call with your co-founder.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Switch to voice mode. You play a busy real estate agent, I&#x27;m calling you about your listing. Run the call with me three times: friendly the first time, rushed the second, skeptical the third. After each round, give me one thing to fix.</pre></div><div class="see"><b>You should see:</b> three practice rounds in, the words come out without thinking.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">5</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 05</span><span class="step-title-text">Flip the statuses as you go.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Every agent you ring: flip their listing to <b>Called</b>.</p><p>Every yes: flip it to <b>Yes</b>.</p><div class="see"><b>You should see:</b> your board telling the truth about your day.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">6</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 06</span><span class="step-title-text">An agent said yes.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Lock it in before you hang up:</p><ul><li>Get their best email address.</li><li>Book the 15 minute video call for tomorrow. Google Meet is free and easy, and that call is where they see the video.</li><li>Flip that listing to Yes.</li></ul><p>This is the business starting. Right here.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">7</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 07</span><span class="step-title-text">Get the photos.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Open their listing and download the photos one by one. Save them into one folder.</p><p>Only the ones you want in the video: front, entry, the main rooms, the best outdoor shot.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">8</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 08</span><span class="step-title-text">Upload them into that listing.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Open the listing in your Studio and drop the photos into its upload zone, roughly in walking order. You'll fine-tune the order on the next page.</p><p class="muted">Faster: send the photos to your co-founder instead and say &quot;upload these into [address] in my Studio, in this order&quot;. It does the uploading for you.</p><div class="see"><b>You should see:</b> the thumbnails appear numbered, and the status flips to "Photos In" by itself.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">9</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 09</span><span class="step-title-text">Two new skills for your co-founder.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Before the video work starts, your co-founder needs two skills.</p><p>One writes a cinema-grade video prompt for every scene. One stitches your finished clips into the final film.</p><p>For each one: download the skill file, upload it to your co-founder in chat, and tell it to save the skill.</p><p class="muted">On your phone and can&#x27;t attach files? Copy the full message instead, it does exactly the same job.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">10</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 10</span><span class="step-title-text">Install the prompt writer.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>This is the whole skill, sitting in one box. Tap copy, paste it to your co-founder, and it installs it and confirms.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called kling-prompt-generator. Save the following content as the SKILL.md file in the .agents/skills/kling-prompt-generator/ directory:
+
+---
+name: kling-prompt-generator
+description: Generates optimized Kling 3.0 video generation prompts for property walkthrough transitions. Takes a student&#x27;s plain-English per-scene description + property images, outputs prompts ready for Envato.
+---
+
+# Kling Prompt Generator (v3.1 - Per-Scene Descriptions, Envato)
+
+## What the AI Needs Per Scene to Generate the Best Prompt
+1. What room is the start frame (Frame N)
+2. What room is the end frame (Frame N+1)
+3. What camera movement the student wants (push forward, pan right, etc.)
+4. The two actual images (for spatial context)
+
+## Flow
+
+1. Student uploads property photos in walkthrough order (drag and drop)
+2. N images appear as N-1 video cards (Frame 1 to 2, Frame 2 to 3, etc.)
+3. Each card has a &quot;Describe this scene&quot; text input where the student writes 1-2 sentences:
+   - What room Frame N is
+   - What room Frame N+1 is
+   - What camera movement they want
+   Example: &quot;Frame 1 is the front entrance, Frame 2 is the living room. Camera pushes forward through the front door into the living room.&quot;
+4. Student clicks &quot;Generate All Prompts&quot;
+5. The Superagent receives each card&#x27;s description text + that card&#x27;s two image URLs
+6. For each card, generate the Kling 3.0 prompt by combining:
+   - The student&#x27;s description (rooms + camera movement intent)
+   - The actual images (for spatial detail, what&#x27;s visible, layout verification)
+   - The anti-bounce template
+   - The best Envato camera preset for the described movement
+7. Write the generated_prompt and suggested_preset back to the PropertyImage record
+8. Update the Property status to &quot;Prompts Ready&quot;
+9. Each generated prompt appears directly under its video card
+
+## Envato Camera Preset Selection Logic
+
+- Forward movement through space (corridor, hallway, entering room) = &quot;Dolly In&quot;
+- Backward movement (exiting room, pulling back) = &quot;Dolly Out&quot;
+- Lateral movement left (panning across to left side) = &quot;Pan Left&quot;
+- Lateral movement right (panning across to right side) = &quot;Pan Right&quot;
+- Looking upward (stairs, high ceilings, second level) = &quot;Tilt Up&quot;
+- Looking downward (stairs going down, looking at floor detail) = &quot;Tilt Down&quot;
+- Rising above (balcony view, aerial transition) = &quot;Crane Up&quot;
+- Descending (coming down stairs, lowering view) = &quot;Crane Down&quot;
+- No movement, subject reveals within frame = &quot;Static&quot;
+- Following a path alongside walls = &quot;Tracking Shot&quot;
+
+## Anti-Bounce Language (baked into every prompt)
+
+Every prompt MUST include: &quot;Camera rigidly locked on professional tripod, no walking bounce, no vertical bobbing, no micro-jitter, gimbal-smooth only, constant linear speed.&quot;
+
+## Prompt Template
+
+[Preset] preset. Camera rigidly locked on professional tripod, no walking bounce, no vertical bobbing, no micro-jitter, gimbal-smooth only, constant linear speed. In one continuous motion, the camera [movement from student&#x27;s description, enriched with spatial detail from viewing both images] from [room_type N] to [room_type N+1] as shown in the end frame. Maintain fixed spatial geometry, rigid walls and furniture, no warping, no distortion, no perspective stretch.
+
+## Example
+
+Card 1 description: &quot;Frame 1 is the front entrance, Frame 2 is the hallway. Camera pushes forward through the front door into the hallway.&quot;
+
+Generated prompt for Card 1:
+Dolly In preset. Camera rigidly locked on professional tripod, no walking bounce, no vertical bobbing, no micro-jitter, gimbal-smooth only, constant linear speed. In one continuous motion, the camera pushes forward through the front entrance into the hallway, moving straight ahead until the hallway is visible as shown in the end frame. Maintain fixed spatial geometry, rigid walls and furniture, no warping, no distortion, no perspective stretch.
+
+Card 2 description: &quot;Frame 2 is the hallway, Frame 3 is the living room. Camera pans right from the hallway into the living room.&quot;
+
+Generated prompt for Card 2:
+Pan Right preset. Camera rigidly locked on professional tripod, no walking bounce, no vertical bobbing, no micro-jitter, gimbal-smooth only, constant linear speed. In one continuous motion, the camera pans right from the hallway into the open living room area, continuing until the living room space is fully visible as shown in the end frame. Maintain fixed spatial geometry, rigid walls and furniture, no warping, no distortion, no perspective stretch.
+
+## Envato Workflow for Students (Next Steps)
+
+After prompts are generated, students:
+1. Go to Envato AI Video Generator (elements.envato.com/ai)
+2. For each clip: upload start frame and end frame images
+3. Copy-paste the prompt into the prompt field
+4. Select the suggested camera preset
+5. Set duration to 5 seconds, aspect ratio to 16:9
+6. Generate
+7. Download all clips
+8. Upload clips back to the app&#x27;s Final Clips section
+9. Copy the stitch prompt and send to Superagent to combine into final video
+
+
+Also save a run.sh file in the same directory with this content:
+
+#!/bin/bash
+# Kling Prompt Generator Skill
+# Usage: run_skill kling-prompt-generator &lt;listing_id&gt;
+# Reads all PropertyImage records for a property, generates Kling 3.0 prompts for each transition
+
+LISTING_ID=&quot;$1&quot;
+
+if [ -z &quot;$LISTING_ID&quot; ]; then
+  echo &quot;Usage: kling-prompt-generator &lt;listing_id&gt;&quot;
+  exit 1
+fi
+
+echo &quot;=== Kling Prompt Generator (Envato v3.1) ===&quot;
+echo &quot;Listing ID: $LISTING_ID&quot;
+echo &quot;&quot;
+
+# The actual prompt generation logic is handled by the Superagent
+# This skill provides the template and instructions for the agent to follow
+# when generating prompts for property walkthrough transitions.
+
+cat &lt;&lt; &#x27;TEMPLATE&#x27;
+SKILL INSTRUCTIONS FOR SUPERAGENT:
+
+When triggered, you must:
+
+1. Read all PropertyImage records where property_id matches the provided listing ID
+2. Sort by sequence_order ascending
+3. Read the Property record for property context (address, description, notes)
+4. For each consecutive pair of images (N and N+1):
+   a. Read the scene description from the student&#x27;s &quot;Describe this scene&quot; input
+   b. Determine the best Envato camera preset:
+      - Forward through space = Dolly In
+      - Backward/pulling back = Dolly Out
+      - Lateral left = Pan Left
+      - Lateral right = Pan Right
+      - Looking up = Tilt Up
+      - Looking down = Tilt Down
+      - Rising = Crane Up
+      - Descending = Crane Down
+      - No movement = Static
+      - Following path = Tracking Shot
+   c. Generate a Kling 3.0 prompt using this template:
+      &quot;[Preset] preset. Camera rigidly locked on professional tripod, no walking bounce, no vertical bobbing, no micro-jitter, gimbal-smooth only, constant linear speed. In one continuous motion, the camera [motion from scene description] from [room_type N] to [room_type N+1] as shown in the end frame. Maintain fixed spatial geometry, rigid walls and furniture, no warping, no distortion, no perspective stretch.&quot;
+   d. Update the PropertyImage record (for image N) with:
+      - generated_prompt = the full prompt text
+      - suggested_preset = the preset name
+5. Update the Property status to &quot;Prompts Ready&quot;
+6. Return all prompts in copy-paste format, labeled by clip number and transition
+7. Include step-by-step instructions for using the prompts on Envato
+
+OUTPUT FORMAT:
+Clip 1: [Room A] to [Room B] (Preset: [Preset Name])
+&gt; [Full prompt text]
+
+Clip 2: [Room B] to [Room C] (Preset: [Preset Name])
+&gt; [Full prompt text]
+
+...
+
+NEXT STEPS FOR STUDENTS:
+1. Go to Envato AI Video Generator (elements.envato.com/ai)
+2. For each clip: upload start frame and end frame images
+3. Copy-paste the prompt into the prompt field
+4. Select the suggested camera preset from the dropdown
+5. Set duration to 5 seconds, aspect ratio to 16:9
+6. Generate
+7. Download all clips
+8. Upload clips back to the app&#x27;s Final Clips section
+9. Copy the stitch prompt, send to your Superagent to combine into final video
+TEMPLATE
+</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it confirms the kling-prompt-generator skill is saved.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">11</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 11</span><span class="step-title-text">Install the video stitcher.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Same again, the whole skill in one box. Tap copy, paste it to your co-founder, and it installs it and confirms.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called video-stitcher. Save the following content as the SKILL.md file in the .agents/skills/video-stitcher/ directory:
+
+---
+name: video-stitcher
+description: Stitches multiple property walkthrough video clips (from Envato/Kling) into one final walkthrough video with smooth crossfade transitions between clips, using ffmpeg.
+---
+
+# Video Stitcher
+
+Combines individual Envato-generated clips (one per scene/transition) into a single finished property walkthrough video.
+
+## When to Use
+Student has uploaded all their finished Envato clips back into their Base44 app&#x27;s &quot;Final Clips&quot; section, one clip per scene (Clip 1: Frame 1 to 2, Clip 2: Frame 2 to 3, etc.). Student copies the prompt from the app and sends it to their Superagent in chat.
+
+The student&#x27;s message will look like:
+&quot;I have uploaded all my finished Envato video clips for [property address] into the Final Clips section. Each clip is matched to its scene (Clip 1: Frame 1 to 2, Clip 2: Frame 2 to 3, etc.). Please stitch all clips together into one final walkthrough video with smooth crossfade transitions between each scene, then send me the finished video.&quot;
+
+## What This Skill Does
+1. Reads all ListingClip records for the property from the app, ordered by sequence_order ascending
+2. Downloads each clip video file into the sandbox
+3. Normalizes all clips to 1920x1080, 30fps, h264/aac codec so they match perfectly
+4. Stitches with crossfade (xfade) transitions between each consecutive clip (0.5 second default)
+5. If crossfade fails or there are too many clips, falls back to hard cuts using ffmpeg concat
+6. Outputs one final stitched mp4 file
+7. Uploads the final video using upload_file to get a public URL
+8. Saves the final video URL back to the Property record (final_video_url field)
+9. Updates the property status to &quot;Delivered&quot;
+10. Sends the student a download link via chat
+
+## Step-by-Step Process (for the agent to follow)
+
+### 1. Identify the property and gather clips
+- Find the property by address from the student&#x27;s message (search Property records)
+- Use read_entities to get all ListingClip records for that property_id, sorted by sequence_order ascending
+- Each record has: sequence_order, video_url, label (e.g. &quot;Clip 1: Frame 1 to Frame 2&quot;)
+
+### 2. Download clips
+mkdir -p /app/conversations/&lt;conv_id&gt;/stitching/&lt;property_slug&gt;
+cd /app/conversations/&lt;conv_id&gt;/stitching/&lt;property_slug&gt;
+curl -L -o clip_01.mp4 &quot;&lt;video_url_1&gt;&quot;
+curl -L -o clip_02.mp4 &quot;&lt;video_url_2&gt;&quot;
+# repeat for all clips in order
+
+### 3. Verify each clip is valid
+for f in clip_*.mp4; do
+  echo &quot;Checking $f:&quot;
+  ffprobe -v error -show_entries format=duration -of csv=p=0 &quot;$f&quot;
+done
+
+### 4. Normalize clips (all clips must be same resolution, framerate, codec before xfade)
+ffmpeg -i clip_01.mp4 -vf &quot;scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1&quot; -r 30 -c:v libx264 -crf 18 -preset medium -c:a aac -ar 44100 norm_01.mp4
+# repeat for every clip
+
+### 5. Get duration of each normalized clip (needed for xfade offset calculation)
+ffprobe -v error -show_entries format=duration -of csv=p=0 norm_01.mp4
+ffprobe -v error -show_entries format=duration -of csv=p=0 norm_02.mp4
+# repeat for all normalized clips
+
+### 6. Stitch with crossfade transitions (xfade filter)
+For N clips with 0.5s crossfade, chain xfade filters. The offset for each xfade = cumulative duration of all previous clips minus (crossfade_duration times number of preceding xfades).
+
+Example for 3 clips (each 5s, crossfade 0.5s):
+ffmpeg -i norm_01.mp4 -i norm_02.mp4 -i norm_03.mp4 -filter_complex \
+&quot;[0:v][1:v]xfade=transition=fade:duration=0.5:offset=4.5[v01]; \
+[v01][2:v]xfade=transition=fade:duration=0.5:offset=9[v012]; \
+[0:a][1:a]acrossfade=d=0.5[a01]; \
+[a01][2:a]acrossfade=d=0.5[a012]&quot; \
+-map &quot;[v012]&quot; -map &quot;[a012]&quot; -c:v libx264 -crf 18 -preset medium -c:a aac final_walkthrough.mp4
+
+For more than 5 clips, process pairwise sequentially to avoid filter_complex getting too long.
+
+### 7. Simpler fallback (hard cuts, no crossfade, more reliable for many clips)
+for f in norm_*.mp4; do echo &quot;file &#x27;$f&#x27;&quot; &gt;&gt; concat_list.txt; done
+ffmpeg -f concat -safe 0 -i concat_list.txt -c:v libx264 -crf 18 -preset medium -c:a aac final_walkthrough.mp4
+
+### 8. Upload and deliver
+- Use upload_file to get a public URL for final_walkthrough.mp4
+- Use update_entities to save final_video_url on the Property record
+- Use update_entities to set Property status to &quot;Delivered&quot;
+- Send the student the download link via chat
+
+## Notes
+- Default crossfade: 0.5 seconds
+- Always normalize before stitching (mismatched clips produce garbage)
+- Clean up temp files after upload
+- If a clip is missing or corrupted, tell the student which scene&#x27;s clip is missing so they can re-upload
+- For more than 5 clips, prefer the concat fallback method as the xfade filter chain gets very complex
+
+
+Also save a run.sh file in the same directory with this content:
+
+#!/bin/bash
+# Video Stitcher Skill
+# Usage: run_skill video-stitcher &lt;property_id&gt;
+# Downloads all uploaded clips for a property, normalizes them, stitches with crossfade transitions, uploads final video
+
+PROPERTY_ID=&quot;$1&quot;
+
+if [ -z &quot;$PROPERTY_ID&quot; ]; then
+  echo &quot;Usage: video-stitcher &lt;property_id&gt;&quot;
+  exit 1
+fi
+
+echo &quot;=== Video Stitcher ===&quot;
+echo &quot;Property ID: $PROPERTY_ID&quot;
+echo &quot;&quot;
+
+# The actual stitching logic is handled by the Superagent
+# This skill provides the template and instructions for the agent to follow
+
+cat &lt;&lt; &#x27;TEMPLATE&#x27;
+SKILL INSTRUCTIONS FOR SUPERAGENT:
+
+When triggered, you must:
+
+1. Read all ListingClip records where property_id matches the provided property ID
+2. Sort by sequence_order ascending
+3. For each clip:
+   a. Download the video file from the video_url to a local working directory
+   b. Name files clip_01.mp4, clip_02.mp4, etc. matching sequence order
+4. Verify each clip is valid using ffprobe
+5. Normalize each clip to 1920x1080, 30fps, h264/aac:
+   ffmpeg -i clip_01.mp4 -vf &quot;scale=1920:1080:force_original_aspect_ratio=decrease,pad=1920:1080:(ow-iw)/2:(oh-ih)/2,setsar=1&quot; -r 30 -c:v libx264 -crf 18 -preset medium -c:a aac -ar 44100 norm_01.mp4
+6. Get the duration of each normalized clip using ffprobe
+7. Stitch with crossfade transitions (0.5s default):
+   - Calculate xfade offsets: offset_N = sum of durations of clips 1..N minus crossfade_duration * N
+   - Chain xfade filters for video and acrossfade for audio
+   - For more than 5 clips, use concat fallback instead
+8. Fallback (hard cuts):
+   for f in norm_*.mp4; do echo &quot;file &#x27;$f&#x27;&quot; &gt;&gt; concat_list.txt; done
+   ffmpeg -f concat -safe 0 -i concat_list.txt -c:v libx264 -crf 18 -preset medium -c:a aac final_walkthrough.mp4
+9. Upload the final_walkthrough.mp4 using upload_file tool
+10. Update the Property record:
+    - final_video_url = uploaded file URL
+    - status = &quot;Delivered&quot;
+11. Send the student a download link via chat
+12. Clean up temporary files
+
+IMPORTANT:
+- Always normalize all clips before stitching. Mismatched resolutions or framerates will produce broken output.
+- If a clip is missing or corrupted, tell the student which clip number is missing.
+- Default crossfade duration is 0.5 seconds.
+- Prefer concat fallback for more than 5 clips.
+TEMPLATE
+</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it confirms the video-stitcher skill is saved.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">12</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 12</span><span class="step-title-text">Check both landed.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>What video skills do you have now?</pre></div><div class="see"><b>You should see:</b> it names both skills and what each one does.</div>
+<button type="button" class="btn-done" hidden>Finish this page</button>
+</div>
+</section></li>
+</ol>
+<div class="outro" id="outro" hidden>
+<div class="finish-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></div>
+<h2 class="finish-title">Ready to build your first AI walkthrough video?</h2>
+<p class="finish-sub">A real agent is waiting on it. Next page: you make it.</p>
+<a class="next" href="walkthroughs-d.html">Next: Your first video &rarr;</a>
+</div>
+<button type="button" class="startover">Start this page over</button>
+</main>
+<script>
+window.PAGECFG={"miles": ["agent said yes"], "downloads": []};
+(function(){
+  var KEY='course.m5.c';
+  var CFG=window.PAGECFG||{miles:[],downloads:[]};
+  var lis=[].slice.call(document.querySelectorAll('.steps > li'));
+  var total=lis.length;
+  var segs=[].slice.call(document.querySelectorAll('.segment'));
+  var countEl=document.getElementById('done-count');
+  var outro=document.getElementById('outro');
+  function getDone(){try{var v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?0:Math.min(v,total);}catch(e){return 0;}}
+  function setDone(n){try{localStorage.setItem(KEY,String(n));}catch(e){}}
+  function flagGet(k){try{return localStorage.getItem(KEY+k)==='1';}catch(e){return true;}}
+  function flagSet(k){try{localStorage.setItem(KEY+k,'1');}catch(e){}}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---- audio ---- */
+  var ac=null;
+  function ctx(){try{if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();}if(ac.state==='suspended')ac.resume();return ac;}catch(e){return null;}}
+  function ding(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.13;out.connect(a.destination);[[880,0,0.34],[1318.5,0.075,0.32]].forEach(function(n){var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(n[0],now+n[1]);g.gain.setValueAtTime(0.0001,now+n[1]);g.gain.exponentialRampToValueAtTime(1,now+n[1]+0.012);g.gain.exponentialRampToValueAtTime(0.0001,now+n[1]+n[2]);o.connect(g);g.connect(out);o.start(now+n[1]);o.stop(now+n[1]+n[2]+0.05);});}
+  function fanfare(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.12;out.connect(a.destination);[523.25,659.25,783.99,1046.5].forEach(function(f,i){var at=i*0.11;var o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.setValueAtTime(f,now+at);g.gain.setValueAtTime(0.0001,now+at);g.gain.exponentialRampToValueAtTime(1,now+at+0.015);g.gain.exponentialRampToValueAtTime(0.0001,now+at+0.7);o.connect(g);g.connect(out);o.start(now+at);o.stop(now+at+0.75);});}
+  function tickSnd(){var a=ctx();if(!a)return;var now=a.currentTime;var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(1650,now);o.frequency.exponentialRampToValueAtTime(950,now+0.05);g.gain.setValueAtTime(0.0001,now);g.gain.exponentialRampToValueAtTime(0.06,now+0.006);g.gain.exponentialRampToValueAtTime(0.0001,now+0.06);o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+0.08);}
+  /* ---- confetti ---- */
+  function confetti(){if(reduce)return;var cv=document.createElement('canvas');cv.setAttribute('aria-hidden','true');cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';document.body.appendChild(cv);var c=cv.getContext('2d');if(!c){cv.remove();return;}var dpr=Math.min(window.devicePixelRatio||1,2);var w=window.innerWidth,h=window.innerHeight;cv.width=w*dpr;cv.height=h*dpr;c.scale(dpr,dpr);var cols=['#32d09f','#14926c','#8b5cf6','#c9b6f9','#ffb45c','#15171d'];var n=w<600?90:160;var ps=[];for(var i=0;i<n;i++){ps.push({x:w*(0.5+(Math.random()-0.5)*0.5),y:h*0.35+Math.random()*40,vx:(Math.random()-0.5)*9,vy:-6-Math.random()*9,s:5+Math.random()*7,r:Math.random()*Math.PI,vr:(Math.random()-0.5)*0.35,col:cols[Math.floor(Math.random()*cols.length)]});}var st=performance.now(),raf=0,dur=2000;function fr(now){var el=now-st,life=Math.min(el/dur,1);c.clearRect(0,0,w,h);ps.forEach(function(p){p.vy+=0.32;p.vx*=0.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.globalAlpha=1-life*life;c.fillStyle=p.col;c.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);c.restore();});if(el<dur){raf=requestAnimationFrame(fr);}else{cancelAnimationFrame(raf);cv.remove();}}raf=requestAnimationFrame(fr);}
+  /* ---- icons ---- */
+  var LOCK='<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="4.5" y="8.5" width="11" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.2 8.5V6.6a2.8 2.8 0 0 1 5.6 0v1.9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  var TICK='<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5 8.3 14.3 15.5 6.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var FLAGI='<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17V3.5"/><path d="M5 4h9.5l-2.2 3 2.2 3H5" fill="currentColor" stroke="none"/></svg>';
+  var BOLT='<svg viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M11 2 4 11.5h4.4L8.6 18l7-9.5h-4.4L11 2z"/></svg>';
+  var FILE='<svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5H5.8A1.3 1.3 0 0 0 4.5 3.8v12.4a1.3 1.3 0 0 0 1.3 1.3h8.4a1.3 1.3 0 0 0 1.3-1.3V6.5l-4-4z"/><path d="M11.5 2.5v4h4"/><path d="M10 9v5m0 0-2.2-2.2M10 14l2.2-2.2"/></svg>';
+  /* ---- classify step types ---- */
+  var ACT=/^(go |open |ring|make the call|watch|download|upload|get |send |text |scroll|look for|note the|swap in|click around)/i;
+  lis.forEach(function(li,i){
+    var card=li.querySelector('.step');if(!card)return;
+    var t='';
+    if(card.querySelector('.prompt:not(.chat)'))t='t-build';
+    else if(card.querySelector('.prompt.chat'))t='t-chat';
+    var pl=card.querySelector('.pwrap .plabel');
+    if(pl){var lt=pl.textContent.toUpperCase();
+      if(lt.indexOf('PHONE')>-1){t='t-phone';pl.parentNode.classList.add('is-phone');pl.textContent='On the call';}
+      else t='t-chat';}
+    var titleEl=card.querySelector('.step-title-text');
+    var title=titleEl?titleEl.textContent:'';
+    if(!t&&ACT.test(title.trim()))t='t-act';
+    if(CFG.miles.some(function(m){return title.indexOf(m)>-1;}))t=(t?t+' ':'')+'t-mile';
+    if(t)card.setAttribute('data-t',t);
+    var body=card.querySelector('.step-body');
+    if(body&&/(^|\s)t-mile(\s|$)/.test(t)){var mt=document.createElement('span');mt.className='mile-tag';mt.innerHTML=FLAGI+' CHECKPOINT';body.insertBefore(mt,body.firstChild);}
+    else if(body&&t==='t-act'){var ar=document.createElement('span');ar.className='act';ar.innerHTML=BOLT+' REAL WORLD MOVE';body.insertBefore(ar,body.firstChild);}
+  });
+  /* ---- file download chips ---- */
+  CFG.downloads.forEach(function(d){
+    var li=lis[d.step];if(!li)return;
+    var pre=li.querySelector('.pwrap pre');if(!pre)return;
+    var chip=document.createElement('button');chip.type='button';chip.className='filechip';
+    chip.innerHTML=FILE+d.name+' <small>download</small>';
+    chip.addEventListener('click',function(){
+      try{var blob=new Blob([pre.innerText],{type:'text/markdown'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=d.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);tickSnd();}
+      catch(e){var btn=li.querySelector('.copy');if(btn)btn.click();}
+    });
+    var wrap=li.querySelector('.pwrap');wrap.parentNode.insertBefore(chip,wrap);
+  });
+  /* ---- render ---- */
+  function render(done,animateIdx){
+    lis.forEach(function(li,i){
+      var st=i<done?'done':(i===done?'open':'locked');
+      var card=li.querySelector('.step');
+      var t=card.getAttribute('data-t')||'';
+      card.className='step is-'+st+(t?' '+t.split(' ').join(' '):'')+(i===animateIdx?' just-passed':'');
+      li.className=i<done?'spine-on':'';
+      var badge=card.querySelector('.step-badge');
+      var isMile=t.indexOf('t-mile')>-1;
+      badge.innerHTML=st==='done'?TICK:(st==='locked'?LOCK:(isMile?FLAGI:String(i+1)));
+      var chip=card.querySelector('.step-chip');
+      chip.className='step-chip is-'+st;
+      chip.innerHTML=st==='done'?'Done':(st==='locked'?LOCK:(isMile?'Checkpoint':'Start'));
+      var body=card.querySelector('.step-body');
+      if(body)body.hidden=(st==='locked');
+      var note=card.querySelector('.step-locked-note');
+      if(note)note.hidden=(st!=='locked');
+      var btn=card.querySelector('.btn-done');
+      if(btn)btn.hidden=(st!=='open');
+    });
+    segs.forEach(function(s,i){s.className='segment'+(i<done?' is-filled':(i===done?' is-current':''));});
+    if(countEl)countEl.textContent=String(done);
+    if(outro){var was=outro.hidden;outro.hidden=(done<total);
+      if(was&&!outro.hidden&&!flagGet('.cf')){flagSet('.cf');confetti();}}
+  }
+  lis.forEach(function(li,i){
+    var btn=li.querySelector('.btn-done');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      var done=getDone();
+      if(i!==done)return;
+      var card=li.querySelector('.step');
+      var mile=(card.getAttribute('data-t')||'').indexOf('t-mile')>-1;
+      done+=1;setDone(done);
+      if(done>=total){fanfare();}else if(mile){fanfare();}else{ding();}
+      render(done,i);
+      var target=done<total?lis[done]:outro;
+      if(target)setTimeout(function(){var hdr=document.querySelector('.progress');var off=(hdr&&hdr.offsetHeight?hdr.offsetHeight:0)+16;var y=target.getBoundingClientRect().top+window.pageYOffset-off;window.scrollTo({top:y<0?0:y,behavior:reduce?'auto':'smooth'});},320);
+    });
+  });
+  var so=document.querySelector('.startover');
+  if(so)so.addEventListener('click',function(){setDone(0);try{localStorage.removeItem(KEY+'.cf');}catch(e){}render(0,-1);window.scrollTo({top:0,behavior:reduce?'auto':'smooth'});});
+  /* ---- copy ---- */
+  function doCopy(text,btn){function ok(){tickSnd();btn.textContent='Copied';btn.classList.add('did');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('did');},2000);}function fb(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){}ta.remove();}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fb);}else{fb();}}
+  window.cp=function(b){var pre=b.parentNode.querySelector('pre');doCopy(pre?pre.innerText:'',b);};
+  [].slice.call(document.querySelectorAll('.prompt')).forEach(function(box){
+    var text=box.innerText;
+    var btn=document.createElement('button');btn.className='copybtn';btn.type='button';btn.textContent='Copy';
+    btn.addEventListener('click',function(){doCopy(text,btn);});
+    box.appendChild(btn);
+  });
+  render(getDone(),-1);
+})();
+
+</script>
+<script src="/nav.js" defer></script>
+</body>
+</html>

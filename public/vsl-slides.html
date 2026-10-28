@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VSL Slides</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@600;800&family=IBM+Plex+Mono:wght@500&display=swap">
+<style>
+:root{ --bg:#0b1210; --ink:#f2f7f5; --dim:#8fa09a; --grn:#32d09f; --grnd:#17835f; --vio:#8b5cf6; --line:#1f2b27; }
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--bg);color:var(--ink);font-family:'Archivo',-apple-system,sans-serif;
+  overflow:hidden;cursor:pointer;-webkit-font-smoothing:antialiased}
+.slide{position:absolute;inset:0;display:none;flex-direction:column;align-items:center;
+  justify-content:center;text-align:center;padding:6vw;gap:3.4vh;overflow:hidden}
+.slide.on{display:flex}
+.tag{font-family:'IBM Plex Mono',monospace;font-size:clamp(.65rem,1.1vw,.9rem);
+  letter-spacing:.18em;text-transform:uppercase;color:var(--grn);font-weight:500;z-index:2}
+.big{font-weight:800;font-size:clamp(2.6rem,9vw,8rem);line-height:1;letter-spacing:-.03em;z-index:2}
+.big em{font-style:normal;color:var(--grn)}
+.big .vio{color:var(--vio)}
+.sub{font-weight:600;font-size:clamp(1rem,2.2vw,1.7rem);color:var(--dim);max-width:34ch;line-height:1.35;z-index:2}
+.src{position:absolute;bottom:4.6vh;font-family:'IBM Plex Mono',monospace;font-size:clamp(.62rem,1vw,.9rem);
+  letter-spacing:.14em;color:#3d4d47;text-transform:uppercase;z-index:2}
+.counter{position:fixed;top:16px;right:20px;font-family:'IBM Plex Mono',monospace;font-size:11px;
+  color:#2c3a35;letter-spacing:.1em;user-select:none;z-index:9}
+.hint{position:fixed;bottom:12px;left:20px;font-family:'IBM Plex Mono',monospace;font-size:10px;
+  color:#2c3a35;letter-spacing:.08em;user-select:none;z-index:9}
+
+/* full-bleed image with Ken Burns */
+.slide.img{padding:0}
+.slide.img .bg{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;filter:brightness(.82)}
+.slide.on.img .bg{animation:kb 14s ease-out forwards}
+@keyframes kb{from{transform:scale(1)}to{transform:scale(1.09)}}
+.slide.img .veil{position:absolute;inset:0;background:linear-gradient(rgba(5,10,8,.25), rgba(5,10,8,.66))}
+.slide.img .chtag{position:absolute;top:8vh;left:0;right:0;text-align:center}
+.slide.img .title{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);
+  font-weight:800;font-size:clamp(2.8rem,9vw,8rem);letter-spacing:-.03em;line-height:1;text-align:center;
+  text-shadow:0 4px 40px rgba(0,0,0,.6)}
+.slide.img .title em{font-style:normal;color:var(--grn)}
+.slide.img .cap{position:absolute;left:0;right:0;bottom:0;padding:10vh 6vw 5.4vh;
+  background:linear-gradient(transparent, rgba(5,10,8,.94));
+  font-weight:800;font-size:clamp(1.5rem,4vw,3.2rem);letter-spacing:-.02em;text-align:center}
+.slide.img .cap em{font-style:normal;color:var(--grn)}
+.slide.img.red .veil{background:linear-gradient(rgba(60,8,8,.30), rgba(20,4,4,.72))}
+
+/* glow number */
+.glow{text-shadow:0 0 60px rgba(50,208,159,.45)}
+
+/* timeline draw */
+.tl{display:flex;align-items:center;width:min(76vw,940px);z-index:2}
+.tl .yr{font-weight:800;font-size:clamp(1.8rem,4.4vw,3.6rem)}
+.tl .yr.now{color:var(--grn)}
+.tl .lineWrap{flex:1;height:4px;background:#1a2420;margin:0 2vw;border-radius:2px;overflow:hidden}
+.tl .lineFill{height:100%;width:0;background:linear-gradient(90deg,var(--grn),#8fe8cd);border-radius:2px}
+.slide.on .lineFill{animation:draw 1.6s .3s ease-out forwards}
+@keyframes draw{to{width:100%}}
+
+/* shopfront street */
+.street{display:grid;grid-template-columns:repeat(5,1fr);gap:clamp(10px,1.6vw,22px);width:min(74vw,920px);z-index:2}
+.shopb{aspect-ratio:1/1.05;border-radius:12px;background:#101815;border:1px solid var(--line);
+  position:relative;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding:0 0 12%}
+.shopb .awning{position:absolute;top:0;left:0;right:0;height:22%;border-radius:12px 12px 0 0;background:#16211d}
+.shopb .win{width:56%;height:38%;border-radius:6px;background:#ffd98a;box-shadow:0 0 26px rgba(255,217,138,.45);
+  transition:background 1s ease, box-shadow 1s ease}
+.shopb.dark .win{background:#0c1310;box-shadow:none}
+.shopb.hero .win{background:var(--grn);box-shadow:0 0 34px rgba(50,208,159,.55)}
+.shopb.hero{border-color:var(--grnd)}
+
+/* animated bars */
+.bars{display:flex;flex-direction:column;gap:3vh;width:min(74vw,900px);text-align:left;z-index:2}
+.bar-row .lbl{font-weight:600;font-size:clamp(1rem,2vw,1.5rem);color:var(--dim);margin-bottom:1vh}
+.bar-row .lbl b{color:var(--ink)}
+.track{height:clamp(26px,4.6vh,44px);background:#101815;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fill{height:100%;border-radius:9px;width:0}
+.f88{background:#2c3a35}
+.slide.on .f88{animation:fill88 1.4s .2s ease-out forwards}
+@keyframes fill88{to{width:88%}}
+.f1{background:var(--grn);box-shadow:0 0 24px rgba(50,208,159,.5)}
+.slide.on .f1{animation:fill1 .8s 1.8s ease-out forwards, blink 1.6s 2.8s ease-in-out 3}
+@keyframes fill1{to{width:10%}}
+@keyframes blink{50%{opacity:.35}}
+
+/* gap diagram */
+.gapWrap{display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,2vw,28px);align-items:center;width:min(88vw,1100px);z-index:2}
+.gcard{background:#101815;border:1px solid var(--line);border-radius:16px;
+  padding:clamp(16px,2.8vh,30px) clamp(16px,1.8vw,26px);text-align:left}
+.gcard .h{font-weight:800;font-size:clamp(1.05rem,2.1vw,1.65rem);letter-spacing:-.015em;line-height:1.16}
+.gcard p{font-size:clamp(.85rem,1.4vw,1.1rem);color:var(--dim);line-height:1.45;margin-top:.7vh}
+.gcard.you{background:rgba(50,208,159,.08);border-color:var(--grnd);text-align:center}
+.gcard.you .h{font-size:clamp(1.8rem,4vw,3.4rem)}
+.slide.on .gcard.you{animation:pulse 2s 1s ease-in-out 2}
+@keyframes pulse{50%{box-shadow:0 0 44px rgba(50,208,159,.35)}}
+.garrows{display:flex;flex-direction:column;gap:1.2vh;color:var(--grn);font-weight:800;font-size:clamp(1.4rem,2.6vw,2.4rem)}
+
+/* typing slide */
+.chatBox{width:min(80vw,860px);display:flex;flex-direction:column;gap:2.2vh;z-index:2}
+.bubL{align-self:flex-start;background:#141d1a;border:1px solid var(--line);border-radius:18px 18px 18px 4px;
+  padding:clamp(14px,2.4vh,22px) clamp(16px,2vw,24px);font-size:clamp(1.05rem,2.3vw,1.8rem);font-weight:600;text-align:left;min-height:1em}
+.bubL .cursor{display:inline-block;width:2px;height:1.05em;background:var(--grn);vertical-align:-.15em;
+  animation:cur .8s steps(1) infinite}
+@keyframes cur{50%{opacity:0}}
+.bubR{align-self:flex-end;background:var(--grnd);border-radius:18px 18px 4px 18px;
+  padding:clamp(14px,2.4vh,22px) clamp(16px,2vw,24px);font-size:clamp(1.05rem,2.3vw,1.8rem);font-weight:700;
+  opacity:0;transform:translateY(8px)}
+.bubR.showit{animation:popin .4s ease forwards}
+@keyframes popin{to{opacity:1;transform:none}}
+
+/* flow */
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:clamp(14px,2vw,28px);width:min(86vw,1060px);z-index:2}
+.stepC{background:#101815;border:1px solid var(--line);border-radius:16px;
+  padding:clamp(18px,3vh,30px) clamp(16px,1.8vw,26px);position:relative;text-align:left}
+.stepC .n{width:36px;height:36px;border-radius:50%;background:var(--grnd);color:#fff;font-weight:800;
+  display:flex;align-items:center;justify-content:center;margin-bottom:1.4vh}
+.stepC .h{font-weight:800;font-size:clamp(1.1rem,2.2vw,1.7rem)}
+.stepC p{font-size:clamp(.85rem,1.4vw,1.1rem);color:var(--dim);margin-top:.6vh;line-height:1.4}
+.stepC.win{background:rgba(50,208,159,.08);border-color:var(--grnd)}
+.stepC:not(:last-child)::after{content:"→";position:absolute;right:-1.6vw;top:50%;transform:translate(50%,-50%);
+  color:var(--grn);font-weight:800;font-size:clamp(1.4rem,2.4vw,2.2rem);z-index:2}
+
+/* history stack + money stack */
+.stack3{display:flex;gap:clamp(10px,1.6vw,26px);align-items:center;justify-content:center;z-index:2;width:100%}
+.pol{background:#101815;border:1px solid var(--line);border-radius:14px;padding:10px 10px 14px;
+  box-shadow:0 18px 44px rgba(0,0,0,.5);max-width:30%}
+.pol img{display:block;width:100%;border-radius:8px}
+.pol .lab{font-family:'IBM Plex Mono',monospace;font-size:clamp(.6rem,1vw,.85rem);letter-spacing:.12em;
+  color:var(--dim);margin-top:10px;text-transform:uppercase}
+.pol.r1{transform:rotate(-3deg)}
+.pol.r2{transform:rotate(1.6deg)}
+.pol.r3{transform:rotate(3.4deg)}
+.pol.ph{border-style:dashed;border-color:#2c3a35;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;min-width:24%}
+.pol.ph .lab{margin:0;color:#3d4d47;text-align:center;padding:0 10px}
+.money .pol{max-width:23%}
+.money .pol img{border-radius:10px}
+
+/* future-pace message */
+.msg{width:min(70vw,640px);z-index:2}
+.msg .from{font-family:'IBM Plex Mono',monospace;font-size:clamp(.65rem,1.1vw,.9rem);letter-spacing:.14em;
+  color:#3d4d47;text-transform:uppercase;margin-bottom:1.4vh}
+.msg .bubble{background:#1b2b25;border:1px solid var(--grnd);border-radius:20px;padding:clamp(18px,3vh,30px);
+  font-size:clamp(1.2rem,2.6vw,2rem);font-weight:700;text-align:left}
+.msg .bubble small{display:block;color:var(--dim);font-weight:500;font-size:.62em;margin-top:1vh}
+
+/* register arrow */
+.down{font-size:clamp(2.4rem,6vw,5rem);color:var(--grn);z-index:2}
+.slide.on .down{animation:bounce 1.2s ease-in-out infinite}
+@keyframes bounce{50%{transform:translateY(14px)}}
+
+/* placeholder frame */
+.phFrame{width:min(72vw,880px);aspect-ratio:16/9;border:2px dashed #2c3a35;border-radius:16px;
+  display:flex;align-items:center;justify-content:center;z-index:2}
+.phFrame span{font-family:'IBM Plex Mono',monospace;font-size:clamp(.7rem,1.2vw,1rem);letter-spacing:.12em;
+  color:#3d4d47;text-transform:uppercase;text-align:center;padding:0 6vw;line-height:2}
+
+@media (prefers-reduced-motion:reduce){*{animation:none!important}
+.f88{width:88%}.f1{width:1.8%}.lineFill{width:100%}.bubR{opacity:1;transform:none}}
+</style>
+</head>
+<body>
+
+<!-- 1 · OPEN ON THE MONEY -->
+<section class="slide" data-init="count157">
+  <div class="tag">The Opportunity</div>
+  <div class="big glow"><em id="c157">$0</em></div>
+  <div class="sub">added to the world economy by 2030 · PwC</div>
+</section>
+
+<!-- 4 -->
+<section class="slide">
+  <div class="tag">The Opportunity</div>
+  <div class="big">Not billion.<br><em>Trillion.</em></div>
+</section>
+
+<!-- 5 · timeline -->
+<section class="slide">
+  <div class="tag">The Opportunity</div>
+  <div class="tl"><div class="yr now">2026</div><div class="lineWrap"><div class="lineFill"></div></div><div class="yr">2030</div></div>
+  <div class="sub">only four years away</div>
+</section>
+
+<!-- 6 · businesses counter -->
+<section class="slide" data-init="count266">
+  <div class="tag">The Opportunity</div>
+  <div class="big glow" style="font-size:clamp(2.4rem,7.4vw,6.4rem)"><em id="c266">0</em><br>small businesses</div>
+  <div class="sub">Australia alone. 26 million people. Now think about the US.</div>
+</section>
+
+<!-- 7 · street lights go dark -->
+<section class="slide" data-init="street">
+  <div class="tag">The Opportunity</div>
+  <div class="big" style="font-size:clamp(1.7rem,4.4vw,3.6rem)">Only <em>1 in 10</em> has implemented AI properly</div>
+  <div class="street" id="street">
+    <div class="shopb hero"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb"><div class="awning"></div><div class="win"></div></div>
+  </div>
+  <div class="sub">the rest are just chatting to ChatGPT</div>
+</section>
+
+<!-- 8 · CH2 divider, clean -->
+<section class="slide">
+  <div class="tag">Chapter 2</div>
+  <div class="big">Why Nobody's<br><em>Done It Yet</em></div>
+</section>
+
+<!-- 9 -->
+<section class="slide">
+  <div class="tag">Why Nobody's Done It Yet</div>
+  <div class="big" style="font-size:clamp(2.2rem,6.4vw,5.4rem)">Cheaper. Faster.<br><em>Better.</em></div>
+</section>
+
+<!-- 10 -->
+<section class="slide">
+  <div class="tag">Why Nobody's Done It Yet</div>
+  <div class="big" style="font-size:clamp(2.2rem,6.4vw,5.4rem)">Then why has<br><em>nobody</em> done it?</div>
+</section>
+
+<!-- 11 · bars -->
+<section class="slide">
+  <div class="tag">Why Nobody's Done It Yet</div>
+  <div class="bars">
+    <div class="bar-row"><div class="lbl"><b>88%</b> say they're "using AI somewhere"</div>
+      <div class="track"><div class="fill f88"></div></div></div>
+    <div class="bar-row"><div class="lbl"><b style="color:var(--grn)">10%</b> have properly implemented it</div>
+      <div class="track"><div class="fill f1"></div></div></div>
+  </div>
+  <div class="src">McKinsey &amp; Co · State of AI</div>
+</section>
+
+<!-- 12 · bike -->
+<section class="slide img">
+  <img class="bg" src="/vsl-img/bike.png" alt=""><div class="veil"></div>
+  <div class="cap">It comes down to <em>knowledge.</em></div>
+</section>
+
+<!-- 13 · CH3 divider on desert -->
+<section class="slide img">
+  <img class="bg" src="/vsl-img/desert-water.png" alt=""><div class="veil"></div>
+  <div class="chtag tag">Chapter 3</div>
+  <div class="title">Where You<br><em>Come In</em></div>
+</section>
+
+<!-- 14 · gap -->
+<section class="slide">
+  <div class="tag">Where You Come In</div>
+  <div class="gapWrap">
+    <div style="display:flex;flex-direction:column;gap:1.8vh">
+      <div class="gcard"><div class="h">Millions of businesses NEED AI</div><p>Or they get left behind. They know it.</p></div>
+      <div class="gcard"><div class="h">They won't spend months learning it</div><p>They're busy running the business.</p></div>
+    </div>
+    <div class="garrows"><span>→</span><span>→</span></div>
+    <div class="gcard you"><div class="h">YOU</div><p>walk in and set it up for them</p></div>
+  </div>
+</section>
+
+<!-- 14b · the gold rush, where the metaphor lives -->
+<section class="slide img">
+  <img class="bg" src="/vsl-img/goldrush.png" alt=""><div class="veil"></div>
+  <div class="cap">Same gold rush. <em>Different tools.</em></div>
+</section>
+
+<!-- 15 · n8n real, framed -->
+<section class="slide">
+  <div class="tag">The Old Way</div>
+  <div style="width:min(78vw,980px);border:1px solid var(--line);border-radius:16px;overflow:hidden;
+    box-shadow:0 24px 60px rgba(0,0,0,.55);z-index:2">
+    <img src="/vsl-img/proof/n8n-nightmare.webp" alt="" style="display:block;width:100%">
+  </div>
+  <div class="sub">ONE system. This is what it used to take to build.</div>
+</section>
+
+<!-- 16 · typing magic -->
+<section class="slide" data-init="typing">
+  <div class="tag">Now</div>
+  <div class="chatBox">
+    <div class="bubL"><span id="typed"></span><span class="cursor"></span></div>
+    <div class="bubR" id="doneBub">Done. Want to hear it answer a call? ✓</div>
+  </div>
+</section>
+
+<!-- 17 · flow -->
+<section class="slide">
+  <div class="tag">Where You Come In</div>
+  <div class="flow">
+    <div class="stepC"><div class="n">1</div><div class="h">You talk</div><p>Tell your super agent what the client needs.</p></div>
+    <div class="stepC"><div class="n">2</div><div class="h">Jarvis builds</div><p>It finds the leads and builds the actual service.</p></div>
+    <div class="stepC win"><div class="n">3</div><div class="h">Client pays you</div><p>You just have the conversation.</p></div>
+  </div>
+</section>
+
+<!-- 18 · history stack -->
+<section class="slide" data-beat="who am i">
+  <div class="tag">Who Am I</div>
+  <div class="big" style="font-size:clamp(1.7rem,4.4vw,3.6rem)">Doing this since <em>2023</em></div>
+  <div style="display:flex;align-items:center;justify-content:center;gap:clamp(10px,1.6vw,26px);width:min(94vw,1280px);z-index:2">
+    <div class="pol r1" style="max-width:24%"><img src="/vsl-img/proof/2023-still.png" alt=""><div class="lab">2023 · teaching businesses AI</div></div>
+    <div style="position:relative;width:22%;aspect-ratio:612/792;flex:none">
+      <img src="/vsl-img/proof/prop-The-Ev.png" alt="" style="position:absolute;inset:0;width:86%;border-radius:8px;transform:rotate(-7deg) translate(-4%,2%);box-shadow:0 10px 30px rgba(0,0,0,.5)">
+      <img src="/vsl-img/proof/prop-Keysto.png" alt="" style="position:absolute;inset:0;width:86%;border-radius:8px;transform:rotate(-2deg) translate(4%,-1%);box-shadow:0 10px 30px rgba(0,0,0,.5)">
+      <img src="/vsl-img/proof/prop-Ace-Co.png" alt="" style="position:absolute;inset:0;width:86%;border-radius:8px;transform:rotate(4deg) translate(10%,3%);box-shadow:0 12px 34px rgba(0,0,0,.55)">
+      <img src="/vsl-img/proof/prop-Fraser.png" alt="" style="position:absolute;inset:0;width:86%;border-radius:8px;transform:rotate(8deg) translate(16%,0);box-shadow:0 14px 38px rgba(0,0,0,.6)">
+      <div class="lab" style="position:absolute;bottom:-1.9em;left:0;right:0;text-align:center;font-family:'IBM Plex Mono',monospace;font-size:clamp(.6rem,1vw,.85rem);letter-spacing:.12em;color:var(--dim);text-transform:uppercase">client proposals · 2023-24</div>
+    </div>
+    <div class="pol r2" style="max-width:24%"><img src="/vsl-img/proof/2024-vsl-still.png" alt=""><div class="lab">2024 · selling AI to local businesses</div></div>
+    <div class="pol r3" style="max-width:20%"><img src="/vsl-img/proof/bali-ad.png" alt="" onerror="this.parentElement.style.display='none'"><div class="lab">running it from Bali</div></div>
+  </div>
+</section>
+
+<!-- 19 · money stack -->
+<section class="slide">
+  <div class="tag">Who Am I</div>
+  <div class="big" style="font-size:clamp(1.7rem,4.4vw,3.6rem)">Six figures. <em>Profit.</em> Not revenue.</div>
+  <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:clamp(12px,1.8vw,26px);width:min(92vw,1240px);z-index:2;align-items:center">
+    <div style="display:flex;flex-direction:column;gap:clamp(12px,2vh,22px);align-items:center">
+      <div class="pol r1" style="max-width:100%"><img style="width:100%;border-radius:8px" src="/vsl-img/proof/cb-crop-5000-7500.png" alt=""></div>
+      <div class="pol r2" style="max-width:100%"><img style="width:100%;border-radius:8px" src="/vsl-img/proof/cb-crop-3850.png" alt=""></div>
+    </div>
+    <div class="pol" style="max-width:none;transform:none"><img style="height:min(64vh,620px);width:auto;border-radius:8px" src="/vsl-img/proof/stripe-payments.png" alt=""></div>
+    <div style="display:flex;flex-direction:column;gap:clamp(12px,2vh,22px);align-items:center">
+      <div class="pol r3" style="max-width:100%"><img style="width:100%;border-radius:8px" src="/vsl-img/proof/cb-crop-11000.png" alt=""></div>
+      <div class="pol r1" style="max-width:100%"><img style="height:clamp(140px,26vh,260px);width:auto;border-radius:8px;display:block;margin:0 auto" src="/vsl-img/proof/cb-crop-aug-multi.png" alt=""></div>
+    </div>
+  </div>
+</section>
+
+<!-- 20 · incentive chain -->
+<section class="slide">
+  <div class="tag">The Deal</div>
+  <div class="big" style="font-size:clamp(1.7rem,4.4vw,3.6rem)">The platform pays me. <em>Not you.</em></div>
+  <div class="flow" style="grid-template-columns:repeat(3,1fr)">
+    <div class="stepC"><div class="n" style="background:var(--vio)">🏢</div><div class="h">The AI platform</div><p>pays me to teach you</p></div>
+    <div class="stepC"><div class="n">🧑</div><div class="h">Me</div><p>free course, nothing to sell you</p></div>
+    <div class="stepC win"><div class="n">🫵</div><div class="h">You</div><p>build your Jarvis, land clients</p></div>
+  </div>
+  <div class="gcard you" style="width:min(86vw,1060px)"><div class="h" style="font-size:clamp(1.1rem,2.4vw,1.9rem)">You quit = I earn nothing. The only way I win is if <em style="font-style:normal;color:var(--grn)">you</em> win.</div></div>
+</section>
+
+<!-- 21 -->
+<section class="slide">
+  <div class="tag">The Deal</div>
+  <div class="big" style="font-size:clamp(1.9rem,5.4vw,4.6rem)">No $5,000 mastermind.<br><em>Nothing to buy.</em></div>
+  <div class="sub">They already paid.</div>
+</section>
+
+<!-- 22 -->
+<section class="slide">
+  <div class="tag">The Deal</div>
+  <div class="big" style="font-size:clamp(1.9rem,5.4vw,4.6rem)">I was <em>you.</em></div>
+  <div class="sub">Dropshipping. Trading. Funnels run by guys who never did the thing. That's exactly why this one is built backwards.</div>
+</section>
+
+<!-- 23 · what's inside -->
+<section class="slide">
+  <div class="tag">What's Inside</div>
+  <div class="flow">
+    <div class="stepC"><div class="n">1</div><div class="h">Your own super agent</div><p>Built step by step. Runs your whole agency with you.</p></div>
+    <div class="stepC"><div class="n">2</div><div class="h">It builds, finds, sells</div><p>The services, the leads, the selling. Done with you.</p></div>
+    <div class="stepC win"><div class="n">3</div><div class="h">Three services, on a platter</div><p>Ones businesses already pay for weekly. Pick one.</p></div>
+  </div>
+</section>
+
+<!-- 24 · future pace: your phone, soon -->
+<section class="slide" data-init="phone">
+  <div class="tag">Soon · your phone, a few weeks from now</div>
+  <div style="width:min(74vw,560px);display:flex;flex-direction:column;gap:1.6vh;z-index:2">
+    <div class="fnote" id="fn1" style="opacity:0;transform:translateY(-10px);background:#1a2420;border:1px solid var(--line);border-radius:16px;padding:clamp(12px,2vh,18px) clamp(14px,1.8vw,22px);text-align:left;display:flex;gap:12px;align-items:flex-start">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--grnd);display:flex;align-items:center;justify-content:center;flex:none;font-size:1.2rem">🤖</div>
+      <div><b style="font-size:clamp(.9rem,1.6vw,1.15rem)">Jarvis</b>
+      <div style="color:var(--dim);font-size:clamp(.85rem,1.5vw,1.1rem)">Found 14 new leads overnight. Board's updated.</div></div>
+    </div>
+    <div class="fnote" id="fn2" style="opacity:0;transform:translateY(-10px);background:#1a2420;border:1px solid var(--line);border-radius:16px;padding:clamp(12px,2vh,18px) clamp(14px,1.8vw,22px);text-align:left;display:flex;gap:12px;align-items:flex-start">
+      <div style="width:38px;height:38px;border-radius:9px;background:#2c3a35;display:flex;align-items:center;justify-content:center;flex:none;font-size:1.2rem">💬</div>
+      <div><b style="font-size:clamp(.9rem,1.6vw,1.15rem)">Dave (Plumbing)</b>
+      <div style="color:var(--dim);font-size:clamp(.85rem,1.5vw,1.1rem)">Yeah mate, sounds good. When can you start?</div></div>
+    </div>
+    <div class="fnote" id="fn3" style="opacity:0;transform:translateY(-10px);background:rgba(50,208,159,.1);border:1px solid var(--grnd);border-radius:16px;padding:clamp(12px,2vh,18px) clamp(14px,1.8vw,22px);text-align:left;display:flex;gap:12px;align-items:flex-start;box-shadow:0 0 34px rgba(50,208,159,.18)">
+      <div style="width:38px;height:38px;border-radius:9px;background:var(--grn);display:flex;align-items:center;justify-content:center;flex:none;font-size:1.2rem">🏦</div>
+      <div><b style="font-size:clamp(.9rem,1.6vw,1.15rem)">Your bank</b>
+      <div style="color:var(--dim);font-size:clamp(.85rem,1.5vw,1.1rem)">You've been paid <b style="color:var(--grn)">$1,500.00</b> into your account.</div></div>
+    </div>
+  </div>
+  <div class="sub">This is what mornings look like when the machine runs.</div>
+</section>
+
+<!-- 25 · urgency callback -->
+<section class="slide" data-init="street2">
+  <div class="tag">Right Now</div>
+  <div class="big" style="font-size:clamp(1.9rem,5vw,4.2rem)">The window is <em>wide open</em></div>
+  <div class="street" id="street2">
+    <div class="shopb hero"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark" id="taken"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+    <div class="shopb dark"><div class="awning"></div><div class="win"></div></div>
+  </div>
+  <div class="sub" id="takenSub">but it does not stay open</div>
+</section>
+
+<!-- 26 · register -->
+<section class="slide">
+  <div class="big">Register <em>below</em></div>
+  <div class="sub">my team will call you</div>
+  <div class="down">↓</div>
+  <div class="src">money loves speed</div>
+</section>
+
+<!-- 31 is appended after 30 in DOM order via this insert group -->
+<!-- 26 · fear, single line (v10 B2) -->
+<section class="slide">
+  <div class="big" style="font-size:clamp(1.8rem,5vw,4.2rem);max-width:18ch">That quiet thing in the back of your head.</div>
+</section>
+
+<!-- 27 · absolution (v10 B3) -->
+<section class="slide">
+  <div class="big" style="font-size:clamp(2.2rem,6.6vw,5.6rem)">It was never <em>you.</em></div>
+</section>
+
+<!-- 28 · two camps (v10 B4) -->
+<section class="slide">
+  <div class="tag">Right Now</div>
+  <div class="cards- two" style="display:grid;grid-template-columns:1fr 1fr;gap:clamp(14px,2vw,30px);width:min(88vw,1060px);z-index:2">
+    <div style="background:rgba(50,208,159,.08);border:1px solid var(--grnd);border-radius:18px;padding:clamp(22px,4vh,40px);box-shadow:0 0 44px rgba(50,208,159,.15)">
+      <div style="font-weight:800;font-size:clamp(1.3rem,2.8vw,2.2rem);letter-spacing:-.02em">Builds something<br>of their <em style="font-style:normal;color:var(--grn)">own</em></div>
+      <p style="color:var(--dim);margin-top:1.2vh;font-size:clamp(.9rem,1.6vw,1.2rem)">AI working for them</p>
+    </div>
+    <div style="background:#0e1613;border:1px solid var(--line);border-radius:18px;padding:clamp(22px,4vh,40px);opacity:.55">
+      <div style="font-weight:800;font-size:clamp(1.3rem,2.8vw,2.2rem);letter-spacing:-.02em">Same job.<br>Same scroll.</div>
+      <p style="color:var(--dim);margin-top:1.2vh;font-size:clamp(.9rem,1.6vw,1.2rem)">wakes up in two years wondering what happened</p>
+    </div>
+  </div>
+  <div class="sub">the gap gets wider every month</div>
+</section>
+
+<!-- 29 · the thesis (v10 B7) -->
+<section class="slide">
+  <div class="big">You talk.<br><em>Jarvis builds.</em></div>
+</section>
+
+<!-- 30 · honest scarcity (v10 B11) -->
+<section class="slide">
+  <div class="big" style="font-size:clamp(1.9rem,5.2vw,4.4rem)">No countdown.<br><em>No fake deadline.</em></div>
+  <div class="sub">When the sponsored spots are used, registration just closes.</div>
+</section>
+
+<!-- 31 · desert caption variant (v10 B7 desert/water lines) -->
+<section class="slide img">
+  <img class="bg" src="/vsl-img/desert-water.png" alt=""><div class="veil"></div>
+  <div class="cap">They <em>need</em> what you have.</div>
+</section>
+
+<div class="counter" id="c"></div>
+<div class="hint">click / arrows · F fullscreen</div>
+
+<script>
+var s=document.querySelectorAll('.slide'),i=0,timers=[];
+function clearTimers(){timers.forEach(clearTimeout);timers=[]}
+function later(fn,ms){timers.push(setTimeout(fn,ms))}
+
+function initSlide(el){
+  clearTimers();
+  var init=el.getAttribute('data-init');
+  if(init==='count157'){
+    var t=document.getElementById('c157'),n=0,target=15.7,steps=40,k=0;
+    var iv=setInterval(function(){k++;var v=(target*(k/steps));
+      t.textContent='$'+v.toFixed(1)+'T';
+      if(k>=steps){t.textContent='$15.7 TRILLION';clearInterval(iv);}},38);
+    timers.push(iv);
+  }
+  if(init==='count266'){
+    var t2=document.getElementById('c266'),steps2=44,k2=0;
+    var iv2=setInterval(function(){k2++;var v=Math.round(2660000*(k2/steps2));
+      t2.textContent=v.toLocaleString();
+      if(k2>=steps2){t2.textContent='2,660,000';clearInterval(iv2);}},34);
+    timers.push(iv2);
+  }
+  if(init==='street'){
+    var shops=[].slice.call(document.querySelectorAll('#street .shopb'));
+    shops.forEach(function(sh){sh.classList.remove('dark')});
+    var order=[3,7,1,9,5,2,8,4,6]; // hero at 0 stays lit
+    order.forEach(function(idx,j){later(function(){shops[idx].classList.add('dark')},700+j*380)});
+  }
+  if(init==='street2'){
+    var taken=document.getElementById('taken'),sub=document.getElementById('takenSub');
+    taken.classList.add('dark');taken.classList.remove('hero');
+    later(function(){taken.classList.remove('dark');taken.classList.add('hero');
+      sub.textContent='someone just took one';},2600);
+  }
+  if(init==='phone'){
+    ['fn1','fn2','fn3'].forEach(function(id,j){
+      var el=document.getElementById(id);
+      el.style.opacity='0';el.style.transform='translateY(-10px)';
+      later(function(){el.style.transition='all .45s ease';el.style.opacity='1';el.style.transform='none'},700+j*1100);
+    });
+  }
+  if(init==='typing'){
+    var txt='Jarvis, build an AI receptionist for Dave’s Plumbing.';
+    var out=document.getElementById('typed'),done=document.getElementById('doneBub');
+    out.textContent='';done.classList.remove('showit');
+    txt.split('').forEach(function(ch,j){later(function(){out.textContent+=ch},350+j*42)});
+    later(function(){done.classList.add('showit')},350+txt.length*42+700);
+  }
+}
+function show(n){i=(n+s.length)%s.length;
+for(var k=0;k<s.length;k++)s[k].classList.toggle('on',k===i);
+document.getElementById('c').textContent=(i+1)+' / '+s.length;
+initSlide(s[i]);}
+document.addEventListener('keydown',function(e){
+  if(e.key==='ArrowRight'||e.key===' '||e.key==='ArrowDown')show(i+1);
+  else if(e.key==='ArrowLeft'||e.key==='ArrowUp')show(i-1);
+  else if(e.key==='f'||e.key==='F'){document.fullscreenElement?document.exitFullscreen():document.documentElement.requestFullscreen();}});
+document.addEventListener('click',function(e){show(e.clientX<window.innerWidth/4?i-1:i+1);});
+var startAt=parseInt(new URLSearchParams(location.search).get('s')||'1',10);
+show(isNaN(startAt)?0:startAt-1);
+</script>
+</body>
+</html>

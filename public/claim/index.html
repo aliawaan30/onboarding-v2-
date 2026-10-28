@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Start Your AI Agency, Free</title>
+<meta name="description" content="Build your own Jarvis, the AI that runs an entire agency for you. The full course is free.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;900&family=IBM+Plex+Mono:wght@400;600&display=swap">
+<style>
+:root{
+  --bg:#0b1210; --bg2:#0e1714; --card:#101b17; --line:#1d2b26;
+  --ink:#f2f5f4; --dim:#9db4ac; --green:#32d09f; --green-deep:#1fa87c;
+  --display:'Archivo',Arial,sans-serif; --mono:'IBM Plex Mono',Menlo,monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--ink);font-family:var(--display);font-weight:500;line-height:1.55;-webkit-font-smoothing:antialiased}
+img{max-width:100%;display:block}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1060px;margin:0 auto;padding:0 20px}
+.eyebrow{font-family:var(--mono);font-size:.86rem;font-weight:600;letter-spacing:.24em;text-transform:uppercase;color:var(--green);margin-bottom:16px}
+h1,h2{font-weight:900;letter-spacing:-.5px;text-wrap:balance}
+h2{font-size:clamp(1.6rem,4.5vw,2.4rem);margin-bottom:14px}
+p.lead{color:var(--dim);max-width:620px}
+section{padding:72px 0}
+.btn{display:inline-block;background:var(--green);color:#04140f;font-weight:900;font-size:1.05rem;padding:16px 30px;border-radius:14px;border:0;cursor:pointer;transition:transform .12s ease}
+.btn:hover{transform:translateY(-2px)}
+.btn.big{font-size:1.15rem;padding:19px 38px}
+.subnote{font-family:var(--mono);font-size:.72rem;color:var(--dim);margin-top:12px;letter-spacing:.06em}
+
+/* nav */
+nav{position:sticky;top:0;z-index:20;background:rgba(11,18,16,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.navin{display:flex;align-items:center;justify-content:space-between;height:62px}
+.logo{display:flex;align-items:center;gap:8px;font-weight:900;font-size:1rem;letter-spacing:.5px}
+.logo .chip{background:var(--green);color:#04140f;border-radius:7px;padding:2px 7px;font-weight:900}
+.navlinks{display:none;gap:26px;font-size:.88rem;color:var(--dim)}
+.navlinks a:hover{color:var(--ink)}
+nav .btn{padding:10px 18px;font-size:.88rem;border-radius:10px}
+@media(min-width:760px){.navlinks{display:flex}}
+
+/* hero */
+.hero{padding:84px 0 40px;text-align:center;background:
+  radial-gradient(60% 50% at 50% 0%,rgba(50,208,159,.10),transparent 70%)}
+.hero h1{font-size:clamp(2.1rem,6.5vw,3.6rem);line-height:1.08;max-width:840px;margin:0 auto 18px}
+.hero h1 em{font-style:normal;color:var(--green)}
+.hero p{color:var(--dim);max-width:640px;margin:0 auto 28px;font-size:1.06rem}
+
+/* stat bar */
+.stats{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;max-width:560px;margin:40px auto 0}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:18px 10px}
+.stat b{display:block;font-size:1.7rem;font-weight:900;color:var(--green)}
+.stat span{font-family:var(--mono);font-size:.68rem;letter-spacing:.08em;color:var(--dim);text-transform:uppercase}
+
+/* vsl */
+.vslbox{max-width:860px;margin:40px auto 0;background:#000;border:1px solid var(--line);border-radius:18px;overflow:hidden;aspect-ratio:16/9;display:flex;align-items:center;justify-content:center;position:relative}
+.vslbox .poster{text-align:center;color:var(--dim)}
+.vslbox .poster .play{width:74px;height:74px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;margin:0 auto 14px;font-size:1.6rem;color:#04140f}
+.vslbox iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+.scarcity{max-width:720px;margin:26px auto 0;font-family:var(--mono);font-size:.8rem;color:var(--dim);text-align:center;line-height:1.7}
+.scarcity b{color:var(--ink)}
+
+/* steps */
+.steps{display:grid;gap:16px;margin-top:36px}
+@media(min-width:820px){.steps{grid-template-columns:repeat(3,1fr)}}
+.step{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:26px 22px}
+.step .tag{font-family:var(--mono);font-size:.68rem;letter-spacing:.18em;color:var(--green);text-transform:uppercase;margin-bottom:12px}
+.step h3{font-size:1.2rem;font-weight:900;margin-bottom:10px}
+.step p{color:var(--dim);font-size:.94rem}
+.step ul{list-style:none;margin-top:14px}
+.step li{font-size:.86rem;color:var(--dim);padding:5px 0 5px 24px;position:relative}
+.step li::before{content:'✓';position:absolute;left:0;color:var(--green);font-weight:700}
+
+/* stack */
+.stack{display:grid;gap:12px;margin-top:34px}
+.item{display:flex;gap:16px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 22px}
+.item .dot{flex:0 0 auto;width:34px;height:34px;border-radius:10px;background:rgba(50,208,159,.14);color:var(--green);display:flex;align-items:center;justify-content:center;font-weight:900}
+.item b{display:block;font-size:1.02rem}
+.item span{color:var(--dim);font-size:.9rem}
+
+/* letter */
+.letter{max-width:760px;margin:36px auto 0;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:36px 30px}
+@media(min-width:700px){.letter{display:grid;grid-template-columns:180px 1fr;gap:28px;align-items:start}.letter .polframe{margin:6px 0 0}}
+.letter p{margin-bottom:16px;color:var(--dim)}
+.letter p b{color:var(--ink)}
+.letter .sig{font-family:var(--mono);font-size:.8rem;color:var(--green);margin-top:6px;margin-bottom:0}
+
+/* proof */
+.proofgrid{display:grid;gap:16px;margin-top:34px}
+@media(min-width:760px){.proofgrid{grid-template-columns:1.4fr 1fr;align-items:center}}
+.proofimg{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.prooftxt p{color:var(--dim);margin-bottom:14px}
+.prooftxt p b{color:var(--ink)}
+
+/* modules */
+.mods{display:grid;gap:10px;margin-top:34px}
+@media(min-width:700px){.mods{grid-template-columns:1fr 1fr}}
+.mod{display:flex;gap:14px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:15px 18px}
+.mod .n{font-family:var(--mono);font-size:.72rem;color:var(--green);flex:0 0 44px}
+.mod span{font-size:.94rem}
+
+/* faq */
+.faq{max-width:720px;margin:34px auto 0}
+details{border-bottom:1px solid var(--line);padding:18px 0}
+summary{cursor:pointer;font-weight:700;font-size:1rem;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::after{content:'+';color:var(--green);font-weight:900}
+details[open] summary::after{content:'–'}
+details p{color:var(--dim);margin-top:12px;font-size:.94rem}
+
+/* register / closed */
+.register{text-align:center;background:
+  radial-gradient(60% 60% at 50% 100%,rgba(50,208,159,.10),transparent 70%)}
+.closedbox{display:none;max-width:560px;margin:0 auto;background:var(--card);border:1px solid var(--line);border-radius:18px;padding:34px 26px}
+.closedbox b{font-size:1.2rem}
+.closedbox p{color:var(--dim);margin-top:10px;font-size:.94rem}
+body.closed .openonly{display:none}
+body.closed .closedbox{display:block}
+
+
+.pkg{max-width:640px;margin:34px auto 0;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:28px 26px}
+.pkgrow{display:flex;justify-content:space-between;align-items:center;gap:14px;padding:15px 0;border-bottom:1px solid var(--line)}
+.pkgrow b{display:block;font-size:.98rem}
+.pkgrow span{color:var(--dim);font-size:.82rem}
+.pkgrow i{font-family:var(--mono);font-style:normal;font-size:.8rem;color:var(--green);background:rgba(50,208,159,.12);border:1px solid rgba(50,208,159,.3);padding:4px 10px;border-radius:99px;white-space:nowrap}
+.pkgtotal{display:flex;justify-content:space-between;align-items:center;padding:20px 0 0}
+.pkgtotal span{font-family:var(--mono);font-size:.85rem;color:var(--dim);letter-spacing:.08em}
+.pkgtotal s{color:var(--ink)}
+.pkgtotal b{font-size:1.9rem;font-weight:900;color:var(--green)}
+.pkgnote{font-family:var(--mono);font-size:.72rem;color:var(--dim);margin-top:10px;letter-spacing:.05em}
+
+.showgrid{display:grid;gap:18px;margin-top:34px}
+@media(min-width:760px){.showgrid{grid-template-columns:1fr 1fr}}
+.showcard{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+.showcard video{width:100%;display:block;background:#000;aspect-ratio:16/9}
+.showcard figcaption{padding:14px 18px;color:var(--dim);font-size:.9rem}
+.polframe{width:150px;border:6px solid #fff;border-radius:4px;transform:rotate(-2.5deg);box-shadow:0 14px 30px -12px rgba(0,0,0,.6);margin:0 0 20px}
+
+.proofstrip{display:grid;gap:16px;margin-top:34px}
+@media(min-width:760px){.proofstrip{grid-template-columns:1fr 1fr}.proofstrip .proofwide{grid-column:1/-1}}
+.proofstrip .proofimg img{width:100%}
+footer{border-top:1px solid var(--line);padding:34px 0;text-align:center;font-family:var(--mono);font-size:.7rem;color:var(--dim);letter-spacing:.06em}
+</style>
+</head>
+<body>
+
+<nav><div class="wrap navin">
+  <a class="logo" href="#top"><span class="chip">AI</span> AGENCY</a>
+  <div class="navlinks">
+    <a href="#how">How It Works</a>
+    <a href="#included">What's Included</a>
+    <a href="#faq">FAQ</a>
+  </div>
+  <a class="btn openonly" href="/jarvis-aiagency/">Claim Free Jarvis</a>
+</div></nav>
+
+<header class="hero" id="top"><div class="wrap">
+  <div class="eyebrow">A free course · Start Your AI Agency</div>
+  <h1>Build your own <em>Jarvis</em>. The AI that runs an entire agency for you.</h1>
+
+  <div class="vslbox" id="vsl" style="margin-top:30px">
+    <div class="poster" id="vslposter">
+      <div class="play">▶</div>
+      <div style="font-family:var(--mono);font-size:.78rem;letter-spacing:.1em">WATCH: HOW THIS WORKS</div>
+    </div>
+  </div>
+
+  <div style="margin-top:26px">
+    <a class="btn big openonly" href="/jarvis-aiagency/">Claim Your Free Jarvis + Course →</a>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><b>3</b><span>ready-to-sell AI services</span></div>
+    <div class="stat"><b>$5,500</b><span>full AI agency course, free</span></div>
+  </div>
+
+</div></header>
+
+<section id="how"><div class="wrap">
+  <div class="eyebrow">How it works</div>
+  <h2>Three steps to your first client.</h2>
+  <p class="lead">No coding, no experience, no five-grand mentorship. A super agent that builds the whole thing in front of you, and the playbook to sell it.</p>
+  <div class="steps">
+    <div class="step">
+      <div class="tag">Step one · 30 minutes</div>
+      <h3>Build your Jarvis.</h3>
+      <p>Copy, paste, done in 30 minutes.</p>
+      <ul><li>Nothing technical</li><li>Yours for good</li><li>Runs the whole course with you</li></ul>
+    </div>
+    <div class="step">
+      <div class="tag">Step two · Pick one service</div>
+      <h3>Jarvis builds it.</h3>
+      <p>Pick one service. Jarvis builds the real thing clients pay for.</p>
+      <ul><li>Real, working services</li><li>Built in front of you</li><li>Businesses already buy these</li></ul>
+    </div>
+    <div class="step">
+      <div class="tag">Step three · Land the client</div>
+      <h3>Sell it with Jarvis.</h3>
+      <p>Fresh leads every night. Jarvis preps the call. You press the button.</p>
+      <ul><li>Fresh leads daily, on autopilot</li><li>Scripts and objections handled</li><li>Proposal and invoice included</li></ul>
+    </div>
+  </div>
+</div></section>
+
+<section id="included" style="background:var(--bg2)"><div class="wrap">
+  <div class="eyebrow">Your package</div>
+  <h2>The full stack. Zero to start.</h2>
+  <p class="lead">Not a gated preview. Every build, prompt, script and system I use, in the order you need them.</p>
+  <div class="pkg">
+    <div class="pkgrow"><div><b>The full AI Agency course</b><span>From nothing to your first paying client</span></div><i>$2,000</i></div>
+    <div class="pkgrow"><div><b>Your own Jarvis, set up step by step</b><span>The super agent that runs it all for you</span></div><i>$2,000</i></div>
+    <div class="pkgrow"><div><b>3 ready-to-sell AI services</b><span>AI websites, an AI receptionist, property video walkthroughs</span></div><i>$1,000</i></div>
+    <div class="pkgrow"><div><b>Word-for-word sales scripts</b><span>Exactly what to say to land the client</span></div><i>$500</i></div>
+    <div class="pkgtotal"><span>TOTAL VALUE <s>$5,500</s></span><b>FREE</b></div>
+    <p class="pkgnote">This will not be free forever. When the spots are used, it closes.</p>
+    <div style="text-align:center;margin-top:20px"><a class="btn big openonly" href="/jarvis-aiagency/">Claim Your Free Jarvis + Course →</a></div>
+  </div>
+</div></section>
+
+<!-- CRM SHOWCASE SLOT: waiting on the Lead CRM screenshot from Blake -->
+
+<section><div class="wrap">
+  <div class="eyebrow">A note from Blake</div>
+  <h2 style="text-align:center">Wait. What's the catch?</h2>
+  <div class="letter">
+    <img class="polframe" src="/vsl-img/blake-founder.jpg" alt="Blake">
+    <div class="lettertxt">
+    <p><b>How is all of this free?</b> Look, I know what you're thinking. Nobody hands over their whole business system for nothing. So let me spill it.</p>
+    <p>This entire course, your Jarvis included, runs on one platform: Base44. When you build on it, <b>Base44 pays me as a partner.</b> You'd need that to run your own AI agency no matter who taught you, and that subscription money doesn't come to me either way.</p>
+    <!-- SPONSORSHIP VARIANT (gated on Base44 confirmation, do not publish until true):
+    <p>Then Base44, the platform I literally built Jarvis on, came to me and offered to sponsor this course. They foot the bill. They pay me to bring people like you in and actually get you building.</p>
+    -->
+    <p>Which means <b>I only get paid if you actually build something and use it.</b> If you register and quit, I get nothing. Zero. There's no upsell at the end, no five-thousand-dollar mastermind hiding behind the last module. There is nothing of mine to buy.</p>
+    <p>The only way this works for me is if you win. Go and find me another free course that can say that.</p>
+    <p class="sig">— Blake · founder, AI Agency</p>
+    </div>
+  </div>
+</div></section>
+
+<section style="background:var(--bg2)"><div class="wrap">
+  <div class="eyebrow">Why listen to me</div>
+  <h2>Three years. Six figures in profit, not revenue.</h2>
+  <div class="proofstrip">
+    <div class="proofimg"><img src="/vsl-img/proof/cb-pub-multi.png" alt="Client payments landing" loading="lazy"></div>
+    <div class="proofimg"><img src="/vsl-img/proof/stripe-payments.png" alt="Stripe client payments, all succeeded" loading="lazy"></div>
+    <div class="proofimg proofwide"><img src="/vsl-img/proof/cb-pub-11000.png" alt="An $11,000 client payment" loading="lazy"></div>
+  </div>
+  <div class="proofgrid" style="display:block;max-width:640px">
+    <div class="prooftxt">
+      <p>I've sold AI services to local businesses for three years. <b>The hard way:</b> all-nighters, wiring every system by hand, learning what business owners actually pay for.</p>
+      <p>Then I built Jarvis, and the entire job got done for me. <b>This course is that exact system</b>, handed over in order, with your own Jarvis doing the heavy lifting.</p>
+    </div>
+  </div>
+</div></section>
+
+<section id="faq" style="background:var(--bg2)"><div class="wrap">
+  <div class="eyebrow">FAQ</div>
+  <h2>Straight answers.</h2>
+  <div class="faq">
+    <details open><summary>Is it actually free?</summary><p>Yes. And I get why that's hard to believe, so here's the whole picture.</p><p>The course, the Jarvis build, the three services, the sales scripts, every bit of it is free. There's no locked half, no premium tier, no upsell waiting at the end. There is nothing of mine to buy.</p><p>The only money you'll ever spend is the platform subscription your own Jarvis runs on, and you'd need that to run your own AI agency no matter who taught you. That money goes to the platform, not to me. I only make anything if you actually build on it and use it, which is exactly why I want you to win.</p></details>
+    <details><summary>What do I need to start?</summary><p>A laptop, a phone, and roughly $150 to get your Jarvis set up and running on its platform. If you can copy and paste, you're qualified.</p></details>
+    <details><summary>I have zero experience. Is that a problem?</summary><p>No. Every step is copy and paste, in order, and your Jarvis does the building. The course was written for someone starting from nothing.</p></details>
+    <details><summary>What's the catch?</summary><p>Base44 pays me as a partner when you build on their platform, and only if you actually build and use it. If you register and do nothing, I make nothing. That's the whole model. Nothing of mine to buy, ever.</p></details>
+    <details><summary>Why is registration limited?</summary><p>The platform sponsors a set number of people through the course. When those spots are used, registration closes.</p></details>
+    <details><summary>How long until I can land a client?</summary><p>Realistically you can land a client in your first day, but generally it takes 5 to 7 days to land your first client. Your Jarvis is built in about 30 minutes, and your leads list runs from the very first night.</p></details>
+  </div>
+</div></section>
+
+<section class="register" id="register"><div class="wrap">
+  <div class="eyebrow">Claim it</div>
+  <h2>Your Jarvis is waiting.</h2>
+  <p class="lead" style="margin:0 auto 28px;text-align:center">If the button below still works, there are still spots.</p>
+  <div class="openonly">
+    <a class="btn big" href="/jarvis-aiagency/">Claim Your Free Jarvis + Course →</a>
+  </div>
+  <div class="closedbox">
+    <b>Spots are gone. It's closed.</b>
+    <p>The current spots are used. If more open up, the button comes back. There's no waitlist behind the waitlist, sorry.</p>
+  </div>
+</div></section>
+
+<footer><div class="wrap">AI AGENCY · START YOUR AI AGENCY, A FREE COURSE</div></footer>
+
+<script>
+// ---- switches ----
+var REGISTRATION_OPEN = true;   // false = every CTA swaps to the closed state
+var VSL_URL = "";               // paste the video embed URL here when it exists
+
+if(!REGISTRATION_OPEN){ document.body.classList.add('closed'); }
+if(VSL_URL){
+  var box = document.getElementById('vsl');
+  box.innerHTML = '<iframe src="' + VSL_URL + '" allow="autoplay; fullscreen" allowfullscreen></iframe>';
+}
+</script>
+</body>
+</html>

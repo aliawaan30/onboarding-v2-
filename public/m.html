@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0e1512">
+<title>The AI Agency — contents</title>
+<style>
+:root{
+  --grn:#32d09f; --vio:#8b5cf6;
+  --ink:#0e1512; --mut:#5f6d67; --line:#e3e9e6; --bg:#fbfcfb; --card:#fff;
+  --body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",Roboto,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--body);
+  font-size:16px;line-height:1.5;padding-bottom:calc(48px + env(safe-area-inset-bottom))}
+
+header{background:var(--ink);color:#fff;padding:calc(22px + env(safe-area-inset-top)) 20px 22px}
+header .kick{font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--grn);font-weight:700}
+header h1{margin:8px 0 6px;font-size:22px;line-height:1.25;letter-spacing:-.02em}
+header p{margin:0;font-size:13.5px;color:#9db0a8}
+header .nums{margin-top:14px;display:flex;gap:18px;font-size:11px;letter-spacing:.06em;
+  text-transform:uppercase;color:#7d908a}
+header .nums b{display:block;font-size:17px;color:#fff;letter-spacing:-.01em;text-transform:none}
+
+.wrap{max-width:640px;margin:0 auto;padding:0 14px}
+
+.mod{margin-top:26px}
+.mod-h{display:flex;align-items:baseline;gap:9px;padding:0 6px 9px}
+.mod-h .n{font-size:11px;font-weight:800;letter-spacing:.1em;color:var(--vio)}
+.mod-h .t{font-size:12.5px;font-weight:700;letter-spacing:.02em;color:var(--mut);
+  text-transform:uppercase}
+
+ul{list-style:none;margin:0;padding:0;background:var(--card);
+  border:1px solid var(--line);border-radius:14px;overflow:hidden}
+li+li{border-top:1px solid var(--line)}
+a.pg{display:flex;align-items:center;gap:13px;min-height:60px;padding:13px 15px;
+  text-decoration:none;color:var(--ink)}
+a.pg:active{background:#f1f6f4}
+a.pg .ltr{flex:none;width:27px;height:27px;border-radius:8px;background:#eef4f1;
+  color:var(--mut);font-size:11.5px;font-weight:800;display:flex;align-items:center;
+  justify-content:center;text-transform:uppercase}
+a.pg .ttl{flex:1;font-size:14.5px;line-height:1.35;letter-spacing:-.01em}
+a.pg .go{flex:none;color:#c2cec9;font-size:17px}
+li:first-child a.pg .ltr{background:var(--grn);color:#06231a}
+
+footer{padding:34px 20px 14px;text-align:center;color:var(--mut);font-size:12.5px}
+footer a{color:var(--vio);font-weight:600}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="kick">Review build</div>
+  <h1>The AI Agency</h1>
+  <p>Every page, in order. Tap any one to read it.</p>
+  <div class="nums">
+    <div><b>8</b>modules</div>
+    <div><b>34</b>pages</div>
+    <div><b>210</b>prompts</div>
+  </div>
+</header>
+
+<div class="wrap" id="out"></div>
+
+<footer>
+  Notes go to Telegram.<br>
+  <a href="/hub/index.html">Open the full hub</a>
+</footer>
+
+<script>
+var MODULES = [
+ ["M1","What an AI agency is",[
+   ["courses/m1/index.html","Every business near you needs AI, and almost none of them have it"]]],
+ ["M2","Build your business",[
+   ["courses/business/business-a.html","Nobody buys from somebody who says they do a bit of everything"],
+   ["courses/business/business-b.html","Build your website"],
+   ["courses/business/business-c.html","Your offer, contact and getting paid"],
+   ["courses/business/business-d.html","Go live"]]],
+ ["M3","Find your leads",[
+   ["courses/leads/leads-a.html","Your AI Goes Out and Finds the Customers"],
+   ["courses/leads/leads-c.html","Build Your Lead CRM"],
+   ["courses/leads/leads-d.html","Find Businesses With No Website"],
+   ["courses/leads/leads-e.html","Find Businesses Missing Calls"],
+   ["courses/leads/leads-f.html","Find Agents With Listings and No Video"],
+   ["courses/leads/leads-g.html","Let It Run Every Night"]]],
+ ["M4","AI Websites",[
+   ["courses/websites/websites-a.html","Why every business needs a website"],
+   ["courses/websites/websites-b.html","Build the Website"]]],
+ ["M9","Premium Websites",[
+   ["courses/premium/premium-a.html","The Same Afternoon, Ten Times the Money"],
+   ["courses/premium/premium-b.html","Load the Skill and Write the Brief"],
+   ["courses/premium/premium-c.html","Make the Media in Envato"],
+   ["courses/premium/premium-d.html","Build the Site"],
+   ["courses/premium/premium-e.html","Check It, Then Hand It Over"]]],
+ ["M5","AI Walkthrough Videos",[
+   ["courses/walkthroughs/walkthroughs-a.html","Agents Pay Hundreds for One Video, Then Wait a Week"],
+   ["courses/walkthroughs/walkthroughs-b.html","Build the App"],
+   ["courses/walkthroughs/walkthroughs-c.html","Finish the App"],
+   ["courses/walkthroughs/walkthroughs-d.html","Make Your First Video"]]],
+ ["M6","AI Receptionists",[
+   ["courses/receptionists/receptionists-a.html","Every missed call is a job that went to someone else"],
+   ["courses/receptionists/receptionists-b.html","Build The Booking Engine"],
+   ["courses/receptionists/receptionists-c.html","Build The Receptionist"],
+   ["courses/receptionists/receptionists-d.html","Give It A Real Number"]]],
+ ["M7","The calls",[
+   ["courses/calls/calls-a.html","The whole business comes down to one conversation"],
+   ["courses/calls/calls-b.html","The Cold Call"],
+   ["courses/calls/calls-c.html","The Meeting"]]],
+ ["M8","Deliver and repeat",[
+   ["courses/deliver/deliver-a.html","Getting the client is the hard part. Keeping them is the profitable part"],
+   ["courses/deliver/deliver-b.html","Hand It Over"],
+   ["courses/deliver/deliver-c.html","Get Paid"],
+   ["courses/deliver/deliver-d.html","Proof And Referrals"],
+   ["courses/deliver/deliver-e.html","Charge More, And Keep It Running"]]]
+];
+
+var LTR = "abcdefg";
+var out = document.getElementById('out');
+var h = '';
+for (var i = 0; i < MODULES.length; i++) {
+  var m = MODULES[i];
+  h += '<div class="mod"><div class="mod-h"><span class="n">' + m[0] +
+       '</span><span class="t">' + m[1] + '</span></div><ul>';
+  for (var j = 0; j < m[2].length; j++) {
+    var p = m[2][j];
+    var badge = m[2].length === 1 ? '1' : LTR.charAt(j);
+    h += '<li><a class="pg" href="/' + p[0] + '">' +
+         '<span class="ltr">' + badge + '</span>' +
+         '<span class="ttl">' + p[1] + '</span>' +
+         '<span class="go">&rsaquo;</span></a></li>';
+  }
+  h += '</ul></div>';
+}
+out.innerHTML = h;
+</script>
+
+</body>
+</html>

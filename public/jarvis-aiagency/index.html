@@ -1,0 +1,640 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Build Your AI Agency</title>
+<meta name="description" content="Get your own Jarvis to build your AI agency.">
+<meta property="og:title" content="Get your own Jarvis to build your AI agency.">
+<meta property="og:description" content="Watch the video, then register.">
+<meta name="theme-color" content="#07090c">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Instrument+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#07090c;
+  --ink:#f2f5f4;
+  --muted:#c3cdcf;
+  --line:#39454b;
+  --field:#0d1116;
+  --accent:#32d09f;
+  --accent-glow:rgba(50,208,159,.18);
+  --display:"Bricolage Grotesque",system-ui,-apple-system,sans-serif;
+  --body:"Instrument Sans",system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;padding:0;height:100%}
+body{
+  background:var(--bg);
+  color:var(--ink);
+  font-family:var(--body);
+  min-height:100dvh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px 22px calc(28px + env(safe-area-inset-bottom));
+  overflow:hidden;
+  position:relative;
+}
+/* ambient light, the only decoration */
+.glow{position:fixed;inset:0;pointer-events:none;z-index:0}
+.glow::before,.glow::after{content:"";position:absolute;border-radius:50%;filter:blur(90px)}
+.glow::before{
+  width:min(78vw,560px);height:min(78vw,560px);
+  top:-22%;left:50%;transform:translateX(-50%);
+  background:radial-gradient(circle,var(--accent-glow) 0%,rgba(50,208,159,.05) 45%,transparent 70%);
+}
+.glow::after{
+  width:min(90vw,680px);height:min(60vw,420px);
+  bottom:-30%;left:50%;transform:translateX(-50%);
+  background:radial-gradient(circle,rgba(90,120,255,.10) 0%,transparent 68%);
+}
+.grain{position:fixed;inset:0;pointer-events:none;z-index:1;opacity:.035;
+  background-image:radial-gradient(#fff 1px,transparent 1px);background-size:3px 3px}
+
+main{position:relative;z-index:2;width:100%;max-width:440px}
+
+/* video slot. Renders nothing until a URL is set in the script. */
+.vsl{display:none;margin:0 0 24px}
+.vsl.on{display:block}
+.vsl.off{display:none}
+.vsl .frame{
+  position:relative;width:100%;padding-top:56.25%;
+  background:var(--field);
+  border:1px solid var(--line);
+  border-radius:14px;
+  overflow:hidden;
+}
+.vsl .frame iframe{position:absolute;top:0;left:0;width:100%;height:100%;border:0}
+
+h1{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:clamp(2.05rem,8.4vw,2.9rem);
+  line-height:1.05;
+  letter-spacing:-.02em;
+  margin:0 0 30px;
+  text-wrap:balance;
+}
+h1 .hl{color:var(--accent)}
+
+form{display:flex;flex-direction:column;gap:11px}
+/* two step: fields are not there until they tap */
+.fields{
+  display:grid;
+  grid-template-rows:0fr;
+  opacity:0;
+  transition:grid-template-rows .34s cubic-bezier(.2,.7,.3,1), opacity .26s ease;
+}
+.fields>div{overflow:hidden;display:flex;flex-direction:column;gap:11px}
+form.open .fields{grid-template-rows:1fr;opacity:1}
+form.open .fields>div{padding-bottom:0}
+label{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+input{
+  width:100%;
+  font-family:var(--body);
+  font-size:16px; /* never below 16, stops iOS zoom */
+  color:var(--ink);
+  background:var(--field);
+  border:1px solid var(--line);
+  border-radius:13px;
+  padding:16px 17px;
+  outline:none;
+  transition:border-color .16s ease, box-shadow .16s ease, background .16s ease;
+  -webkit-appearance:none;
+  appearance:none;
+}
+input::placeholder{color:#5d686c}
+input:focus{
+  border-color:var(--accent);
+  background:#0f151a;
+  box-shadow:0 0 0 3px rgba(50,208,159,.14);
+}
+button{
+  font-family:var(--display);
+  font-weight:800;
+  font-size:1.02rem;
+  letter-spacing:.01em;
+  color:#04140f;
+  background:var(--accent);
+  border:0;
+  border-radius:13px;
+  padding:17px 20px;
+  margin-top:3px;
+  cursor:pointer;
+  transition:transform .12s ease, filter .16s ease, opacity .16s ease;
+  min-height:54px;
+}
+button:hover{filter:brightness(1.06)}
+button:active{transform:scale(.985)}
+button[disabled]{opacity:.6;cursor:default;transform:none}
+
+.err{
+  margin:12px 2px 0;
+  font-size:.88rem;
+  color:#ff8f7a;
+  min-height:1.1em;
+}
+
+/* success state replaces the card in place */
+.done{display:none;text-align:center;animation:rise .5s cubic-bezier(.2,.7,.3,1) both}
+.done.on{display:block}
+form.off,h1.off{display:none}
+.tick{
+  width:52px;height:52px;border-radius:50%;
+  background:rgba(50,208,159,.12);
+  border:1px solid rgba(50,208,159,.35);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+}
+.tick svg{width:26px;height:26px}
+.done h2{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(1.7rem,7vw,2.2rem);line-height:1.1;
+  letter-spacing:-.02em;margin:0 0 12px;
+}
+.done p{margin:0 auto;color:var(--muted);font-size:1.05rem;line-height:1.55;max-width:32ch}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---- questions ---- */
+.q{display:none;animation:rise .32s cubic-bezier(.2,.7,.3,1) both}
+.q.on{display:block}
+.qhead{
+  font-family:var(--display);font-weight:800;
+  font-size:clamp(1.32rem,5.6vw,1.62rem);line-height:1.2;
+  letter-spacing:-.015em;margin:0 0 18px;text-wrap:balance;
+}
+.opts{display:flex;flex-direction:column;gap:10px}
+.opt{
+  font-family:var(--body);font-size:1rem;font-weight:500;text-align:left;
+  color:var(--ink);background:var(--field);
+  border:1px solid var(--line);border-radius:13px;
+  padding:16px 17px;min-height:54px;cursor:pointer;width:100%;
+  transition:border-color .14s ease, background .14s ease, transform .1s ease;
+}
+.opt:hover{border-color:#5a6a72;background:#111820}
+.opt:active{transform:scale(.99)}
+.opt.picked{border-color:var(--accent);background:rgba(50,208,159,.08)}
+.dots{display:flex;gap:6px;margin:0 0 20px}
+.dots i{width:22px;height:3px;border-radius:2px;background:#1d242a;transition:background .2s ease}
+.dots i.done{background:var(--accent)}
+.phoneerr{
+  color:#ff7a6b;font-family:var(--body);font-size:.82rem;
+  margin:14px 0 0;font-weight:500;
+}
+.phonerow{display:flex;gap:9px}
+.ccwrap{position:relative;flex:0 0 116px}
+select.cc{
+  width:100%;height:100%;font-family:var(--body);font-size:16px;font-weight:500;
+  color:var(--ink);background:var(--field);border:1px solid var(--line);
+  border-radius:13px;padding:16px 30px 16px 15px;min-height:54px;
+  -webkit-appearance:none;appearance:none;outline:none;cursor:pointer;
+  transition:border-color .16s ease, background .16s ease;
+}
+select.cc:focus{border-color:var(--accent);background:#0f151a;box-shadow:0 0 0 3px rgba(50,208,159,.14)}
+.ccwrap::after{
+  content:"";position:absolute;right:14px;top:50%;width:8px;height:8px;
+  border-right:2px solid var(--muted);border-bottom:2px solid var(--muted);
+  transform:translateY(-70%) rotate(45deg);pointer-events:none;
+}
+.phonerow input{flex:1;min-width:0}
+.qsub{color:var(--muted);font-size:1.02rem;line-height:1.5;margin:-8px 0 18px}
+.peek{font-family:var(--mono,Menlo,monospace);font-size:.68rem;letter-spacing:.22em;color:var(--accent);margin:0 0 14px;text-transform:uppercase}
+.qlines p{font-size:1.34rem;font-weight:800;line-height:1.3;margin:0 0 10px;opacity:0;transform:translateY(10px)}
+.q.on .qlines p{animation:rise .45s cubic-bezier(.2,.7,.3,1) forwards}
+.q.on .qlines p:nth-child(2){animation-delay:.45s}
+.q.on .qlines p:nth-child(3){animation-delay:.9s}
+.qlines .g,.qhead .g{color:var(--accent);font-style:normal}
+.q.on .qask{animation:rise .45s cubic-bezier(.2,.7,.3,1) 1.35s both}
+
+/* small celebration, only on the very last screen */
+.pop{position:fixed;inset:0;pointer-events:none;z-index:5;overflow:hidden}
+.pop b{
+  position:absolute;top:-12px;width:7px;height:11px;border-radius:1px;
+  opacity:0;animation:fall 1.5s cubic-bezier(.25,.6,.4,1) forwards;
+}
+@keyframes fall{
+  0%{opacity:0;transform:translate3d(0,0,0) rotate(0deg)}
+  8%{opacity:1}
+  100%{opacity:0;transform:translate3d(var(--dx),105vh,0) rotate(var(--rot))}
+}
+
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important;transition:none !important}
+  .fields{transition:none}
+}
+@media (max-height:620px){
+  h1{margin-bottom:22px}
+  body{padding-top:20px;padding-bottom:20px}
+}
+</style>
+</head>
+<body>
+<div class="glow" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<main>
+  <div class="vsl" id="vsl"></div>
+
+  <h1 id="head">Get your own <span class="hl">Jarvis</span> to build your AI agency.</h1>
+
+  <form id="f" novalidate>
+    <div class="fields" id="fields" aria-hidden="true"><div>
+      <label for="name">Your name</label>
+      <input id="name" name="name" type="text" placeholder="Your name" autocomplete="given-name" autocapitalize="words" tabindex="-1" required>
+
+      <label for="email">Your email</label>
+      <input id="email" name="email" type="email" placeholder="Your email" autocomplete="email" inputmode="email" autocapitalize="off" autocorrect="off" spellcheck="false" tabindex="-1" required>
+
+      <label for="phone">Your number</label>
+      <div class="phonerow">
+        <div class="ccwrap">
+          <select class="cc" id="cc" aria-label="Country code" tabindex="-1"></select>
+        </div>
+        <input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Your number" tabindex="-1" required>
+      </div>
+    </div></div>
+
+    <button id="go" type="submit">Register</button>
+    <p class="err" id="err" role="alert" aria-live="polite"></p>
+  </form>
+
+  <div class="q" id="q1">
+    <div class="dots"><i></i><i></i></div>
+    <div class="peek">Picture this</div>
+    <div class="qlines">
+      <p>Your Jarvis <em class="g">finds the businesses</em>.</p>
+      <p>It <em class="g">builds the exact work</em> you sell them.</p>
+      <p>And it <em class="g">preps every sales call</em> for you.</p>
+    </div>
+    <h2 class="qhead qask">Would you use it?</h2>
+    <div class="opts qask">
+      <button type="button" class="opt" data-v="Yes">Obviously</button>
+      <button type="button" class="opt" data-v="Yes if it actually works">Yes, if it actually works</button>
+      <button type="button" class="opt" data-v="Not sure">Not sure</button>
+    </div>
+  </div>
+
+  <div class="q" id="q2">
+    <div class="dots"><i class="done"></i><i></i></div>
+    <div class="peek">The course is 100% free</div>
+    <h2 class="qhead">Do you have at least <em class="g">$50</em> to get your <em class="g">Jarvis</em> set up and running your entire AI agency?</h2>
+    <p class="qsub">That covers the platform your Jarvis runs on. None of it comes to me.</p>
+    <div class="opts">
+      <button type="button" class="opt" data-v="Yes ready">Yes, I'm ready</button>
+      <button type="button" class="opt" data-v="Not right now">Not right now</button>
+    </div>
+  </div>
+
+
+  <div class="done" id="done">
+    <div class="tick" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#32d09f" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5 9.5 18 20 6.5"/></svg>
+    </div>
+    <h2>You're in the running.</h2>
+    <p id="donesub">If you qualify, you hear from us on this number first. Watch your phone.</p>
+  </div>
+
+</main>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------- the video
+  // Paste the Loom share link between the quotes and the player appears.
+  // Example: https://www.loom.com/share/abc123
+  // Leave it empty and the page shows no video at all.
+  var VSL_URL = "";
+
+  (function(){
+    var slot = document.getElementById('vsl');
+    var raw = (VSL_URL || '').trim();
+    if(!slot || !raw) return;
+    var src = raw;
+    var m = raw.match(/loom\.com\/(?:share|embed)\/([A-Za-z0-9]+)/);
+    if(m) src = 'https://www.loom.com/embed/' + m[1];
+    slot.innerHTML = '<div class="frame"><iframe src="' + src + '" title="Watch this first" ' +
+      'frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe></div>';
+    slot.classList.add('on');
+  })();
+
+  var GHL_HOOK = "https://services.leadconnectorhq.com/hooks/5ScFByVzgeiOD3WsNptM/webhook-trigger/d6fb8bfa-6adb-4806-afbb-5546034c0b54";
+  var ghlSent = false;
+  // Fire the new lead straight into GHL. form-urlencoded is a CORS-simple body
+  // GHL parses natively (text/plain silently failed before), so the request
+  // lands even though we cannot read the cross-origin response. Once per lead.
+  function pushGHL(name, email, phone, hot){
+    if(ghlSent || !email) return;
+    ghlSent = true;
+    try{
+      var b = 'name=' + encodeURIComponent(name || 'Lead') +
+              '&email=' + encodeURIComponent(email) +
+              '&phone=' + encodeURIComponent(phone || '') +
+              '&source=' + encodeURIComponent('jarvis-waitlist') +
+              '&tag=' + encodeURIComponent(hot ? 'yes-50-hot' : 'organic-waitlist');
+      fetch(GHL_HOOK, { method:'POST', mode:'no-cors',
+        headers:{'Content-Type':'application/x-www-form-urlencoded'},
+        body:b, keepalive:true }).catch(function(){});
+    }catch(e){}
+  }
+  var URL_ = "https://klyiqncsgxcrbdgonaaj.supabase.co";
+  var KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtseWlxbmNzZ3hjcmJkZ29uYWFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU0MjkxMTQsImV4cCI6MjA5MTAwNTExNH0.WuM-vY6LBoNF2XiQJG2YX5CDOa-AWVGlhobfeuBOLl8";
+
+  var opened = false;
+  var fields = document.getElementById('fields');
+  var f = document.getElementById('f'),
+      head = document.getElementById('head'),
+      done = document.getElementById('done'),
+      vsl = document.getElementById('vsl'),
+      err = document.getElementById('err'),
+      go = document.getElementById('go');
+
+  function bad(m){ err.textContent = m; }
+
+  f.addEventListener('submit', function(e){
+    e.preventDefault();
+    bad('');
+
+    // step one: the tap that opens the form. Focus must happen inside the
+    // gesture or iOS will not raise the keyboard.
+    if(!opened){
+      opened = true;
+      f.classList.add('open');
+      fields.setAttribute('aria-hidden','false');
+      var n = document.getElementById('name');
+      var em = document.getElementById('email');
+      n.removeAttribute('tabindex'); em.removeAttribute('tabindex');
+      var ph0 = document.getElementById('phone'); if(ph0) ph0.removeAttribute('tabindex');
+      var cc0 = document.getElementById('cc'); if(cc0) cc0.removeAttribute('tabindex');
+      try{ n.focus({preventScroll:true}); }catch(e0){ n.focus(); }
+      return;
+    }
+
+    var name = document.getElementById('name').value.trim();
+    var email = document.getElementById('email').value.trim().toLowerCase();
+
+    if(!name){ bad('Add your name.'); return; }
+    if(!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)){ bad("That email doesn't look right."); return; }
+
+    var phoneRaw = document.getElementById('phone').value.trim();
+    if(phoneRaw.replace(/\D/g, '').length < 6){
+      bad('Pop your number in so we can give you a call.');
+      try{ document.getElementById('phone').focus(); }catch(e9){}
+      return;
+    }
+
+    go.disabled = true;
+    go.textContent = 'Registering you...';
+
+    var src = '';
+    try { src = (new URLSearchParams(window.location.search)).get('src') || ''; } catch(e2){}
+
+    fetch(URL_ + '/rest/v1/waitlist', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'apikey': KEY,
+        'Authorization': 'Bearer ' + KEY,
+        'Prefer': 'return=minimal'
+      },
+      body: JSON.stringify({ name: name, email: email, source: src })
+    }).then(function(r){
+      // 409 means this email is already on the list, which is still a win
+      if(r.ok || r.status === 201 || r.status === 204 || r.status === 409){
+        // iOS keeps the viewport shifted while the keyboard is up, which is what
+        // makes the card look like it fell down the page. Blur, then reset.
+        try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e4){}
+        head.classList.add('off');
+        f.classList.add('off');
+        if(vsl) vsl.classList.add('off');
+        JOINED = email; JOINED_NAME = name; SRC = src;
+        // Bank the number immediately. Even if they abandon at q1, this is a
+        // lead we can ring, which is the whole point of the funnel.
+        A.phone = (ccSel && ccSel.value ? ccSel.value + ' ' : '') + phoneRaw.replace(/^0+/, '');
+        logEvent('phone', A.phone);
+        pushGHL(JOINED_NAME, JOINED, A.phone, false);
+        saveAnswers(false);
+        show('q1');
+        window.setTimeout(function(){ try{ window.scrollTo(0,0); }catch(e5){} }, 60);
+        try{ localStorage.setItem('waitlist.joined','1'); }catch(e3){}
+      } else {
+        go.disabled = false; go.textContent = 'Register';
+        bad('That did not go through. Give it another tap.');
+      }
+    }).catch(function(){
+      go.disabled = false; go.textContent = 'Register';
+      bad('No connection. Give it another tap.');
+    });
+  });
+
+  // ---------------------------------------------------------------- questions
+  var JOINED = '', JOINED_NAME = '', SRC = '';
+  var A = { would_use:null, has_capital:null, phone:null };
+  // One pageview per browser: first visit sets a local flag and logs a single
+  // 'pageview' event, repeat visits log nothing. Page CVR = signups / these.
+  try{
+    if(!localStorage.getItem('aia_pv')){
+      localStorage.setItem('aia_pv', '1');
+      var vsrc = '';
+      try{ vsrc = (new URLSearchParams(window.location.search)).get('src') || 'direct'; }catch(e9){ vsrc = 'direct'; }
+      fetch(URL_ + '/rest/v1/waitlist_events', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json','apikey':KEY,'Authorization':'Bearer '+KEY,'Prefer':'return=minimal'},
+        body: JSON.stringify({ email:'visitor', name: Math.random().toString(36).slice(2,10), question:'pageview', answer: vsrc }),
+        keepalive: true
+      }).catch(function(){});
+    }
+  }catch(e8){}
+  var TZ = '', LOCALE = '';
+  try { TZ = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; } catch(e){}
+  try { LOCALE = navigator.language || ''; } catch(e){}
+  var sent = false;
+
+  function show(id){
+    var all = document.querySelectorAll('.q, .done');
+    for(var i=0;i<all.length;i++){ all[i].classList.remove('on'); }
+    var el = document.getElementById(id);
+    if(el) el.classList.add('on');
+    try{ window.scrollTo(0,0); }catch(e){}
+  }
+
+  // Every tap is banked on its own the second it happens, so a half finished
+  // person is still a lead. Append only, and a failure here never stops the UI.
+  function logEvent(question, answer){
+    if(!JOINED || !question || !answer) return;
+    try{
+      fetch(URL_ + '/rest/v1/waitlist_events', {
+        method: 'POST',
+        headers: {
+          'Content-Type':'application/json',
+          'apikey': KEY,
+          'Authorization':'Bearer ' + KEY,
+          'Prefer':'return=minimal'
+        },
+        body: JSON.stringify({
+          email: JOINED,
+          name: JOINED_NAME,
+          question: question,
+          answer: answer
+        }),
+        keepalive: true
+      }).catch(function(){});
+    }catch(e){}
+  }
+
+  // small celebration on the last screen only
+  function celebrate(){
+    try{
+      if(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+      var wrap = document.createElement('div');
+      wrap.className = 'pop';
+      wrap.setAttribute('aria-hidden','true');
+      var cols = ['#32d09f','#32d09f','#5a78ff','#f2f5f4'];
+      for(var i=0;i<26;i++){
+        var b = document.createElement('b');
+        b.style.left = (6 + Math.random()*88) + '%';
+        b.style.background = cols[i % cols.length];
+        b.style.setProperty('--dx', (Math.random()*160 - 80) + 'px');
+        b.style.setProperty('--rot', (Math.random()*720 - 360) + 'deg');
+        b.style.animationDelay = (Math.random()*0.25) + 's';
+        b.style.animationDuration = (1.2 + Math.random()*0.6) + 's';
+        wrap.appendChild(b);
+      }
+      document.body.appendChild(wrap);
+      window.setTimeout(function(){ if(wrap.parentNode) wrap.parentNode.removeChild(wrap); }, 2400);
+    }catch(e){}
+  }
+
+  function saveAnswers(finished, beacon){
+    if(sent && !finished) return;
+    if(!JOINED) return;
+    if(!A.would_use && !A.has_capital && !A.phone) return;
+    sent = true;
+    // Column names must match waitlist_answers exactly or PostgREST 400s
+    // and the row is silently lost. has_capital lives in money_goal; the
+    // table has no timezone/locale columns, so those stay in events only.
+    var body = JSON.stringify({
+      email: JOINED,
+      would_use: A.would_use,
+      money_goal: A.has_capital,
+      phone: A.phone,
+      completed: !!finished,
+      source: SRC
+    });
+    var url = URL_ + '/rest/v1/waitlist_answers';
+    var hdrs = {
+      'Content-Type':'application/json',
+      'apikey': KEY,
+      'Authorization':'Bearer ' + KEY,
+      'Prefer':'return=minimal'
+    };
+    try{
+      fetch(url, { method:'POST', headers:hdrs, body:body, keepalive:true });
+    }catch(e){}
+  }
+
+  // country codes. AU first, then the rest alphabetically.
+  var CC = [
+    ["AU","Australia","+61"],["US","United States","+1"],["GB","United Kingdom","+44"],
+    ["CA","Canada","+1"],["NZ","New Zealand","+64"],["IE","Ireland","+353"],
+    ["IN","India","+91"],["PK","Pakistan","+92"],["BD","Bangladesh","+880"],
+    ["PH","Philippines","+63"],["ID","Indonesia","+62"],["MY","Malaysia","+60"],
+    ["SG","Singapore","+65"],["TH","Thailand","+66"],["VN","Vietnam","+84"],
+    ["ZA","South Africa","+27"],["NG","Nigeria","+234"],["KE","Kenya","+254"],
+    ["GH","Ghana","+233"],["EG","Egypt","+20"],["AE","UAE","+971"],
+    ["SA","Saudi Arabia","+966"],["IL","Israel","+972"],["TR","Turkey","+90"],
+    ["DE","Germany","+49"],["FR","France","+33"],["NL","Netherlands","+31"],
+    ["BE","Belgium","+32"],["ES","Spain","+34"],["PT","Portugal","+351"],
+    ["IT","Italy","+39"],["CH","Switzerland","+41"],["AT","Austria","+43"],
+    ["SE","Sweden","+46"],["NO","Norway","+47"],["DK","Denmark","+45"],
+    ["FI","Finland","+358"],["PL","Poland","+48"],["RO","Romania","+40"],
+    ["GR","Greece","+30"],["CZ","Czechia","+420"],["HU","Hungary","+36"],
+    ["HR","Croatia","+385"],["RS","Serbia","+381"],["MK","North Macedonia","+389"],
+    ["BG","Bulgaria","+359"],["UA","Ukraine","+380"],["BR","Brazil","+55"],
+    ["MX","Mexico","+52"],["AR","Argentina","+54"],["CL","Chile","+56"],
+    ["CO","Colombia","+57"],["PE","Peru","+51"],["JP","Japan","+81"],
+    ["KR","South Korea","+82"],["CN","China","+86"],["HK","Hong Kong","+852"],
+    ["TW","Taiwan","+886"],["LK","Sri Lanka","+94"],["NP","Nepal","+977"]
+  ];
+  var ccSel = document.getElementById('cc');
+  (function(){
+    var html = '';
+    for(var i=0;i<CC.length;i++){
+      html += '<option value="' + CC[i][2] + '" data-iso="' + CC[i][0] + '">' + CC[i][0] + ' ' + CC[i][2] + '</option>';
+    }
+    ccSel.innerHTML = html;
+
+    // guess their country from the phone's own settings, no popup
+    var iso = '';
+    // Timezone first: it tracks where the phone actually is. Locale lies
+    // (an Australian Mac set to en-GB says GB).
+    {
+      var tzMap = {"Australia":"AU","Pacific/Auckland":"NZ","Asia/Kolkata":"IN","Asia/Calcutta":"IN",
+        "Asia/Karachi":"PK","Asia/Manila":"PH","Asia/Jakarta":"ID","Asia/Dubai":"AE",
+        "Africa/Lagos":"NG","Africa/Johannesburg":"ZA","Europe/London":"GB","Europe/Dublin":"IE",
+        "America/Toronto":"CA","America/Vancouver":"CA"};
+      for(var k in tzMap){ if(TZ.indexOf(k) === 0){ iso = tzMap[k]; break; } }
+      if(!iso && TZ.indexOf('America/') === 0) iso = 'US';
+    }
+    if(!iso){
+      try{
+        var l = (navigator.language || '');
+        var m = l.match(/[-_]([A-Za-z]{2})$/);
+        if(m) iso = m[1].toUpperCase();
+      }catch(e){}
+    }
+    if(iso){
+      var opts = ccSel.options;
+      for(var j=0;j<opts.length;j++){
+        if(opts[j].getAttribute('data-iso') === iso){ ccSel.selectedIndex = j; break; }
+      }
+    }
+  })();
+
+  
+  function wire(qid, field, next){
+    var box = document.getElementById(qid);
+    var btns = box.querySelectorAll('.opt[data-v]');
+    for(var i=0;i<btns.length;i++){
+      (function(b){
+        b.addEventListener('click', function(){
+          A[field] = b.getAttribute('data-v');
+          logEvent(field, A[field]);
+          b.classList.add('picked');
+          // Hot lead: they said yes to the $50. Bank the answer, then send them
+          // straight to the VSL landing page to watch + apply (re-confirm = hot).
+          if(field === 'has_capital' && A[field] === 'Yes ready'){
+            saveAnswers(true);
+            window.setTimeout(function(){ location.href = 'https://theaiagencybuilder.com/?from=waitlist'; }, 220);
+            return;
+          }
+          window.setTimeout(function(){ if(next==='done'){ finish(); } else { show(next); } }, 170);
+        });
+      })(btns[i]);
+    }
+  }
+  wire('q1','would_use','q2');
+  wire('q2','has_capital','done');
+
+  function finish(){
+    // The number is captured on the first card now, so this is just the close.
+    saveAnswers(true);
+    try{ if(document.activeElement && document.activeElement.blur) document.activeElement.blur(); }catch(e){}
+    show('done');
+    celebrate();
+  }
+  // Phone now lives on the first card, so Enter submits the form rather than
+  // jumping to the close.
+  document.getElementById('phone').addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); try{ go.click(); }catch(e10){} }
+  });
+
+  // if they wander off part way through, keep whatever they gave us
+  window.addEventListener('pagehide', function(){ saveAnswers(false, true); });
+  document.addEventListener('visibilitychange', function(){
+    if(document.visibilityState === 'hidden') saveAnswers(false, true);
+  });
+})();
+</script>
+</body>
+</html>

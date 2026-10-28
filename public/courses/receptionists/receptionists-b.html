@@ -1,0 +1,969 @@
+<!doctype html>
+<html lang="en">
+<head>
+<script src="/gate.js"></script>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Module 6: Build The Booking Engine</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600&family=JetBrains+Mono:wght@700&display=swap">
+<style>
+:root{
+  --ground:#ffffff; --ground-2:#f5faf8; --surface:#ffffff; --surface-sunk:#f7fbf9;
+  --ink:#15171d; --ink-2:#3b414f; --ink-3:#6b7280; --ink-4:#9aa0ab;
+  --line:#e6eae8; --line-2:#cfd8d4;
+  --accent:#32d09f; --accent-deep:#14926c; --accent-ink:#052e21;
+  --accent-tint:#e7faf3; --accent-tint-2:#ccf3e5; --accent-line:#90e5c8;
+  --accent2:#8b5cf6; --accent2-deep:#6a3de0; --accent2-tint:#f2edff; --accent2-tint-2:#e2d8fd; --accent2-line:#c9b6f9;
+  --ok:#0f8a55; --ok-tint:#e4f6ed; --warn:#a2560d; --warn-tint:#fdf0e2;
+  --term:#0d1a15; --term-2:#12241c; --term-ink:#8fe9c8; --term-dim:#4d8f76;
+  --radius:18px; --radius-sm:12px;
+  --shadow-sm:0 1px 2px rgba(21,23,29,0.05);
+  --shadow-md:0 1px 2px rgba(21,23,29,0.05),0 8px 24px -12px rgba(21,23,29,0.16);
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(50,208,159,0.4);
+  --display:'Bricolage Grotesque','Instrument Sans',system-ui,sans-serif;
+  --body:'Instrument Sans',system-ui,-apple-system,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,monospace;
+  --ease:cubic-bezier(0.2,0.7,0.3,1);
+  --mod:var(--accent); --mod-deep:var(--accent-deep); --mod-ink:var(--accent-ink);
+  --mod-tint:var(--accent-tint); --mod-tint-2:var(--accent-tint-2); --mod-line:var(--accent-line);
+  --alt:var(--accent2); --alt-deep:var(--accent2-deep); --alt-tint:var(--accent2-tint); --alt-line:var(--accent2-line);
+}
+body.mod-walk{
+  --mod:#8b5cf6; --mod-deep:#6a3de0; --mod-ink:#f4f0ff;
+  --mod-tint:#f2edff; --mod-tint-2:#e2d8fd; --mod-line:#c9b6f9;
+  --alt:#32d09f; --alt-deep:#14926c; --alt-tint:#e7faf3; --alt-line:#90e5c8;
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(139,92,246,0.38);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--ground);color:var(--ink);font-family:var(--body);font-size:17px;line-height:1.6;-webkit-font-smoothing:antialiased;}
+body{min-height:100dvh;background-image:radial-gradient(900px 460px at 12% -180px,rgba(50,208,159,0.10),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(139,92,246,0.09),transparent 66%);background-repeat:no-repeat;background-attachment:fixed;}
+body.mod-walk{background-image:radial-gradient(900px 460px at 12% -180px,rgba(139,92,246,0.11),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(50,208,159,0.09),transparent 66%);}
+::selection{background:var(--mod-tint-2);color:var(--mod-deep);}
+.shell{max-width:768px;margin:0 auto;padding:122px 20px 96px;}
+p{margin:0 0 13px;color:var(--ink-2);}
+ul{padding-left:20px;margin:8px 0 13px;color:var(--ink-2);}
+li{margin-bottom:4px;}
+.muted{color:var(--ink-3);}
+.flag{display:inline-block;background:var(--warn-tint);color:var(--warn);border-radius:6px;padding:1px 8px;font-size:.76rem;font-weight:600;font-family:var(--mono);}
+/* ------- progress rail ------- */
+.progress{position:fixed;top:0;left:0;right:0;z-index:50;background:rgba(255,255,255,0.84);backdrop-filter:saturate(180%) blur(18px);-webkit-backdrop-filter:saturate(180%) blur(18px);border-bottom:1px solid var(--line);}
+.progress-inner{max-width:768px;margin:0 auto;padding:13px 20px 14px;}
+.progress-row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;margin-bottom:10px;}
+.progress-lead{display:flex;align-items:baseline;gap:10px;min-width:0;}
+.progress-count{font-family:var(--mono);font-weight:700;white-space:nowrap;color:var(--mod-deep);font-size:18px;line-height:1;}
+.progress-of{color:var(--ink-4);font-size:13px;}
+.progress-title{font-size:14px;font-weight:600;color:var(--ink-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;}
+.segments{display:flex;gap:5px;}
+.segment{flex:1;height:7px;border-radius:99px;background:var(--ground-2);box-shadow:inset 0 0 0 1px rgba(21,23,29,0.05);position:relative;overflow:hidden;transition:background 480ms var(--ease);}
+.segment::after{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,var(--mod-deep),var(--mod) 65%,var(--alt));transform:scaleX(0);transform-origin:left;transition:transform 520ms var(--ease);}
+.segment.is-filled::after{transform:scaleX(1);}
+.segment.is-current{background:var(--mod-tint-2);}
+.segment.is-current::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.85),transparent);transform:translateX(-100%);animation:sweep 2.2s var(--ease) infinite;}
+@keyframes sweep{to{transform:translateX(100%);}}
+/* ------- hero ------- */
+.hero{margin-bottom:42px;animation:rise 620ms var(--ease) both;}
+.eyebrow{margin:0 0 14px;font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--mod-deep);font-weight:700;display:flex;align-items:center;gap:9px;flex-wrap:wrap;}
+.eyebrow::before{content:'';width:18px;height:2px;border-radius:2px;background:var(--mod);flex:0 0 auto;}
+.hero h1{margin:0 0 12px;font-family:var(--display);font-size:clamp(30px,7.4vw,47px);line-height:1.04;letter-spacing:-0.03em;font-weight:800;color:var(--ink);}
+.hero .lede{font-size:18.5px;color:var(--ink-2);max-width:56ch;}
+.hero-fig{margin:26px 0 4px;padding:20px 18px 14px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-sm);}
+.hero-fig svg{display:block;max-width:100%;height:auto;margin:0 auto;color:var(--ink);}
+.hero-fig figcaption{margin-top:10px;text-align:center;color:var(--ink-3);font-size:.88rem;}
+/* ------- steps + spine ------- */
+.steps{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:18px;}
+.steps>li{position:relative;}
+.steps>li+li::before{content:'';position:absolute;left:41px;top:-19px;width:2px;height:20px;border-radius:2px;background:var(--line-2);transition:background 420ms var(--ease);}
+.steps>li.spine-on+li::before{background:linear-gradient(180deg,var(--mod),var(--mod-line));box-shadow:0 0 8px rgba(50,208,159,0.35);}
+body.mod-walk .steps>li.spine-on+li::before{box-shadow:0 0 8px rgba(139,92,246,0.35);}
+.step{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:24px;scroll-margin-top:108px;box-shadow:var(--shadow-sm);transition:border-color 260ms var(--ease),box-shadow 260ms var(--ease),background 260ms var(--ease),transform 200ms var(--ease);}
+.step:hover{transform:translateY(-1px);}
+.step.is-locked:hover{transform:none;}
+.step.is-locked{background:rgba(255,255,255,0.5);border-style:dashed;box-shadow:none;}
+.step.is-open{border-color:var(--mod-line);box-shadow:var(--shadow-lg);}
+.step.is-done{background:var(--surface-sunk);}
+.step.just-passed{animation:pass-pop 700ms var(--ease);}
+@keyframes pass-pop{0%{transform:scale(1);box-shadow:0 0 0 0 rgba(15,138,85,0.4);}35%{transform:scale(1.012);box-shadow:0 0 0 8px rgba(15,138,85,0.12);}100%{transform:scale(1);box-shadow:0 0 0 16px rgba(15,138,85,0);}}
+/* type edge strips */
+.step.t-build.is-open{border-left:4px solid var(--accent);}
+.step.t-chat.is-open{border-left:4px solid var(--accent2);}
+.step.t-phone.is-open{border-left:4px solid #14926c;}
+.step-head{display:flex;align-items:center;gap:14px;}
+.step-badge{flex:0 0 auto;width:34px;height:34px;display:grid;place-items:center;border-radius:11px;background:var(--ground-2);border:1px solid var(--line);font-family:var(--mono);font-size:14px;font-weight:700;color:var(--ink-3);transition:all 220ms var(--ease);}
+.step.is-locked .step-badge{background:transparent;color:var(--ink-4);border-style:dashed;}
+.step.is-open .step-badge{background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);border-color:transparent;box-shadow:0 4px 12px -4px var(--mod);}
+.step.is-done .step-badge{background:var(--ok-tint);color:var(--ok);border-color:rgba(15,138,85,0.28);}
+.step.is-done .step-badge svg path{stroke-dasharray:22;stroke-dashoffset:22;animation:tickdraw 420ms var(--ease) 120ms forwards;}
+@keyframes tickdraw{to{stroke-dashoffset:0;}}
+.step-heading{flex:1 1 auto;min-width:0;}
+.step-title{margin:0;font-family:var(--display);font-size:20px;line-height:1.22;font-weight:700;letter-spacing:-0.02em;color:var(--ink);}
+.step.is-locked .step-title{color:var(--ink-2);}
+.step-n{font-family:var(--mono);font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-4);display:block;margin-bottom:3px;}
+.step.is-open .step-n{color:var(--mod-deep);}
+.step-chip{flex:0 0 auto;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;letter-spacing:.02em;border-radius:99px;padding:5px 12px;}
+.step-chip.is-open{background:var(--mod-tint);color:var(--mod-deep);border:1px solid var(--mod-line);}
+.step-chip.is-done{background:var(--ok-tint);color:var(--ok);border:1px solid rgba(15,138,85,0.28);}
+.step-chip.is-locked{background:transparent;color:var(--ink-4);border:1px dashed var(--line-2);}
+.step-locked-note{margin:12px 0 0 48px;font-size:14px;color:var(--ink-4);}
+.step-body{margin-top:20px;animation:rise 420ms var(--ease) both;}
+@keyframes rise{from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:none;}}
+/* real-world action ribbon */
+.act{display:inline-flex;align-items:center;gap:8px;background:var(--ground-2);border:1px solid var(--line);border-radius:99px;padding:4px 12px 4px 6px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.12em;color:var(--ink-3);margin:0 0 12px;}
+.act svg{width:20px;height:20px;display:block;color:var(--mod-deep);}
+/* ------- BUILD terminal panels ------- */
+.prompt{position:relative;background:var(--term);border:1px solid #1d3a2e;border-radius:14px;padding:52px 18px 18px;margin:12px 0 14px;font-family:var(--mono);font-size:.85rem;color:var(--term-ink);white-space:pre-wrap;overflow-wrap:break-word;box-shadow:inset 0 1px 0 rgba(255,255,255,0.04),0 10px 26px -14px rgba(13,26,21,0.55);}
+.prompt::before{content:"PASTE INTO BASE44";position:absolute;top:0;left:0;right:0;height:36px;display:flex;align-items:center;padding-left:64px;font-size:.64rem;letter-spacing:.16em;color:var(--term-dim);font-weight:700;font-family:var(--body);background:var(--term-2);border-bottom:1px solid #1d3a2e;border-radius:13px 13px 0 0;}
+.prompt::after{content:'';position:absolute;top:14px;left:18px;width:8px;height:8px;border-radius:50%;background:#2fbf8f;box-shadow:14px 0 0 #f2b84b,28px 0 0 #ef7b6a;}
+/* CHAT bubbles */
+.prompt.chat{background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;color:#3a2a72;box-shadow:var(--shadow-sm);padding:48px 18px 16px;}
+.prompt.chat::before{content:"TO YOUR CO-FOUNDER";background:transparent;border-bottom:1px dashed var(--accent2-line);color:var(--accent2-deep);padding-left:40px;border-radius:15px 15px 0 0;}
+.prompt.chat::after{top:11px;left:16px;width:14px;height:14px;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));box-shadow:none;}
+/* pwrap variants (labelled panels with pre) */
+.pwrap{position:relative;background:var(--accent2-tint);border:1px solid var(--accent2-line);border-radius:16px 16px 16px 5px;padding:48px 18px 16px;margin:12px 0 14px;box-shadow:var(--shadow-sm);}
+.pwrap .plabel{position:absolute;top:0;left:0;right:0;height:34px;display:flex;align-items:center;padding-left:40px;font-size:.64rem;letter-spacing:.16em;color:var(--accent2-deep);font-weight:700;font-family:var(--body);border-bottom:1px dashed var(--accent2-line);margin:0;}
+.pwrap::after{content:'';position:absolute;top:10px;left:16px;width:14px;height:14px;border-radius:50%;background:linear-gradient(180deg,var(--accent2),var(--accent2-deep));}
+.pwrap pre{margin:0;white-space:pre-wrap;word-wrap:break-word;font-family:var(--mono);font-size:.85rem;color:#3a2a72;max-height:340px;overflow-y:auto;}
+/* PHONE frame */
+.pwrap.is-phone{background:#101418;border:1px solid #2a3340;border-radius:26px;padding:64px 22px 22px;box-shadow:0 18px 40px -18px rgba(16,20,24,0.55);}
+.pwrap.is-phone::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:86px;height:18px;border-radius:99px;background:#000;}
+.pwrap.is-phone::after{display:none;}
+.pwrap.is-phone .plabel{position:absolute;top:34px;left:22px;right:22px;height:26px;display:flex;align-items:center;gap:8px;padding-left:16px;font-size:.62rem;letter-spacing:.14em;color:#7ce7c0;border-bottom:1px solid #223229;background:rgba(50,208,159,0.08);border-radius:8px;}
+.pwrap.is-phone .plabel::before{content:'';width:7px;height:7px;border-radius:50%;background:#32d09f;animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.35;}}
+.pwrap.is-phone pre{color:#e8eef2;font-family:var(--body);font-size:.94rem;line-height:1.65;}
+/* copy buttons */
+.copybtn,.copy{position:absolute;top:5px;right:8px;background:var(--surface);border:1px solid var(--line-2);color:var(--ink);border-radius:9px;padding:5px 13px;font-family:var(--body);font-size:.78rem;font-weight:600;cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);z-index:2;}
+.prompt:not(.chat) .copybtn{background:#173026;border-color:#26543f;color:#8fe9c8;}
+.pwrap.is-phone .copy{top:36px;background:#1b2530;border-color:#31404f;color:#cfe0ea;}
+.copybtn:hover,.copy:hover{transform:translateY(-1px);box-shadow:var(--shadow-md);}
+.copybtn.did,.copy.did{background:var(--ok-tint) !important;border-color:rgba(15,138,85,0.35) !important;color:var(--ok) !important;}
+.copybtn:focus-visible,.copy:focus-visible{outline:2px solid var(--alt);outline-offset:2px;}
+/* what-you-should-see mini window */
+.see{position:relative;border:1px solid var(--line);border-left:1px solid var(--line);border-radius:12px;padding:40px 16px 12px;margin:14px 0;color:var(--ink-3);font-size:.95rem;background:var(--surface);box-shadow:var(--shadow-sm);}
+.see::before{content:"WHAT YOU SHOULD SEE";position:absolute;top:0;left:0;right:0;height:30px;display:flex;align-items:center;padding-left:56px;font-size:.62rem;letter-spacing:.15em;font-weight:700;color:var(--ink-4);font-family:var(--body);background:var(--ground-2);border-bottom:1px solid var(--line);border-radius:11px 11px 0 0;}
+.see::after{content:'';position:absolute;top:12px;left:14px;width:6px;height:6px;border-radius:50%;background:var(--line-2);box-shadow:11px 0 0 var(--line-2),22px 0 0 var(--line-2);}
+.see b{color:var(--accent-deep);}
+.callout{background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:var(--radius-sm);padding:16px 20px;margin:14px 0;}
+/* milestone checkpoint cards */
+.step.t-mile{border-width:2px;}
+.step.t-mile.is-open{border-color:transparent;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;box-shadow:var(--shadow-lg);}
+.step.t-mile .step-chip.is-open{background:linear-gradient(120deg,var(--mod-tint),var(--alt-tint));}
+.mile-tag{display:inline-flex;align-items:center;gap:7px;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.15em;color:var(--mod-deep);background:var(--mod-tint);border:1px solid var(--mod-line);border-radius:99px;padding:4px 12px;margin:0 0 12px;}
+.mile-tag svg{width:12px;height:12px;}
+/* file download chips */
+.filechip{display:inline-flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--line-2);border-radius:12px;padding:10px 16px;margin:4px 10px 10px 0;font-family:var(--mono);font-size:.82rem;font-weight:700;color:var(--ink-2);cursor:pointer;box-shadow:var(--shadow-sm);transition:all 160ms var(--ease);}
+.filechip:hover{transform:translateY(-1px);border-color:var(--mod-line);color:var(--mod-deep);box-shadow:var(--shadow-md);}
+.filechip svg{width:17px;height:17px;color:var(--mod-deep);}
+.filechip small{font-family:var(--body);font-weight:500;color:var(--ink-4);}
+/* done button */
+.btn-done{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:15.5px;font-weight:700;cursor:pointer;min-height:48px;padding:12px 18px;width:100%;margin-top:20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--mod);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.btn-done:hover{transform:translateY(-1px);}
+.btn-done:active{transform:translateY(1px) scale(0.995);}
+.btn-done:focus-visible{outline:2px solid var(--alt);outline-offset:3px;}
+/* outro finish card */
+.outro{margin-top:44px;animation:rise 520ms var(--ease) both;background:linear-gradient(var(--surface),var(--surface)) padding-box,linear-gradient(120deg,var(--mod),var(--alt)) border-box;border:2px solid transparent;border-radius:var(--radius);padding:34px 28px;text-align:center;box-shadow:var(--shadow-lg);}
+.finish-badge{width:56px;height:56px;margin:0 auto 14px;border-radius:50%;background:linear-gradient(180deg,var(--mod),var(--mod-deep));display:grid;place-items:center;color:var(--mod-ink);box-shadow:0 10px 24px -10px var(--mod);}
+.finish-badge svg{width:28px;height:28px;}
+.finish-title{margin:0 0 6px;font-family:var(--display);font-size:24px;font-weight:800;letter-spacing:-0.02em;color:var(--ink);}
+.finish-sub{margin:0 0 6px;color:var(--ink-3);font-size:.98rem;}
+.next{display:inline-block;margin-top:16px;background:linear-gradient(180deg,var(--mod),var(--mod-deep));color:var(--mod-ink);font-weight:700;border-radius:12px;padding:13px 24px;text-decoration:none;font-family:var(--display);box-shadow:0 8px 20px -10px var(--mod);}
+.next:hover{transform:translateY(-1px);}
+.nextpage{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-3);font-size:.95rem;}
+.startover{display:block;margin:46px auto 0;background:none;border:none;color:var(--ink-4);font-size:12.5px;font-family:var(--body);cursor:pointer;text-decoration:underline;text-underline-offset:3px;}
+.startover:hover{color:var(--ink-2);}
+@media(prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important;}.segment.is-current::before{display:none;}}
+@media(max-width:600px){.step{padding:18px;}.steps>li+li::before{left:35px;}.shell{padding-top:112px;}}
+
+
+.pwrap.is-skill{padding-bottom:36px;}
+.pwrap.is-skill pre{max-height:220px;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-right:2px;}
+.pwrap.is-skill .sfade{position:absolute;left:1px;right:1px;bottom:1px;height:60px;pointer-events:none;border-radius:0 0 16px 5px;background:linear-gradient(to bottom,rgba(242,237,255,0) 0%,rgba(242,237,255,0.9) 60%,#f2edff 100%);}
+.pwrap.is-skill .shint{position:absolute;left:0;right:0;bottom:10px;text-align:center;font-size:.6rem;letter-spacing:.14em;font-weight:700;font-family:var(--body);color:var(--accent2-deep);opacity:.7;z-index:3;pointer-events:none;}
+.pwrap.is-skill .copy{background:var(--accent2);border-color:var(--accent2-deep);color:#fff;font-weight:700;padding:6px 17px;}
+.pwrap.is-skill .copy:hover{background:var(--accent2-deep);border-color:var(--accent2-deep);}
+@media(max-width:600px){.pwrap.is-skill pre{max-height:190px;font-size:.8rem;}}
+</style>
+<style>
+body.mod-call{
+  --mod:#32d09f; --mod-deep:#14926c; --mod-ink:#052e21;
+  --mod-tint:#e7faf3; --mod-tint-2:#ccf3e5; --mod-line:#90e5c8;
+  --alt:#32d09f; --alt-deep:#14926c; --alt-tint:#e7faf3; --alt-line:#90e5c8;
+  --shadow-lg:0 1px 2px rgba(21,23,29,0.05),0 12px 28px -14px rgba(21,23,29,0.18),0 40px 64px -48px rgba(239,143,46,0.38);
+}
+body.mod-call{background-image:radial-gradient(900px 460px at 12% -180px,rgba(239,143,46,0.11),transparent 68%),radial-gradient(760px 420px at 92% -60px,rgba(50,208,159,0.09),transparent 66%);}
+body.mod-call .steps>li.spine-on+li::before{box-shadow:0 0 8px rgba(239,143,46,0.35);}
+/* screenshot placeholder frame, styled properly */
+figure.vid{margin:16px 0 10px;}figure.vid img{width:100%;display:block;border-radius:var(--radius-sm);border:1px solid var(--line-2);}figure.vid figcaption{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--ink-4);margin-top:8px;}
+figure.shot{margin:14px 0 4px;padding:26px 18px 16px;background:var(--ground-2);border:1px dashed var(--line-2);border-radius:var(--radius-sm);display:flex;flex-direction:column;align-items:center;gap:9px;}
+figure.shot svg{width:26px;height:26px;color:var(--ink-4);}
+figure.shot figcaption{font-family:var(--mono);font-size:.62rem;letter-spacing:.14em;color:var(--ink-4);text-align:center;}
+.helpline{margin-top:26px;padding-top:20px;border-top:1px solid var(--line);color:var(--ink-3);font-size:.95rem;}
+/* ------- complete block ------- */
+.cblock-btn{appearance:none;border:1px solid transparent;border-radius:12px;font-family:var(--body);font-size:16px;font-weight:700;cursor:pointer;min-height:52px;padding:14px 26px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 1px 2px rgba(21,23,29,0.12),0 8px 20px -10px var(--accent,#32d09f);transition:transform 140ms var(--ease),box-shadow 160ms var(--ease);}
+.cblock-btn:hover{transform:translateY(-1px);}
+.cblock-btn:active{transform:translateY(0);}
+.cblock-btn.is-done,.cblock-btn.is-done:hover{background:var(--surface,#ffffff);color:var(--accent-deep,#14926c);border-color:var(--accent-line,#90e5c8);box-shadow:none;cursor:default;transform:none;}
+.outro .cblock-btn{margin:18px auto 0;}
+.outro .next{display:block;width:-moz-fit-content;width:fit-content;margin:14px auto 0;}
+.outro:not(.is-done) .next{background:none;color:var(--ink-3,#6b7280);font-weight:600;font-size:.95rem;padding:9px 14px;box-shadow:none;}
+.outro:not(.is-done) .next:hover{color:var(--ink-2,#3b414f);transform:none;}
+.outro.is-done .next{background:linear-gradient(180deg,var(--accent,#32d09f),var(--accent-deep,#14926c));color:var(--accent-ink,#052e21);box-shadow:0 8px 20px -10px var(--accent,#32d09f),0 0 0 4px var(--accent-tint-2,#ccf3e5);}
+@media (max-width:420px){.cblock-btn{width:100%;}}
+@media (prefers-reduced-motion: reduce){.cblock-btn{transition:none;}}
+</style>
+</head>
+<body class="mod-call">
+<div class="progress"><div class="progress-inner">
+<div class="progress-row">
+<div class="progress-lead"><span class="progress-count"><span id="done-count">0</span><span class="progress-of"> of 9</span></span>
+<span class="progress-title">Module 6 &middot; Page B: Build The Booking Engine</span></div>
+</div>
+<div class="segments"><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span><span class="segment"></span></div>
+</div></div>
+<main class="shell">
+<header class="hero">
+<div class="eyebrow">Module 6 &middot; Page B</div>
+<h1>Build The Booking Engine</h1>
+<p class="lede">Before your receptionist can take a booking, it needs somewhere to put one. So you build that first, and the voice comes after it.</p>
+<p>Nine messages to your co-founder and you have a working booking system. No voice yet. Just the part that remembers.</p>
+</header>
+<ol class="steps">
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">1</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 01</span><span class="step-title-text">Create the Blank App.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>In Base44, create a new app. When it asks what you want, give it only this:</p><div class="prompt">Create an app called "AI Receptionist". Do not build anything inside it. Do not add any pages, tables or features. Just create it with that name and tell me when it is done.</div><p>Do nothing else inside it. Your co-founder builds in there from here on.</p><figure class="shot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="8.5" cy="10" r="1.5"/><path d="M21 16l-5-5-4 4-2-2-4 4"/></svg><figcaption>YOUR APPS SCREEN</figcaption></figure><div class="see"><b>You should see:</b> an empty app called AI Receptionist. Nothing in it. That is exactly right.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">2</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 02</span><span class="step-title-text">Give Your Co-Founder the Booking Skill.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>This is the whole skill sitting in one box. It is the instructions for building the booking side, written once so your co-founder can follow them on every client after this one.</p><p>Tap copy. Paste it. It saves it and confirms.</p><div class="pwrap is-skill"><div class="plabel">THE WHOLE SKILL, ONE COPY</div><button class="copy" onclick="cp(this)">Copy</button><pre>Please create a skill called receptionist-booking-backend. Save the following content as the SKILL.md file in the .agents/skills/receptionist-booking-backend/ directory:
+
+---
+name: receptionist-booking-backend
+description: Builds the booking backend for an AI receptionist inside a Base44 app. Creates the Booking entity, the booking_api function that checks availability and creates bookings, the inbound_call_router function and the retell_webhook function. Run this BEFORE the Retell agent is created, so the tool URLs already exist when the tools are attached.
+---
+
+# Receptionist Booking Backend
+
+## What this skill is for
+
+An AI receptionist needs somewhere to put a booking before it can take one. This
+skill builds that place. You build it first, every time, because the voice agent's
+tools need real working URLs the moment they are attached. Building the agent first
+and the backend second is the single most common way this build breaks.
+
+You build four things inside the owner's Base44 app:
+
+1. The **Booking** entity, the table every booking lands in.
+2. The **booking_api** function, the one endpoint the voice agent calls.
+3. The **inbound_call_router** function, which tells Retell which agent answers.
+4. The **retell_webhook** function, which receives call events after each call.
+
+## Parameters you need before you start
+
+Ask the owner for these and never assume them. Everything in this skill that looks
+like `{THIS}` is filled in from the answers.
+
+- `{APP_NAME}` the Base44 app you are building inside.
+- `{APP_URL}` the app's live base URL, for example `https://your-app.base44.app`.
+  You read this off the app itself. Never reuse a URL from an example.
+- `{CLIENT_TIMEZONE}` the IANA timezone of the client's business, for example
+  `Australia/Brisbane`. This is the client's timezone, not yours, not the server's.
+- `{OPEN_TIME}` and `{CLOSE_TIME}` the hours bookings can be made in.
+- `{SLOT_MINUTES}` how long one booking slot is.
+- `{SERVICE_LIST}` the services the business books.
+- `{RETELL_API_KEY}` stored in the app's secrets, never pasted into a page or a
+  prompt in plain text.
+
+If you do not have one of these, ask one short question and wait. Do not invent a
+default.
+
+## Rule zero: the server decides
+
+Write this down and keep it true through the whole build.
+
+- The agent talks.
+- The knowledge base knows.
+- **The server decides.**
+
+Every date, every validation, every "is that slot free", every write to the
+database happens in `booking_api`, in code, on the server. The language model
+never resolves a date, never checks a calendar, never decides whether a booking is
+valid. If you find yourself putting that logic in a prompt, stop and put it here
+instead.
+
+## Part 1: the Booking entity
+
+Create an entity called `Booking` with exactly these fields:
+
+- `name` (text) the caller's full name
+- `phone` (text) the caller's phone number
+- `address` (text) where the job is
+- `date` (text) the resolved booking date in `YYYY-MM-DD`
+- `time` (text) the booking time in 24 hour `HH:MM`
+- `service` (text) what they need done
+- `status` (choice: pending, confirmed, completed, cancelled. Default: pending)
+
+Optional fields, add them only if the owner asks:
+
+- `notes` (text) anything else the caller said
+- `urgency` (choice: routine, urgent, emergency)
+- `call_id` (text) the Retell call this booking came from
+
+Read the field list back to the owner before you move on.
+
+## Part 2: the booking_api function
+
+One backend function, two actions. The voice agent's two tools both point at it.
+
+### Action: check_availability
+
+Input: `date` (a string that may be the literal word `today`, the literal word
+`tomorrow`, a weekday name, or a `YYYY-MM-DD` date).
+
+What the server does, in this order:
+
+1. Resolve the date. Take the current time in `{CLIENT_TIMEZONE}`. If the input is
+   `today`, that is today's date in that timezone. If it is `tomorrow`, add one
+   day. If it is a weekday name, take the next occurrence of that weekday. If it
+   is already `YYYY-MM-DD`, use it as given.
+2. Reject the past. If the resolved date is before today in `{CLIENT_TIMEZONE}`,
+   return an error that says the date has already gone and asks for another day.
+   Never write a past booking.
+3. Build the day's slots from `{OPEN_TIME}` to `{CLOSE_TIME}` in `{SLOT_MINUTES}`
+   steps.
+4. Remove any slot that already has a Booking on that date with status `pending`
+   or `confirmed`.
+5. Return the resolved date and a short list of free times. Two or three options
+   is plenty. A voice agent reading out fourteen times is unusable.
+
+### Action: create_booking
+
+Input: `name`, `phone`, `address`, `date`, `time`, `service`.
+
+What the server does, in this order:
+
+1. Resolve `date` exactly the way `check_availability` does. Same code path, not
+   a copy.
+2. Reject the past, same rule.
+3. Check the slot is still free. If it is not, return the next two free times so
+   the agent can offer them instead of failing.
+4. Check for a duplicate first: same name, same date, same time already saved
+   means the caller repeated themselves or the agent retried. Return the existing
+   booking instead of writing a second row.
+5. Create the Booking row with status `confirmed`. The agent confirms with the
+   caller on the phone, so there is no pending step in V1.
+6. Return a short confirmation with the resolved date and time in words the agent
+   can say back, for example `Thursday the 11th at 2pm`.
+
+### The message field is the steering wheel
+
+Every response `booking_api` returns carries a `message` field, and that message
+is not for the caller. It is the next instruction to the voice agent. `Booked:
+Sarah tomorrow at 2pm. Read it back once, mention the callout fee, then wrap up`
+tells the agent exactly what to do next. `No slots left on that day. Offer the
+next day` steers it out of a dead end. Write every message as an instruction to
+the agent, never as a raw data dump, and the conversation stays on rails even
+when things go wrong.
+
+### The date rule, stated once so nobody is confused
+
+The agent is told, in its tool descriptions, to pass the caller's words: the
+literal word `today`, the literal word `tomorrow`, or a weekday name. The server
+turns that into a real date. This exists because a voice model has no idea what
+today's date is and will happily guess a date two years in the past. Every date
+lands on the server or it is wrong.
+
+### Signature verification
+
+Retell signs every custom tool request with HMAC-SHA256 and sends it in the
+`X-Retell-Signature` header. `booking_api` verifies that signature against the
+Retell API key held in the app's secrets, and rejects anything that fails. Do this
+before you read the body. Anyone who finds the URL can otherwise write bookings
+into the client's database. Implement the check per Retell's current signature
+docs and prove it with a real call: one call that books successfully WITH
+verification on is the test. `[VERIFY: confirm the exact signature format against
+docs.retellai.com before a client build goes live.]`
+
+### Reference implementation, shaped by a live build
+
+The code below is the working shape from a receptionist that took real bookings
+on real phone calls. Use it as the skeleton and fill every `{PLACEHOLDER}` from
+the owner's answers. The parts that earn their keep: the date resolver that
+accepts the literal words the agent passes, the time normaliser that survives
+"9am" and "midday", the duplicate check, the spoken-friendly times, and error
+responses that always return HTTP 200 with an instruction in `message` (a non-200
+makes the voice agent stall mid-call).
+
+```typescript
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+// booking_api - the one endpoint the voice agent calls.
+Deno.serve(async (req) =&gt; {
+  const headers = { 'Content-Type': 'application/json' };
+  try {
+    let body: any = {};
+    try { body = await req.json(); } catch { /* empty body */ }
+    console.log('booking_api name:', body.name, 'args:', JSON.stringify(body.args));
+
+    const toolName = body.name || body.tool_name || '';
+    const args = body.args || body.parameters || {};
+
+    const TIMEZONE = '{CLIENT_TIMEZONE}';            // e.g. 'Australia/Brisbane'
+    // Every bookable time from {OPEN_TIME} to {CLOSE_TIME} in {SLOT_MINUTES} steps.
+    const SLOTS = ['07:00','08:00','09:00','10:00','11:00','12:00',
+                   '13:00','14:00','15:00','16:00','17:00'];
+    const DEFAULT_SERVICE = '{most common service from SERVICE_LIST}';
+    const WRAP_NOTE = '{one line the agent mentions while wrapping up}';
+
+    const base44 = createClientFromRequest(req);
+
+    // Today's date where the CLIENT is, as YYYY-MM-DD ('en-CA' formats ISO-style).
+    const todayLocal = (): string =&gt;
+      new Date().toLocaleDateString('en-CA', { timeZone: TIMEZONE });
+
+    const normaliseDate = (raw: string): string =&gt; {
+      if (!raw) return '';
+      const s = String(raw).trim().toLowerCase();
+      const today = todayLocal();
+      if (s === 'today' || s === 'now' || s === 'tonight') return today;
+      if (s === 'tomorrow' || s === 'next day' || s === 'tmr') {
+        return new Date(new Date(today + 'T12:00:00Z').getTime()
+          + 24 * 3600 * 1000).toISOString().slice(0, 10);
+      }
+      const WEEKDAYS = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+      const wd = WEEKDAYS.indexOf(s.replace(/^next /, ''));
+      if (wd &gt;= 0) {
+        const t = new Date(today + 'T12:00:00Z');
+        const diff = ((wd - t.getUTCDay()) + 7) % 7 || 7;
+        return new Date(t.getTime() + diff * 24 * 3600 * 1000).toISOString().slice(0, 10);
+      }
+      if (/^\d{4}-\d{2}-\d{2}/.test(s)) return s.slice(0, 10);
+      const parsed = new Date(raw);
+      if (!isNaN(parsed.getTime())) {
+        const iso = parsed.toISOString().slice(0, 10);
+        return iso &lt; today ? '' : iso;
+      }
+      return '';
+    };
+
+    // "9am", "9:00 AM", "midday" -&gt; "09:00"
+    const normaliseTime = (raw: string): string =&gt; {
+      if (!raw) return '';
+      const s = String(raw).trim().toLowerCase();
+      if (s === 'midday' || s === 'noon') return '12:00';
+      const m = s.match(/^(\d{1,2})(?::(\d{2}))?\s*(am|pm)?/);
+      if (!m) return '';
+      let h = parseInt(m[1], 10);
+      const mins = m[2] || '00';
+      if (m[3] === 'pm' &amp;&amp; h &lt; 12) h += 12;
+      if (m[3] === 'am' &amp;&amp; h === 12) h = 0;
+      if (h &lt; 0 || h &gt; 23) return '';
+      return `${String(h).padStart(2, '0')}:${mins}`;
+    };
+
+    // "14:00" -&gt; "2pm", because the agent says these out loud
+    const spoken = (t: string): string =&gt; {
+      const h = parseInt(t.slice(0, 2), 10);
+      return h === 12 ? '12pm' : h &lt; 12 ? `${h}am` : `${h - 12}pm`;
+    };
+
+    const DATE_HELP = "Ask the caller which day, then pass the literal word "
+      + "'today' or 'tomorrow', a weekday name, or a YYYY-MM-DD date. "
+      + "Never guess dates yourself.";
+
+    if (toolName === 'check_availability') {
+      const date = normaliseDate(args.date || args.booking_date || '');
+      if (!date) {
+        return new Response(JSON.stringify({ success: false,
+          message: `Date missing or in the past. ${DATE_HELP}` }),
+          { status: 200, headers });
+      }
+      let bookedTimes: string[] = [];
+      try {
+        const existing = await base44.asServiceRole.entities.Booking.filter({ date });
+        bookedTimes = (existing || [])
+          .filter((b: any) =&gt; b.status === 'pending' || b.status === 'confirmed')
+          .map((b: any) =&gt; b.time);
+      } catch (e) { bookedTimes = []; }
+      const available = SLOTS.filter((s: string) =&gt; !bookedTimes.includes(s));
+      return new Response(JSON.stringify({
+        success: true, date,
+        available_slots: available,
+        available_slots_spoken: available.map(spoken),
+        message: available.length &gt; 0
+          ? `Slots open on ${date}: ${available.slice(0, 3).map(spoken).join(', ')}. Offer two or three, not the whole list.`
+          : `No slots left on ${date}. Offer the next day.`,
+      }), { status: 200, headers });
+    }
+
+    if (toolName === 'create_booking') {
+      const name = args.name || args.first_name || 'Customer';
+      const phone = args.phone || 'caller ID (on call record)';
+      const address = args.address || '';
+      const date = normaliseDate(args.date || args.booking_date || '');
+      const time = normaliseTime(args.time || args.booking_time || '');
+
+      if (!address || !date || !time) {
+        return new Response(JSON.stringify({ success: false,
+          message: `Booking blocked. Missing or invalid: `
+            + `${!address ? 'address ' : ''}${!date ? `date (${DATE_HELP})` : ''}`
+            + `${(!date &amp;&amp; !time) ? ' and ' : ''}${!time ? 'time' : ''}. `
+            + `Get these from the caller, then try once more.` }),
+          { status: 200, headers });
+      }
+
+      try {
+        // Duplicate check: same name, date and time already saved = do not double-book
+        let existing: any = null;
+        try {
+          const dupes = await base44.asServiceRole.entities.Booking.filter({ date, time, name });
+          existing = (dupes || [])[0];
+        } catch (e) { /* ignore */ }
+
+        if (existing &amp;&amp; existing.status === 'confirmed') {
+          return new Response(JSON.stringify({
+            success: true, booking_id: existing.id, name, date, time,
+            message: `Already booked: ${name} on ${date} at ${spoken(time)}, `
+              + `${existing.address}. Read it back once and wrap up.`,
+          }), { status: 200, headers });
+        }
+
+        const created = await base44.asServiceRole.entities.Booking.create({
+          name, phone, address,
+          service: args.service || DEFAULT_SERVICE,
+          date, time, status: 'confirmed',
+        });
+
+        return new Response(JSON.stringify({
+          success: true, booking_id: created?.id, name, date, time,
+          message: `Booked: ${name} on ${date} at ${spoken(time)}, ${address}. `
+            + `Read it back once, ${WRAP_NOTE}, then wrap up.`,
+        }), { status: 200, headers });
+      } catch (e) {
+        console.log('create error:', String(e));
+        return new Response(JSON.stringify({ success: false,
+          message: 'Booking system temporarily unavailable. Do not retry more '
+            + 'than once. Say someone will call back to confirm.' }),
+          { status: 200, headers });
+      }
+    }
+
+    return new Response(JSON.stringify({ success: false,
+      message: `Unknown tool: ${toolName}` }), { status: 200, headers });
+  } catch (e) {
+    console.log('endpoint error:', String(e));
+    return new Response(JSON.stringify({ success: false,
+      message: 'Tool endpoint error.' }), { status: 200, headers });
+  }
+});
+```
+
+## Part 3: the inbound_call_router function
+
+Retell calls this when a call arrives on the number, before the agent starts
+speaking. It returns which agent answers and any variables that agent should know.
+
+- Input: Retell's inbound call payload, which includes the caller's number.
+- Output: the agent id to use, plus any dynamic variables the greeting needs, for
+  example `{BUSINESS_NAME}` and today's date in `{CLIENT_TIMEZONE}`.
+- Keep it fast and boring. If it errors, the call fails.
+
+## Part 4: the retell_webhook function
+
+Retell posts call events here: `call_started`, `call_ended` and `call_analyzed`.
+
+For V1, receive all three, verify the signature the same way `booking_api` does,
+and log them so the owner can see what happened on a call. `call_analyzed` carries
+the post-call analysis fields, which is where the call summary lives.
+
+### CallLog entity, designed now, built later
+
+The design is here so it is ready when the owner wants reporting. Do not build it
+unless they ask.
+
+- `call_id` (text) the Retell call id
+- `call_date` (text)
+- `duration_seconds` (number)
+- `caller_phone` (text)
+- `outcome` (choice: booking, message, transfer, question, other)
+- `summary` (text) from the post-call analysis
+- `disconnection_reason` (text)
+
+When it exists, `retell_webhook` writes one row per `call_analyzed` event and the
+owner gets per-client monthly reporting for free.
+
+### Reference implementation for the webhook
+
+The canonical shape, reconstructed from the same live build. For V1 without the
+CallLog entity, keep the entity write commented out and the console log in: the
+function still proves calls are landing. Always return 200, even on errors,
+because Retell retries on anything else and a retry storm on a broken handler is
+miserable to debug.
+
+```typescript
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+Deno.serve(async (req) =&gt; {
+  const headers = { 'Content-Type': 'application/json' };
+  try {
+    const raw = await req.text();
+    let event: any = {};
+    try { event = JSON.parse(raw); } catch { /* ignore */ }
+
+    const eventType = event.event_type || event.event || '';
+    const call = event.call || event;
+    const callId = call.call_id || event.call_id || '';
+    console.log('retell_webhook event:', eventType, 'call:', callId);
+
+    const base44 = createClientFromRequest(req);
+
+    if (eventType === 'call.ended' || eventType === 'call_analyzed'
+        || event.call_analysis || event.post_call_analysis) {
+      const analysis = event.post_call_analysis || event.call_analysis || {};
+      try {
+        // Upsert by call_id: read first, then create or update
+        const existing = await base44.asServiceRole.entities.CallLog.filter({ call_id: callId });
+        const payload = {
+          call_id: callId,
+          agent_id: call.agent_id || '',
+          direction: call.direction || '',
+          from_number: call.from_number || '',
+          to_number: call.to_number || '',
+          duration_seconds: call.call_cost?.duration_seconds ?? 0,
+          disconnection_reason: call.disconnection_reason || '',
+          call_summary: analysis.call_summary || '',
+          caller_name: analysis.data?.caller_name || '',
+          caller_number: analysis.data?.caller_number || call.from_number || '',
+          booking_made: analysis.data?.booking_made ?? false,
+        };
+        if ((existing || []).length &gt; 0) {
+          await base44.asServiceRole.entities.CallLog.update(existing[0].id, payload);
+        } else {
+          await base44.asServiceRole.entities.CallLog.create(payload);
+        }
+      } catch (e) {
+        console.log('CallLog write failed:', String(e));
+        // Still return 200 so Retell does not retry-storm
+      }
+    }
+
+    return new Response(JSON.stringify({ received: true }), { status: 200, headers });
+  } catch (e) {
+    return new Response(JSON.stringify({ received: true, error: String(e) }), { status: 200, headers });
+  }
+});
+```
+
+## What this V1 does NOT do
+
+- **No SMS.** Do not build, promise or mention a text message to the caller or to
+  staff. On an Australian number that needs a Twilio regulatory bundle and a
+  messaging permission that are not in place. The Booking entity is the source of
+  truth: the owner checks bookings in the app, or asks their co-founder agent for
+  the day's bookings. SMS is the first upgrade once the paperwork clears, not part
+  of V1. `[VERIFY: SMS dispatch is blocked pending the Twilio regulatory bundle.]`
+- **No calendar.** Google Calendar and platform booking APIs are a later tier. The
+  entity is the calendar in V1.
+
+## Read-back verification, do this before you say you are finished
+
+Print each of these and compare them to what the owner asked for, one at a time.
+Do not summarise. Show the actual values.
+
+1. The Booking entity name and every field name and type.
+2. The full live URL of `booking_api`, `inbound_call_router` and `retell_webhook`.
+   Read the app subdomain character by character. A wrong URL means every tool the
+   agent fires will fail silently and the conversation will sound fine while
+   nothing gets saved.
+3. `{CLIENT_TIMEZONE}` exactly as it will be used in the date code.
+4. The open time, close time and slot length.
+5. A live test: call `check_availability` with `date` set to the literal word
+   `tomorrow` and show the resolved date it returns. Confirm with the owner that
+   this is genuinely tomorrow where the client is.
+6. A live test: call `create_booking` with a made-up name, then show the new
+   Booking row. Then delete the test row.
+
+Only when all six read back correctly do you tell the owner the backend is ready
+for the agent to be built on top of it.
+
+Once it is saved: read it, and reply &quot;ready to build the booking side&quot; when you understand it. Do not build anything yet.</pre><span class="sfade" aria-hidden="true"></span><span class="shint">SCROLL TO READ IT, OR JUST TAP COPY</span></div><div class="see"><b>You should see:</b> it saves the skill and tells you it is ready. Nothing is built yet, that is correct.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">3</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 03</span><span class="step-title-text">Look for a Real Business to Build For.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>You are about to build a receptionist. It needs a business to be a receptionist for.</p><p>Pick a real one near you. A plumber, a cleaner, a mobile dog groomer, an electrician. It needs a phone number and a website with their services on it.</p><p>You are not selling to them today. You just need something real, because a receptionist built for a made up business teaches you nothing and sounds like nothing.</p><p>Open a note on your phone and copy in three things: their business name, their website address, and their opening hours.</p><div class="see"><b>You should have:</b> a name, a web address and a set of hours, sitting in a note you can paste from.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">4</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 04</span><span class="step-title-text">Tell Your Co-Founder About Them.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Fill in the square brackets with what you just wrote down.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Here is the business I am building the receptionist for.
+
+Business name: [THEIR NAME]
+What they do: [PLUMBER, CLEANER, WHATEVER THEY ARE]
+Their website: [THEIR WEB ADDRESS]
+Their opening hours: [THEIR HOURS]
+The timezone they are in: [YOUR TIMEZONE, WRITTEN LIKE Australia/Brisbane]
+How long one job takes: [60 MINUTES IS A FINE GUESS]
+
+We are building inside the AI Receptionist app I just made. Save all of that and read it back to me. Do not build anything yet.</pre></div><p>If you do not know your timezone written that way, ask your co-founder and it will tell you.</p><div class="see"><b>You should see:</b> your six answers read back correctly, and nothing built yet.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">5</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 05</span><span class="step-title-text">Build the Bookings Table.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>One row per booking. This is the thing the business owner actually looks at.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your receptionist-booking-backend skill, build part 1 only: create the Booking table in my AI Receptionist app, with exactly the fields the skill lists.
+
+Do not build any functions yet. Tell me when it is saved and list the fields back to me.</pre></div><figure class="shot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.4-2h6.2L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9z"/><circle cx="12" cy="13" r="3.4"/></svg><figcaption>THE BOOKING TABLE</figcaption></figure><div class="see"><b>You should see:</b> a table called Booking with seven fields: name, phone, address, date, time, service and status. Empty for now.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">6</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 06</span><span class="step-title-text">Build the Booking Engine.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>This is the piece that does the thinking. It works out what day the caller means, checks whether that time is free, and saves the booking.</p><p>All of that happens here, in code, and none of it happens in the AI's head. That is on purpose and you will see why on the next page.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your receptionist-booking-backend skill, build part 2: the booking_api function, with both of its actions, check_availability and create_booking.
+
+Use the timezone I gave you for every date. Work out the words today and tomorrow on the server, and refuse any date that has already been. Check the X-Retell-Signature header on every request before you read anything else.
+
+Tell me when it is live and give me its full web address.</pre></div><div class="see"><b>You should see:</b> the function live, and a web address that ends in /functions/booking_api. Paste that address into your note. You need it on the next page.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">7</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 07</span><span class="step-title-text">Add the Two Call Handlers.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Two small pieces. One decides which receptionist answers when a call comes in. The other catches what happened after the call ends.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Using your receptionist-booking-backend skill, build part 3: the two call handlers.
+
+inbound_call_router, which tells the phone system which agent should answer this call.
+retell_webhook, which catches the call events after every call, including the summary.
+
+Same signature check on both. Give me the full web address of each one.</pre></div><div class="see"><b>You should see:</b> two more web addresses. Put both in your note next to the first one, so you have all three in one place.</div>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">8</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 08</span><span class="step-title-text">Make a Test Booking.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Nobody is on the phone yet, so you play the part of the AI and make it take a booking in chat.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Test the booking engine for me, pretending you are the voice on a call.
+
+1. Call check_availability with the date set to the single word tomorrow. Show me the date it worked out and the times it offered.
+2. Call create_booking for a customer called Test Person, phone 0400 000 000, address 1 Test Street, for one of those times.
+3. Show me the row that got saved.
+
+Then tell me plainly: is the date it saved really tomorrow where this business is?</pre></div><figure class="shot"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8.5A1.5 1.5 0 0 1 5.5 7h2l1.4-2h6.2L16.5 7h2A1.5 1.5 0 0 1 20 8.5v9a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 17.5v-9z"/><circle cx="12" cy="13" r="3.4"/></svg><figcaption>THE ROW IN YOUR TABLE</figcaption></figure><div class="see"><b>You should see:</b> a real date, tomorrow's date, and a new row sitting in the Booking table with Test Person in it.</div><p>If it comes back with a date from a different year, the date work is happening in the wrong place. Tell your co-founder to move it onto the server and try again.</p>
+<button type="button" class="btn-done" hidden>Done, next</button>
+</div>
+</section></li>
+
+<li><section class="step is-locked">
+<div class="step-head">
+<span class="step-badge" aria-hidden="true">9</span>
+<div class="step-heading"><h2 class="step-title"><span class="step-n">Step 09</span><span class="step-title-text">Read the Three Addresses Back.</span></h2></div>
+<span class="step-chip is-locked"></span>
+</div>
+<p class="step-locked-note" hidden>Finish the step above to unlock this one.</p>
+<div class="step-body" hidden><p>Boring, and it saves you an hour later. Every one of the next two pages depends on these three addresses being exactly right.</p><div class="pwrap"><div class="plabel">SAY THIS TO YOUR CO-FOUNDER</div><button class="copy" onclick="cp(this)">Copy</button><pre>Read the three web addresses back to me one at a time, character by character: booking_api, inbound_call_router and retell_webhook.
+
+Then delete the Test Person booking so the table is empty again.</pre></div><div class="see"><b>You should see:</b> three addresses, all on your own app, and an empty Booking table. Check them against your note character by character.</div>
+<button type="button" class="btn-done" hidden>Finish this page</button>
+</div>
+</section></li>
+</ol>
+
+<div class="outro" id="outro">
+<div class="finish-badge" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4.5 12.5 9.5 17.5 19.5 6.5"/></svg></div>
+<h2 class="finish-title">The Engine Is Built</h2>
+<p class="finish-sub">Somewhere for every booking to land, and it already knows what day tomorrow is. Now the voice that takes them.</p>
+<button type="button" class="cblock-btn">Complete This Page</button>
+<a class="next" href="receptionists-c.html">Next: Build The Receptionist &rarr;</a>
+</div>
+<p class="helpline">Something not working the way this page says it should? Post it in the group with a screenshot. Someone will get you moving.</p>
+<button type="button" class="startover">Start this page over</button>
+</main>
+<script>
+window.PAGECFG={"miles": [], "downloads": []};
+(function(){
+  var KEY='course.m6.b';
+  var CFG=window.PAGECFG||{miles:[],downloads:[]};
+  var lis=[].slice.call(document.querySelectorAll('.steps > li'));
+  var total=lis.length;
+  var segs=[].slice.call(document.querySelectorAll('.segment'));
+  var countEl=document.getElementById('done-count');
+  var outro=document.getElementById('outro');
+  function getDone(){try{var v=parseInt(localStorage.getItem(KEY),10);return isNaN(v)?0:Math.min(v,total);}catch(e){return 0;}}
+  function setDone(n){try{localStorage.setItem(KEY,String(n));}catch(e){}}
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  /* ---- audio ---- */
+  var ac=null;
+  function ctx(){try{if(!ac){var C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C();}if(ac.state==='suspended')ac.resume();return ac;}catch(e){return null;}}
+  function ding(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.13;out.connect(a.destination);[[880,0,0.34],[1318.5,0.075,0.32]].forEach(function(n){var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(n[0],now+n[1]);g.gain.setValueAtTime(0.0001,now+n[1]);g.gain.exponentialRampToValueAtTime(1,now+n[1]+0.012);g.gain.exponentialRampToValueAtTime(0.0001,now+n[1]+n[2]);o.connect(g);g.connect(out);o.start(now+n[1]);o.stop(now+n[1]+n[2]+0.05);});}
+  function fanfare(){var a=ctx();if(!a)return;var now=a.currentTime;var out=a.createGain();out.gain.value=0.12;out.connect(a.destination);[523.25,659.25,783.99,1046.5].forEach(function(f,i){var at=i*0.11;var o=a.createOscillator(),g=a.createGain();o.type='triangle';o.frequency.setValueAtTime(f,now+at);g.gain.setValueAtTime(0.0001,now+at);g.gain.exponentialRampToValueAtTime(1,now+at+0.015);g.gain.exponentialRampToValueAtTime(0.0001,now+at+0.7);o.connect(g);g.connect(out);o.start(now+at);o.stop(now+at+0.75);});}
+  function tickSnd(){var a=ctx();if(!a)return;var now=a.currentTime;var o=a.createOscillator(),g=a.createGain();o.type='sine';o.frequency.setValueAtTime(1650,now);o.frequency.exponentialRampToValueAtTime(950,now+0.05);g.gain.setValueAtTime(0.0001,now);g.gain.exponentialRampToValueAtTime(0.06,now+0.006);g.gain.exponentialRampToValueAtTime(0.0001,now+0.06);o.connect(g);g.connect(a.destination);o.start(now);o.stop(now+0.08);}
+  /* ---- confetti ---- */
+  function confetti(){if(reduce)return;var cv=document.createElement('canvas');cv.setAttribute('aria-hidden','true');cv.style.cssText='position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:9999';document.body.appendChild(cv);var c=cv.getContext('2d');if(!c){cv.remove();return;}var dpr=Math.min(window.devicePixelRatio||1,2);var w=window.innerWidth,h=window.innerHeight;cv.width=w*dpr;cv.height=h*dpr;c.scale(dpr,dpr);var cols=['#32d09f','#14926c','#8b5cf6','#c9b6f9','#8b5cf6','#15171d'];var n=w<600?90:160;var ps=[];for(var i=0;i<n;i++){ps.push({x:w*(0.5+(Math.random()-0.5)*0.5),y:h*0.35+Math.random()*40,vx:(Math.random()-0.5)*9,vy:-6-Math.random()*9,s:5+Math.random()*7,r:Math.random()*Math.PI,vr:(Math.random()-0.5)*0.35,col:cols[Math.floor(Math.random()*cols.length)]});}var st=performance.now(),raf=0,dur=2000;function fr(now){var el=now-st,life=Math.min(el/dur,1);c.clearRect(0,0,w,h);ps.forEach(function(p){p.vy+=0.32;p.vx*=0.995;p.x+=p.vx;p.y+=p.vy;p.r+=p.vr;c.save();c.translate(p.x,p.y);c.rotate(p.r);c.globalAlpha=1-life*life;c.fillStyle=p.col;c.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6);c.restore();});if(el<dur){raf=requestAnimationFrame(fr);}else{cancelAnimationFrame(raf);cv.remove();}}raf=requestAnimationFrame(fr);}
+  /* ---- icons ---- */
+  var LOCK='<svg viewBox="0 0 20 20" width="15" height="15" aria-hidden="true"><rect x="4.5" y="8.5" width="11" height="8" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7.2 8.5V6.6a2.8 2.8 0 0 1 5.6 0v1.9" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+  var TICK='<svg viewBox="0 0 20 20" width="16" height="16" aria-hidden="true"><path d="M4.5 10.5 8.3 14.3 15.5 6.4" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  var FLAGI='<svg viewBox="0 0 20 20" width="13" height="13" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 17V3.5"/><path d="M5 4h9.5l-2.2 3 2.2 3H5" fill="currentColor" stroke="none"/></svg>';
+  var BOLT='<svg viewBox="0 0 20 20" aria-hidden="true" fill="currentColor"><path d="M11 2 4 11.5h4.4L8.6 18l7-9.5h-4.4L11 2z"/></svg>';
+  var FILE='<svg viewBox="0 0 20 20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M11.5 2.5H5.8A1.3 1.3 0 0 0 4.5 3.8v12.4a1.3 1.3 0 0 0 1.3 1.3h8.4a1.3 1.3 0 0 0 1.3-1.3V6.5l-4-4z"/><path d="M11.5 2.5v4h4"/><path d="M10 9v5m0 0-2.2-2.2M10 14l2.2-2.2"/></svg>';
+  /* ---- classify step types ---- */
+  var ACT=/^(go |open |ring|make the call|watch|download|upload|get |send |text |scroll|look for|note the|swap in|click around)/i;
+  lis.forEach(function(li,i){
+    var card=li.querySelector('.step');if(!card)return;
+    var t='';
+    if(card.querySelector('.prompt:not(.chat)'))t='t-build';
+    else if(card.querySelector('.prompt.chat'))t='t-chat';
+    var pl=card.querySelector('.pwrap .plabel');
+    if(pl){var lt=pl.textContent.toUpperCase();
+      if(lt.indexOf('PHONE')>-1){t='t-phone';pl.parentNode.classList.add('is-phone');pl.textContent='On the call';}
+      else t='t-chat';}
+    var titleEl=card.querySelector('.step-title-text');
+    var title=titleEl?titleEl.textContent:'';
+    if(!t&&ACT.test(title.trim()))t='t-act';
+    if(CFG.miles.some(function(m){return title.indexOf(m)>-1;}))t=(t?t+' ':'')+'t-mile';
+    if(t)card.setAttribute('data-t',t);
+    var body=card.querySelector('.step-body');
+    if(body&&/(^|\s)t-mile(\s|$)/.test(t)){var mt=document.createElement('span');mt.className='mile-tag';mt.innerHTML=FLAGI+' CHECKPOINT';body.insertBefore(mt,body.firstChild);}
+    else if(body&&t==='t-act'){var ar=document.createElement('span');ar.className='act';ar.innerHTML=BOLT+' REAL WORLD MOVE';body.insertBefore(ar,body.firstChild);}
+  });
+  /* ---- file download chips ---- */
+  CFG.downloads.forEach(function(d){
+    var li=lis[d.step];if(!li)return;
+    var pre=li.querySelector('.pwrap pre');if(!pre)return;
+    var chip=document.createElement('button');chip.type='button';chip.className='filechip';
+    chip.innerHTML=FILE+d.name+' <small>download</small>';
+    chip.addEventListener('click',function(){
+      try{var blob=new Blob([pre.innerText],{type:'text/markdown'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=d.name;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},400);tickSnd();}
+      catch(e){var btn=li.querySelector('.copy');if(btn)btn.click();}
+    });
+    var wrap=li.querySelector('.pwrap');wrap.parentNode.insertBefore(chip,wrap);
+  });
+  /* ---- render ---- */
+  function render(done,animateIdx){
+    lis.forEach(function(li,i){
+      var st=i<done?'done':(i===done?'open':'locked');
+      var card=li.querySelector('.step');
+      var t=card.getAttribute('data-t')||'';
+      card.className='step is-'+st+(t?' '+t.split(' ').join(' '):'')+(i===animateIdx?' just-passed':'');
+      li.className=i<done?'spine-on':'';
+      var badge=card.querySelector('.step-badge');
+      var isMile=t.indexOf('t-mile')>-1;
+      badge.innerHTML=st==='done'?TICK:(st==='locked'?LOCK:(isMile?FLAGI:String(i+1)));
+      var chip=card.querySelector('.step-chip');
+      chip.className='step-chip is-'+st;
+      chip.innerHTML=st==='done'?'Done':(st==='locked'?LOCK:(isMile?'Checkpoint':'Start'));
+      var body=card.querySelector('.step-body');
+      if(body)body.hidden=(st==='locked');
+      var note=card.querySelector('.step-locked-note');
+      if(note)note.hidden=(st!=='locked');
+      var btn=card.querySelector('.btn-done');
+      if(btn)btn.hidden=(st!=='open');
+    });
+    segs.forEach(function(s,i){s.className='segment'+(i<done?' is-filled':(i===done?' is-current':''));});
+    if(countEl)countEl.textContent=String(done);
+  }
+  lis.forEach(function(li,i){
+    var btn=li.querySelector('.btn-done');
+    if(!btn)return;
+    btn.addEventListener('click',function(){
+      var done=getDone();
+      if(i!==done)return;
+      var card=li.querySelector('.step');
+      var mile=(card.getAttribute('data-t')||'').indexOf('t-mile')>-1;
+      done+=1;setDone(done);
+      if(done>=total){fanfare();}else if(mile){fanfare();}else{ding();}
+      render(done,i);
+      var target=done<total?lis[done]:outro;
+      if(target)setTimeout(function(){var hdr=document.querySelector('.progress');var off=(hdr&&hdr.offsetHeight?hdr.offsetHeight:0)+16;var y=target.getBoundingClientRect().top+window.pageYOffset-off;window.scrollTo({top:y<0?0:y,behavior:reduce?'auto':'smooth'});},320);
+    });
+  });
+  var so=document.querySelector('.startover');
+  if(so)so.addEventListener('click',function(){try{localStorage.removeItem('done:'+location.pathname);}catch(e){}setDone(0);render(0,-1);location.reload();});
+  /* ---- copy ---- */
+  function doCopy(text,btn){function ok(){tickSnd();btn.textContent='Copied';btn.classList.add('did');setTimeout(function(){btn.textContent='Copy';btn.classList.remove('did');},2000);}function fb(){var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');ok();}catch(e){}ta.remove();}
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(ok,fb);}else{fb();}}
+  window.cp=function(b){var pre=b.parentNode.querySelector('pre');doCopy(pre?pre.innerText:'',b);};
+  [].slice.call(document.querySelectorAll('.prompt')).forEach(function(box){
+    var text=box.innerText;
+    var btn=document.createElement('button');btn.className='copybtn';btn.type='button';btn.textContent='Copy';
+    btn.addEventListener('click',function(){doCopy(text,btn);});
+    box.appendChild(btn);
+  });
+  render(getDone(),-1);
+  window.__confetti=confetti;window.__ding=ding;
+})();
+
+</script>
+<script>
+/* ---- complete card ---- */
+(function(){
+  var reduce=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var wrap=document.getElementById('outro');
+  if(!wrap)return;
+  var btn=wrap.querySelector('.cblock-btn');
+  if(!btn)return;
+  var key='done:'+location.pathname;
+  function markDone(){
+    btn.textContent='Completed';
+    btn.classList.add('is-done');
+    btn.disabled=true;
+    wrap.classList.add('is-done');
+  }
+  try{if(localStorage.getItem(key)==='1')markDone();}catch(e){}
+  btn.addEventListener('click',function(){
+    try{localStorage.setItem(key,'1');}catch(e){}
+    markDone();
+    try{if(!reduce&&window.__confetti)window.__confetti();if(window.__ding)window.__ding();}catch(e){}
+  });
+})();
+</script>
+<script src="/nav.js" defer></script>
+</body>
+</html>
