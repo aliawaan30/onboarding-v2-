@@ -15,7 +15,7 @@ export const LOOM_URLS: Record<number, string> = {
   5: '/course-media/onboarding/onboarding-05-soul-v2.mp4', // the soul interview
   6: '/course-media/onboarding/onboarding-06-skills-v2.mp4', // load its skills
   7: '', // find your goldmine, not filmed yet
-  8: '/course-media/onboarding/onboarding-08-checkins-v2.mp4', // keep you honest
+  8: '/course-media/onboarding/onboarding-08-checkins-v3.mp4', // keep you honest
   9: '/course-media/onboarding/onboarding-09-phone.mp4', // put it in your phone
   10: '/course-media/onboarding/onboarding-10-website.mp4', // see what it can do
   11: '/course-media/onboarding/onboarding-11-outro-v2.mp4', // get your key (interim, Blake reshooting off GET-YOUR-KEY-SCRIPT.md)

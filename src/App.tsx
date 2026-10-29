@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import type { Session } from '@supabase/supabase-js'
 import { isConfigured, supabase } from './lib/supabase'
 import type { Gates, Path, Student, StudentPatch } from './lib/types'
-import { INTRO, NAME_STEP, TOTAL_STEPS, WATCH, stepsFor, type Ctx } from './content/steps'
+import { INTRO, NAME_STEP, TOTAL_STEPS, stepsFor, watchFor, type Ctx } from './content/steps'
 import { matchesBrainReply, matchesCode, matchesPhrase } from './lib/gates'
 import { ding, fanfare } from './lib/sound'
 import { buzz } from './lib/haptics'
@@ -173,6 +173,8 @@ export default function App() {
       biz: path === 'business',
     }
   }, [student?.agent_name, student?.first_name, path])
+
+  const WATCH = watchFor(ctx.biz)
 
   const completed = student?.current_step ?? 0
   const gates = student?.gates ?? {}
@@ -456,7 +458,7 @@ export default function App() {
               </div>
               {path && (!watchDone || showWatch) && (
                 <div className="step-body">
-                  <LoomEmbed step={0} label={WATCH.videoLabel} />
+                  {WATCH.videoLabel !== '' && <LoomEmbed step={0} label={WATCH.videoLabel} />}
                   <div className="watch-alert">
                     <p className="watch-alert-title">Watch this 1 minute video before you start</p>
                     <div className="video">

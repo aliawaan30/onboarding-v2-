@@ -104,6 +104,23 @@ export const WATCH = {
   gateLabel: "Watched it. Let's build",
 }
 
+/** Business owner version of the intro. The 5 minute intro video is agency only, so it is hidden here. */
+export const WATCH_BUSINESS: typeof WATCH = {
+  ...WATCH,
+  title: 'Before you start',
+  time: '~1 min',
+  videoLabel: '',
+  body: () => [
+    'Today you build your business its own AI chief of staff. It learns how your business really runs, audits it like a consultant would, and builds your first automation with you.',
+    'Watch the short video above on how this page works, then press the button.',
+  ],
+  gateLabel: "Got it. Let's build",
+}
+
+export function watchFor(biz: boolean): typeof WATCH {
+  return biz ? WATCH_BUSINESS : WATCH
+}
+
 export const STEPS: StepDef[] = [
   {
     n: 1,
@@ -371,7 +388,8 @@ export const TOTAL_STEPS = STEPS.length
 
 
 /**
- * Business owner path. Same steps, same order, same videos. Only the copy that
+ * Business owner path. Same steps, same order. The agency only videos (intro and steps 5,
+ * 6, 8, 10 and 11) are hidden on this path until business versions are filmed. Only the copy that
  * talks about an agency changes, plus Step 10 rebuilds their own website
  * instead of the brand showcase.
  */
@@ -413,6 +431,7 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
       `${c.agent} tells you who it is and what it will do for your business. Not a generic AI answer. That is the brain working.`,
   },
   5: {
+    videoLabel: '',
     title: 'The business interview',
     body: (c) => [
       `The big one. Everything so far made ${c.agent} smart. This is where it learns how your business really runs, like a consultant on a discovery call.`,
@@ -423,6 +442,7 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
       'a practical conversation about how your business runs. It ends with a summary of your business, its first look at the top three automations for you, and then your code.',
   },
   6: {
+    videoLabel: '',
     body: (c) => [
       `Skills are the jobs ${c.agent} knows how to do. We have built every skill it needs to run the busy work of your business.`,
       `Auditing your business like a consultant, building automations, catching every enquiry, writing replies, chasing quotes, handling reviews and planning for missed calls. Give this file to ${c.agent} the same way you gave it the brain.`,
@@ -447,6 +467,7 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
       'a map of how your business runs today, then a ranked list of automations with rough time or money saved, and which ones it can build now.',
   },
   8: {
+    videoLabel: '',
     title: 'Set up your check-ins',
     body: (c) => [
       `Every busy owner needs someone keeping an eye on things. Yours comes built in.`,
@@ -467,6 +488,7 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
       `${c.agent} says both are live. Then check for yourself: open its Automations page and you should see two, the daily brief and the weekly wrap. If they are not there, ask it to set them up again.`,
   },
   10: {
+    videoLabel: '',
     title: 'See what it can do',
     time: 'Your first automation',
     body: (c) => [
@@ -484,9 +506,11 @@ const BUSINESS_OVERRIDES: Record<number, Partial<StepDef>> = {
       'a short plan, then your first automation built and tested, with the test result. Nothing touches a real customer without your yes.',
   },
   11: {
+    videoLabel: '',
     body: (c) => [
       `One thing left. ${c.agent} has been holding your key the whole time, and it only hands it over once everything above is genuinely done. Send it this.`,
       `Your key opens the community, where you'll find extra help and ideas. From here ${c.agent} works through your automation plan with you, keeps every enquiry from going cold, and checks in on the days you told it.`,
+      `Want the whole system built and looked after for you? Blake's team builds custom AI systems for businesses. Ask ${c.agent} about it any time.`,
     ],
   },
 }
