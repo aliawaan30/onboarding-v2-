@@ -10,7 +10,7 @@ const RESEND_AFTER = 30
 // is not in the email. Flip this to true the moment both templates are updated
 // (Authentication -> Emails -> Templates: Magic Link AND Confirm signup); the
 // code path underneath is built and stays ready.
-const EMAIL_HAS_CODE = false
+const EMAIL_HAS_CODE = true
 
 // Crew door for filming and testing: add ?pw to the URL and a password field
 // appears. Signs in with a password set in Supabase Studio, no email involved.
