@@ -229,7 +229,7 @@ export function SignIn() {
         ) : (
           <>
             <p className="auth-body">
-              Pop your email in and we will send you a one tap sign in link. No password to remember.
+              {EMAIL_HAS_CODE ? 'Pop your email in and we will send you a six digit sign in code. No password to remember.' : 'Pop your email in and we will send you a one tap sign in link. No password to remember.'}
             </p>
             <form onSubmit={onSubmit} className="auth-form">
               <label className="gate-label" htmlFor="email">
@@ -279,7 +279,7 @@ export function SignIn() {
                 </p>
               )}
               <button type="submit" className="btn btn-primary" disabled={busy || email.trim().length === 0}>
-                {busy ? 'Sending' : 'Send my link'}
+                {busy ? 'Sending' : EMAIL_HAS_CODE ? 'Send my code' : 'Send my link'}
               </button>
               <p className="gate-msg is-wrong" aria-live="polite">
                 {error}
